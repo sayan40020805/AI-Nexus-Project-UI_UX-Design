@@ -1,15 +1,26 @@
 /* App.css - Custom styles for App component */
 
-/* App.css - Modern Dark Theme with 3D Effects */
+/* App.css - Modern Dark Theme with Sidebar Layout */
 
-main.app {
-  min-height: 100vh;
-  background-color: var(--bg);
-  transition: background-color 0.3s ease-in-out;
-  perspective: 1000px;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-main.app::before {
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--bg);
+}
+
+.app-layout::before {
   content: '';
   position: fixed;
   top: 0;
@@ -23,10 +34,35 @@ main.app::before {
   z-index: -1;
 }
 
-.app-section {
-  position: relative;
-  scroll-margin-top: 80px;
-  animation: fadeInUp 0.8s ease-out;
+/* Header - Fixed at top */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  z-index: 50;
+}
+
+/* Main content area */
+.app-main-content {
+  flex: 1;
+  margin-top: 70px;
+  width: 100%;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Desktop layout - sidebar visible on left */
+@media (min-width: 1024px) {
+  .app-main-content {
+    margin-left: 280px;
+  }
+}
+
+.app-content-wrapper {
+  width: 100%;
+  min-height: calc(100vh - 70px);
+  animation: fadeInUp 0.6s ease-out;
 }
 
 @keyframes fadeInUp {
@@ -38,6 +74,20 @@ main.app::before {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Footer */
+footer {
+  width: 100%;
+  margin-top: auto;
+  z-index: 10;
+}
+
+/* Sections & Typography */
+.app-section {
+  position: relative;
+  scroll-margin-top: 80px;
+  animation: fadeInUp 0.8s ease-out;
 }
 
 .app-section-hero {
@@ -57,36 +107,6 @@ main.app::before {
 .app-section-content {
   position: relative;
   z-index: 1;
-}
-
-.app-main {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 4rem 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 5rem;
-}
-
-@media (max-width: 1024px) {
-  .app-main {
-    padding: 3rem 2rem;
-    gap: 4rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .app-main {
-    padding: 2rem 1rem;
-    gap: 2.5rem;
-  }
-}
-
-@media (max-width: 640px) {
-  .app-main {
-    padding: 1.5rem 1rem;
-    gap: 2rem;
-  }
 }
 
 .section-title {
@@ -125,13 +145,34 @@ main.app::before {
   }
 }
 
+/* Content Padding */
+.app-main {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 5rem;
+}
+
+/* Responsive Design */
 @media (max-width: 1024px) {
+  .app-main {
+    padding: 3rem 2rem;
+    gap: 4rem;
+  }
+
   .section-title {
     font-size: 2.5rem;
   }
 }
 
 @media (max-width: 768px) {
+  .app-main {
+    padding: 2rem 1rem;
+    gap: 2.5rem;
+  }
+
   .section-title {
     font-size: 1.875rem;
     margin-bottom: 1rem;
@@ -149,7 +190,17 @@ main.app::before {
 }
 
 @media (max-width: 640px) {
+  .app-main {
+    padding: 1.5rem 1rem;
+    gap: 2rem;
+  }
+
   .section-title {
     font-size: 1.5rem;
   }
+
+  .app-main-content {
+    padding-top: 0;
+  }
 }
+

@@ -10,7 +10,7 @@
   font-size: 0.875rem;
   font-weight: 500;
   transition: all 0.2s ease-in-out;
-  border: none;
+  border-radius:2px;
   cursor: pointer;
   outline: none;
   position: relative;

@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Header } from './components/Header';
+import { ModernSidebar } from './components/ModernSidebar';
 import { Hero } from './components/Hero';
 import { AIShowcase } from './components/AIShowcase';
 import { Community } from './components/Community';
@@ -8,137 +10,106 @@ import { JobBoard } from './components/JobBoard';
 import { ModelDirectory } from './components/ModelDirectory';
 import { NewsFeed } from './components/NewsFeed';
 import { Footer } from './components/Footer';
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarInset,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarTrigger,
-} from './components/ui/sidebar';
-import { Home, Newspaper, Sparkles, Cpu, Briefcase, Calendar, Users, Search, User } from 'lucide-react';
+import Login from './pages/Login/Login';
+import Register from './pages/Register/Register';
+import Dashboard from './pages/Dashboard/Dashboard';
 import './App.css';
 
-function App() {
+const MainApp = () => {
   const [activeSection, setActiveSection] = useState('home');
 
   const handleNavigate = (section) => {
     setActiveSection(section);
-    const element = document.getElementById(section);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const renderSection = () => {
+    switch (activeSection) {
+      case 'home':
+        return <Hero onExploreModels={() => handleNavigate('models')} onJoinCommunity={() => handleNavigate('community')} />;
+      case 'news':
+        return <NewsFeed />;
+      case 'showcase':
+        return <AIShowcase />;
+      case 'models':
+        return <ModelDirectory />;
+      case 'career':
+        return <JobBoard />;
+      case 'events':
+        return <Events />;
+      case 'community':
+        return <Community />;
+      case 'about':
+        return (
+          <div className="app-main" style={{ padding: '4rem 2rem' }}>
+            <section className="app-section">
+              <div className="app-section-header">
+                <h2 className="section-title">About AI Nexus</h2>
+                <div className="section-underline" />
+              </div>
+              <div className="app-section-content">
+                <p style={{ color: 'var(--text-muted)', maxWidth: 820 }}>
+                  AI Nexus is a community-driven hub for models, tools, and resources in AI. This About page is a placeholder — replace with real content when ready.
+                </p>
+              </div>
+            </section>
+          </div>
+        );
+      default:
+        return <Hero onExploreModels={() => handleNavigate('models')} onJoinCommunity={() => handleNavigate('community')} />;
     }
-  };
-
-  const handleExploreModels = () => {
-    handleNavigate('models');
-  };
-
-  const handleJoinCommunity = () => {
-    handleNavigate('community');
-  };
-
-  const sidebarItems = [
-    { id: 'home', label: 'Home', icon: Home },
-    { id: 'news', label: 'News', icon: Newspaper },
-    { id: 'showcase', label: 'Showcase', icon: Sparkles },
-    { id: 'models', label: 'Models & Tools', icon: Cpu },
-    { id: 'career', label: 'Career', icon: Briefcase },
-    { id: 'events', label: 'Events', icon: Calendar },
-    { id: 'community', label: 'Community', icon: Users },
-  ];
+  }
 
   return (
-    <>
-      {/* Header Navigation */}
+    <div className="app-layout">
       <Header activeSection={activeSection} onNavigate={handleNavigate} />
-
-      {/* Main Content */}
-      <main className="app">
-        {/* Hero Section */}
-        <section id="home" className="app-section app-section-hero">
-          <Hero onExploreModels={handleExploreModels} onJoinCommunity={handleJoinCommunity} />
-        </section>
-
-        {/* Main Content Area */}
-        <div className="app-main">
-          {/* News Section */}
-          <section id="news" className="app-section">
-            <div className="app-section-header">
-              <h2 className="section-title">Latest AI News</h2>
-              <div className="section-underline"></div>
-            </div>
-            <div className="app-section-content">
-              <NewsFeed />
-            </div>
-          </section>
-
-          {/* AI Showcase Section */}
-          <section id="showcase" className="app-section">
-            <div className="app-section-header">
-              <h2 className="section-title">AI Showcase</h2>
-              <div className="section-underline"></div>
-            </div>
-            <div className="app-section-content">
-              <AIShowcase />
-            </div>
-          </section>
-
-          {/* Models & Tools Section */}
-          <section id="models" className="app-section">
-            <div className="app-section-header">
-              <h2 className="section-title">AI Models & Tools</h2>
-              <div className="section-underline"></div>
-            </div>
-            <div className="app-section-content">
-              <ModelDirectory />
-            </div>
-          </section>
-
-          {/* Career Section */}
-          <section id="career" className="app-section">
-            <div className="app-section-header">
-              <h2 className="section-title">Career Opportunities</h2>
-              <div className="section-underline"></div>
-            </div>
-            <div className="app-section-content">
-              <JobBoard />
-            </div>
-          </section>
-
-          {/* Events Section */}
-          <section id="events" className="app-section">
-            <div className="app-section-header">
-              <h2 className="section-title">Upcoming Events</h2>
-              <div className="section-underline"></div>
-            </div>
-            <div className="app-section-content">
-              <Events />
-            </div>
-          </section>
-
-          {/* Community Section */}
-          <section id="community" className="app-section">
-            <div className="app-section-header">
-              <h2 className="section-title">Community</h2>
-              <div className="section-underline"></div>
-            </div>
-            <div className="app-section-content">
-              <Community />
-            </div>
-          </section>
-        </div>
-      </main>
-
-      {/* Footer */}
+      <div className="app-main-content">
+        <ModernSidebar activeSection={activeSection} onNavigate={handleNavigate} />
+        <main className="app-content">
+          <section className="app-content-wrapper">{renderSection()}</section>
+        </main>
+      </div>
       <Footer />
-    </>
+    </div>
+  );
+};
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<MainApp />} />
+        <Route
+          path="/login"
+          element={
+            <div className="page-with-header">
+              <Header />
+              <Login />
+              <Footer />
+            </div>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <div className="page-with-header">
+              <Header />
+              <Register />
+              <Footer />
+            </div>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <div className="page-with-header">
+              <Header />
+              <Dashboard />
+              <Footer />
+            </div>
+          }
+        />
+      </Routes>
+    </Router>
   );
 }
 

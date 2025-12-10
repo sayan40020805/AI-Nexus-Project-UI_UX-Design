@@ -93,7 +93,7 @@
   display: none;
   height: 100svh;
   width: var(--sidebar-width);
-  transition: left 0.2s ease-linear, right 0.2s ease-linear, width 0.2s ease-linear;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), right 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease-linear;
 }
 
 @media (min-width: 768px) {
@@ -110,12 +110,22 @@
   left: calc(var(--sidebar-width) * -1);
 }
 
+/* When expanded/open, bring the sidebar back into view */
+.sidebar-container[data-side="left"][data-collapsible="offcanvas"][data-state="expanded"] {
+  left: 0;
+}
+
 .sidebar-container[data-side="right"] {
   right: 0;
 }
 
 .sidebar-container[data-side="right"][data-collapsible="offcanvas"] {
   right: calc(var(--sidebar-width) * -1);
+}
+
+/* When expanded/open on right side */
+.sidebar-container[data-side="right"][data-collapsible="offcanvas"][data-state="expanded"] {
+  right: 0;
 }
 
 .sidebar-container[data-variant="floating"],

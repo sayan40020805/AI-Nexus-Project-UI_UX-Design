@@ -1,4 +1,4 @@
-/* Header.css - Modern 3D Glass Morphism Design */
+/* Header.css - Clean & Functional Design */
 
 .header {
   background: rgba(10, 14, 39, 0.8);
@@ -9,19 +9,16 @@
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  height: 95px;
+  z-index: 50;
   box-shadow: 0 8px 32px rgba(125, 211, 252, 0.15), 
               0 0 50px rgba(6, 182, 212, 0.1);
   transition: all 0.3s ease-in-out;
 }
 
-.header:hover {
-  box-shadow: 0 8px 32px rgba(125, 211, 252, 0.25), 
-              0 0 60px rgba(6, 182, 212, 0.15);
-  border-bottom-color: rgba(125, 211, 252, 0.5);
-}
 
 .header-container {
+  margin-bottom: 120px;
   max-width: 100%;
   margin: 0 auto;
   padding: 1rem 2rem;
@@ -30,18 +27,11 @@
   justify-content: space-between;
 }
 
-@media (max-width: 768px) {
-  .header-container {
-    padding: 1rem;
-  }
-}
-
 .header-flex {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   width: 100%;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .header-left {
@@ -49,6 +39,13 @@
   align-items: center;
   gap: 1rem;
 }
+
+@media (max-width: 768px) {
+  .header-container {
+    padding: 1rem;
+  }
+}
+
 
 .header-logo {
   display: flex;
@@ -61,15 +58,14 @@
 }
 
 .header-logo:hover {
-  transform: scale(1.05) translateZ(20px);
-  filter: drop-shadow(0 0 20px rgba(125, 211, 252, 0.4));
+  transform: scale(1.05);
 }
 
 .header-logo-bg {
   background: linear-gradient(135deg, rgba(125, 211, 252, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%);
   padding: 0.6rem;
   border-radius: 50%;
-  border: 2px solid rgba(125, 211, 252, 0.3);
+  border: 2px solid rgba(125, 211, 252, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -83,7 +79,6 @@
   background: linear-gradient(135deg, rgba(125, 211, 252, 0.3) 0%, rgba(6, 182, 212, 0.3) 100%);
   box-shadow: 0 0 30px rgba(125, 211, 252, 0.4),
               inset 0 0 30px rgba(125, 211, 252, 0.15);
-  transform: rotate(360deg);
 }
 
 /* Dark mode logo background */
@@ -96,26 +91,12 @@
   height: 1.5rem;
   color: var(--primary);
   transition: all 0.3s ease;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    filter: drop-shadow(0 0 10px rgba(125, 211, 252, 0.3));
-  }
-  50% {
-    filter: drop-shadow(0 0 20px rgba(125, 211, 252, 0.5));
-  }
 }
 
 .header-title {
   font-size: 1.5rem;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary);
   font-weight: 700;
-  text-shadow: 0 0 20px rgba(125, 211, 252, 0.2);
   transition: all 0.3s ease-in-out;
   letter-spacing: -0.01em;
 }
@@ -136,7 +117,7 @@
   transition: all 0.3s ease-in-out;
   cursor: pointer;
   padding: 0.5rem 1rem;
-  border-radius: 6px;
+  border-radius: 8px;
   position: relative;
   font-weight: 500;
   overflow: hidden;
@@ -162,7 +143,7 @@
   color: var(--primary);
   font-weight: 600;
   background: rgba(125, 211, 252, 0.1);
-  border: 1px solid rgba(125, 211, 252, 0.3);
+  border: 1px solid rgba(125, 211, 252, 0.4);
   box-shadow: 0 0 15px rgba(125, 211, 252, 0.2);
 }
 
@@ -241,7 +222,7 @@
 .header-mobile-nav-item {
   text-align: left;
   padding: 0.75rem 1rem;
-  border-radius: 6px;
+  border-radius: 8px;
   transition: all 0.3s ease;
   cursor: pointer;
   border: 1px solid transparent;
@@ -269,7 +250,7 @@
   background: rgba(125, 211, 252, 0.15);
   color: var(--primary);
   font-weight: 600;
-  border-color: rgba(125, 211, 252, 0.3);
+  border-color: rgba(125, 211, 252, 0.4);
   box-shadow: 0 0 15px rgba(125, 211, 252, 0.2);
 }
 
@@ -285,7 +266,7 @@
 .header-right {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 2.5rem;
   margin-left: auto;
 }
 
@@ -326,7 +307,6 @@
   background: rgba(125, 211, 252, 0.1);
   border-color: rgba(125, 211, 252, 0.4);
   box-shadow: 0 0 20px rgba(125, 211, 252, 0.3);
-  transform: translateY(-3px);
 }
 
 .header-icon-button:hover::before {
@@ -349,5 +329,18 @@
 
 .header-icon-button:hover .header-icon {
   color: var(--accent);
-  filter: drop-shadow(0 0 8px rgba(125, 211, 252, 0.4));
+}
+
+.header-auth-button {
+  color: var(--text-muted);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.header-auth-button:hover {
+  color: var(--primary);
+  background: rgba(125, 211, 252, 0.1);
 }

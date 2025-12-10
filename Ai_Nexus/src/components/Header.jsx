@@ -1,6 +1,8 @@
-import { Menu, X, Sparkles, Sun, Moon, Sidebar } from 'lucide-react';
+import { Menu, X, Sparkles, Sun, Moon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
+import { Link } from 'react-router-dom';
+import '../styles/Header.css';
 
 export function Header({ activeSection, onNavigate }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -13,16 +15,17 @@ export function Header({ activeSection, onNavigate }) {
 
   const navItems = [
     { id: 'home', label: 'Home' },
-    { id: 'news', label: 'News' },
+    { id: 'news', label: 'AI News' },
     { id: 'showcase', label: 'Showcase' },
-    { id: 'models', label: 'Models & Tools' },
+    { id: 'models', label: 'Models' },
     { id: 'career', label: 'Career' },
     { id: 'events', label: 'Events' },
-    { id: 'community', label: 'Community' },
   ];
 
   const handleNavClick = (id) => {
-    onNavigate(id);
+    if (onNavigate) {
+      onNavigate(id);
+    }
     setMobileMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -33,84 +36,96 @@ export function Header({ activeSection, onNavigate }) {
     setTheme(isDark ? 'light' : 'dark');
   };
 
+  // 👉 FIXED — This triggers ModernSidebar toggle
+  const toggleSidebar = () => {
+    window.dispatchEvent(new Event("toggle-modern-sidebar"));
+  };
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-black/80 backdrop-blur-sm transition-colors duration-300 shadow-sm">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-4">
+    <header className="header">
+      <div className="header-container">
+        <div className="header-flex">
+          <div className="header-left">
+
+            {/* Sidebar Toggle Button */}
             <button
-              onClick={() => handleNavClick('home')}
-              className="flex items-center space-x-2"
+              className="header-icon-button header-sidebar-toggle"
+              onClick={toggleSidebar}
+              aria-label="Toggle sidebar"
             >
-              <div className="bg-sky-500 dark:bg-sky-400 p-2 rounded-full">
-                <Sparkles className="text-white h-5 w-5" />
-              </div>
-              <span className="text-xl font-bold text-slate-800 dark:text-white">AI Nexus</span>
+              <Menu className="header-icon" />
             </button>
+
+            {/* Logo */}
+            <Link
+              to="/"
+              onClick={() => handleNavClick('home')}
+              className="header-logo"
+            >
+              <div className="header-logo-bg">
+                <Sparkles className="header-logo-icon" />
+              </div>
+              <span className="header-title">AI Nexus</span>
+            </Link>
           </div>
 
-          <nav className="hidden md:flex items-center space-x-1">
+          {/* Desktop Navigation */}
+          <nav className="header-nav">
             {navItems.map((item) => (
-              <button
+              <Link
                 key={item.id}
+                to="/"
                 onClick={() => handleNavClick(item.id)}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={
                   activeSection === item.id
-                    ? 'bg-sky-100 dark:bg-sky-900/50 text-sky-600 dark:text-sky-300'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                }`}
+                    ? 'header-nav-item active'
+                    : 'header-nav-item inactive'
+                }
               >
                 {item.label}
-              </button>
+              </Link>
             ))}
           </nav>
 
-          <div className="flex items-center space-x-2">
+          {/* Right side icons */}
+          <div className="header-right">
+            <Link to="/login" className="header-auth-button">Login</Link>
+            <Link to="/register" className="header-auth-button">Register</Link>
+            <Link to="/dashboard" className="header-auth-button">Dashboard</Link>
             <button
-              className="p-2 rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="header-icon-button"
               onClick={toggleDarkMode}
               title="Toggle Dark Mode"
             >
-              {isDark ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
+              {isDark ? <Sun className="header-icon" /> : <Moon className="header-icon" />}
             </button>
-            <div className="hidden md:flex">
-              <button
-                className="p-2 rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                title="Toggle Sidebar"
-              >
-                <Sidebar className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="md:hidden">
-                <button
-                    className="p-2 rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                >
-                    {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-                </button>
-            </div>
+
+            {/* Mobile Menu Toggle */}
+            <button
+              className="header-mobile-toggle"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle mobile menu"
+            >
+              {mobileMenuOpen ? <X className="header-mobile-icon" /> : <Menu className="header-mobile-icon" />}
+            </button>
           </div>
         </div>
 
+        {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <nav className="md:hidden pt-2 pb-4 border-t border-slate-200 dark:border-slate-800">
-            <div className="flex flex-col space-y-1">
+          <nav className="header-mobile-menu open">
+            <div className="header-mobile-nav">
               {navItems.map((item) => (
-                <button
+                <Link
                   key={item.id}
+                  to="/"
                   onClick={() => handleNavClick(item.id)}
-                  className={`px-3 py-2 rounded-md text-base font-medium transition-colors text-left ${
-                    activeSection === item.id
-                    ? 'bg-sky-100 dark:bg-sky-900/50 text-sky-600 dark:text-sky-300'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  className={`header-mobile-nav-item ${
+                    activeSection === item.id ? 'active' : 'inactive'
                   }`}
                 >
                   {item.label}
-                </button>
+                </Link>
               ))}
             </div>
           </nav>
