@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { MapPin, Briefcase, DollarSign, Clock, Search, Filter, Bookmark, Building } from 'lucide-react';
-import '../styles/JobBoard.css';
 
 const jobsData = [
   {
@@ -112,110 +111,82 @@ export function JobBoard({ preview = false }) {
   );
 
   return (
-    <div>
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {!preview && (
-        <div className="job-board-filters-section">
-          <div className="job-board-search-sort">
-            <div className="job-board-search">
-              <Search className="job-board-search-icon" />
-              <input
-                type="text"
-                placeholder="Search jobs, companies, or skills..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="job-board-search-input"
-              />
+        <div className="mb-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-4">
+            <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
+                <input
+                  type="text"
+                  placeholder="Search jobs, companies, or skills..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                />
             </div>
-            <div className="job-board-sort">
-              <Filter className="job-board-sort-icon" />
-              <select
-                value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
-                className="job-board-sort-select"
-              >
-                <option value="All">All Types</option>
-                <option value="Full-time">Full-time</option>
-                <option value="Part-time">Part-time</option>
-                <option value="Contract">Contract</option>
-                <option value="Remote">Remote</option>
-              </select>
+            <div className="relative">
+                <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
+                <select
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                  className="w-full appearance-none pl-12 pr-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                >
+                  <option value="All">All Types</option>
+                  <option value="Full-time">Full-time</option>
+                  <option value="Part-time">Part-time</option>
+                  <option value="Contract">Contract</option>
+                  <option value="Remote">Remote</option>
+                </select>
             </div>
           </div>
-
-          <div className="job-board-ats-simulation">
-            <h4 className="job-board-ats-title">ATS Simulation Available</h4>
-            <p className="job-board-ats-description">
-              Practice with our Applicant Tracking System simulator to optimize your resume and increase your chances of getting hired.
+          <div className="bg-sky-50 dark:bg-sky-900/50 border border-sky-200 dark:border-sky-800 rounded-lg p-6">
+            <h4 className="font-bold text-sky-800 dark:text-sky-200 mb-2">ATS Simulation Available</h4>
+            <p className="text-sm text-sky-700 dark:text-sky-300">
+              Practice with our Applicant Tracking System simulator to optimize your resume and increase your chances.
             </p>
           </div>
         </div>
       )}
 
-      <div className="job-board-job-list">
+      <div className="space-y-6">
         {filteredJobs.map((job) => (
-          <div
-            key={job.id}
-            className="job-board-job-card"
-          >
-            <div className="job-board-job-header">
-              <div className="job-board-job-content">
-                <div className="job-board-job-logo">{job.logo}</div>
-                <div className="job-board-job-info">
-                  <h3 className="job-board-job-title">{job.title}</h3>
-                  <div className="job-board-job-company">
-                    <Building className="job-board-job-company-icon" />
+          <div key={job.id} className="bg-white dark:bg-slate-800/50 p-6 rounded-xl shadow-sm hover:shadow-lg transition-shadow border border-slate-200 dark:border-slate-700">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-4">
+                <div className="text-4xl">{job.logo}</div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">{job.title}</h3>
+                  <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mt-1 mb-2">
+                    <Building className="w-4 h-4" />
                     <span>{job.company}</span>
                   </div>
-                  <p className="job-board-job-description">{job.description}</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-300 clamp-2">{job.description}</p>
                 </div>
               </div>
-              <button
-                onClick={() => toggleSaveJob(job.id)}
-                className="job-board-job-bookmark"
-              >
-                <Bookmark
-                  className={`job-board-job-bookmark-icon ${
-                    savedJobs.has(job.id)
-                      ? 'job-board-job-bookmark-icon-saved'
-                      : 'job-board-job-bookmark-icon-unsaved'
-                  }`}
-                />
+              <button onClick={() => toggleSaveJob(job.id)} className="p-2 text-slate-400 hover:text-sky-500 dark:text-slate-500 dark:hover:text-sky-400 transition-colors">
+                <Bookmark className={`w-6 h-6 ${savedJobs.has(job.id) ? 'fill-current text-sky-500 dark:text-sky-400' : ''}`} />
               </button>
             </div>
 
-            <div className="job-board-job-details">
-              <div className="job-board-job-detail">
-                <MapPin className="job-board-job-detail-icon" />
-                <span>{job.location}</span>
-              </div>
-              <div className="job-board-job-detail">
-                <Briefcase className="job-board-job-detail-icon" />
-                <span>{job.type}</span>
-              </div>
-              <div className="job-board-job-detail">
-                <DollarSign className="job-board-job-detail-icon" />
-                <span>{job.salary}</span>
-              </div>
-              <div className="job-board-job-detail">
-                <Clock className="job-board-job-detail-icon" />
-                <span>{job.posted}</span>
-              </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-slate-600 dark:text-slate-400 my-4">
+              <div className="flex items-center gap-2"><MapPin className="w-4 h-4" /><span>{job.location}</span></div>
+              <div className="flex items-center gap-2"><Briefcase className="w-4 h-4" /><span>{job.type}</span></div>
+              <div className="flex items-center gap-2"><DollarSign className="w-4 h-4" /><span>{job.salary}</span></div>
+              <div className="flex items-center gap-2"><Clock className="w-4 h-4" /><span>{job.posted}</span></div>
             </div>
 
-            <div className="job-board-job-tags">
+            <div className="flex flex-wrap gap-2 mb-4">
               {job.techStack.map((tech) => (
-                <span
-                  key={tech}
-                  className="job-board-job-tag"
-                >
+                <span key={tech} className="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-medium px-2.5 py-1 rounded-full">
                   {tech}
                 </span>
               ))}
             </div>
 
-            <div className="job-board-job-footer">
-              <span className="job-board-job-applicants">{job.applicants} applicants</span>
-              <button className="job-board-job-apply">
+            <div className="pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
+              <span className="text-sm text-slate-500 dark:text-slate-400">{job.applicants} applicants</span>
+              <button className="bg-sky-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-sky-700 dark:bg-sky-500 dark:hover:bg-sky-600 transition-colors">
                 Apply Now
               </button>
             </div>
@@ -224,12 +195,12 @@ export function JobBoard({ preview = false }) {
       </div>
 
       {!preview && (
-        <div className="job-board-interview-prep">
-          <h3 className="job-board-interview-prep-title">Prepare for Your Interview</h3>
-          <p className="job-board-interview-prep-description">
+        <div className="mt-12 text-center bg-gradient-to-r from-purple-600 to-sky-600 text-white rounded-xl p-8 md:p-12">
+          <h3 className="text-2xl font-bold mb-2">Prepare for Your Interview</h3>
+          <p className="max-w-2xl mx-auto mb-6">
             Access our comprehensive interview preparation resources, including practice questions, mock interviews, and expert tips.
           </p>
-          <button className="job-board-interview-prep-button">
+          <button className="bg-white text-purple-600 font-semibold px-6 py-3 rounded-lg hover:bg-slate-100 transition-colors">
             Start Preparing
           </button>
         </div>

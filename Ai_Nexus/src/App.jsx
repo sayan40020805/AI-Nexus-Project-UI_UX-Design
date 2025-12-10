@@ -55,51 +55,90 @@ function App() {
   ];
 
   return (
-    <SidebarProvider>
-      <div className="app">
-        <Header activeSection={activeSection} onNavigate={handleNavigate} />
+    <>
+      {/* Header Navigation */}
+      <Header activeSection={activeSection} onNavigate={handleNavigate} />
 
-        <main>
-          <section id="home">
-            <Hero onExploreModels={handleExploreModels} onJoinCommunity={handleJoinCommunity} />
+      {/* Main Content */}
+      <main className="app">
+        {/* Hero Section */}
+        <section id="home" className="app-section app-section-hero">
+          <Hero onExploreModels={handleExploreModels} onJoinCommunity={handleJoinCommunity} />
+        </section>
+
+        {/* Main Content Area */}
+        <div className="app-main">
+          {/* News Section */}
+          <section id="news" className="app-section">
+            <div className="app-section-header">
+              <h2 className="section-title">Latest AI News</h2>
+              <div className="section-underline"></div>
+            </div>
+            <div className="app-section-content">
+              <NewsFeed />
+            </div>
           </section>
 
-          <div className="app-main">
-            <section id="news">
-              <h2 className="section-title">Latest AI News</h2>
-              <NewsFeed />
-            </section>
-
-            <section id="showcase">
+          {/* AI Showcase Section */}
+          <section id="showcase" className="app-section">
+            <div className="app-section-header">
               <h2 className="section-title">AI Showcase</h2>
+              <div className="section-underline"></div>
+            </div>
+            <div className="app-section-content">
               <AIShowcase />
-            </section>
+            </div>
+          </section>
 
-            <section id="models">
+          {/* Models & Tools Section */}
+          <section id="models" className="app-section">
+            <div className="app-section-header">
               <h2 className="section-title">AI Models & Tools</h2>
+              <div className="section-underline"></div>
+            </div>
+            <div className="app-section-content">
               <ModelDirectory />
-            </section>
+            </div>
+          </section>
 
-            <section id="career">
+          {/* Career Section */}
+          <section id="career" className="app-section">
+            <div className="app-section-header">
               <h2 className="section-title">Career Opportunities</h2>
+              <div className="section-underline"></div>
+            </div>
+            <div className="app-section-content">
               <JobBoard />
-            </section>
+            </div>
+          </section>
 
-            <section id="events">
+          {/* Events Section */}
+          <section id="events" className="app-section">
+            <div className="app-section-header">
               <h2 className="section-title">Upcoming Events</h2>
+              <div className="section-underline"></div>
+            </div>
+            <div className="app-section-content">
               <Events />
-            </section>
+            </div>
+          </section>
 
-            <section id="community">
+          {/* Community Section */}
+          <section id="community" className="app-section">
+            <div className="app-section-header">
               <h2 className="section-title">Community</h2>
+              <div className="section-underline"></div>
+            </div>
+            <div className="app-section-content">
               <Community />
-            </section>
-          </div>
-        </main>
+            </div>
+          </section>
+        </div>
+      </main>
 
-        <Footer />
-      </div>
-    </SidebarProvider>
+      {/* Footer */}
+      <Footer />
+    </>
   );
 }
 

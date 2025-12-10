@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Play, Eye, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
-import '../styles/AIShowcase.css';
 
 const showcaseItems = [
   {
@@ -93,39 +92,39 @@ export function AIShowcase({ preview = false }) {
 
   if (preview) {
     return (
-      <div className="showcase-grid">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {displayedItems.map((item) => (
-          <div key={item.id} className="showcase-card">
-            <div className="showcase-image-container">
+          <div key={item.id} className="bg-white dark:bg-slate-800 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-200 dark:border-slate-700 group">
+            <div className="relative">
               <img
                 src={item.image}
                 alt={item.title}
-                className="showcase-image"
+                className="w-full h-56 object-cover"
               />
-              <div className="showcase-overlay">
-                <button className="showcase-play-button">
-                  <Play className="showcase-play-icon" />
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <button className="bg-sky-500 text-white p-4 rounded-full shadow-lg transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                  <Play className="w-6 h-6" />
                 </button>
               </div>
             </div>
-            <div className="showcase-content">
-              <div className="showcase-meta">
-                <span className="showcase-category">{item.category}</span>
-                <span className="showcase-company">{item.company}</span>
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-semibold text-sky-600 dark:text-sky-400">{item.category}</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">{item.company}</span>
               </div>
-              <h3 className="showcase-title">{item.title}</h3>
-              <p className="showcase-description">{item.description}</p>
-              <div className="showcase-stats">
-                <div className="showcase-views">
-                  <Eye className="showcase-views-icon" />
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 clamp-2">{item.title}</h3>
+              <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 clamp-3">{item.description}</p>
+              <div className="flex justify-between items-center text-sm text-slate-500 dark:text-slate-400">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-5 h-5" />
                   <span>{item.views.toLocaleString()}</span>
                 </div>
                 <button
                   onClick={() => toggleLike(item.id)}
-                  className={`showcase-likes ${likedItems.has(item.id) ? 'liked' : ''}`}
+                  className={`flex items-center gap-2 transition-colors ${likedItems.has(item.id) ? 'text-red-500' : 'hover:text-red-500'}`}
                 >
                   <Heart
-                    className={`showcase-likes-icon ${likedItems.has(item.id) ? 'liked' : ''}`}
+                    className={`w-5 h-5 ${likedItems.has(item.id) ? 'fill-current' : ''}`}
                   />
                   <span>{item.likes.toLocaleString()}</span>
                 </button>
@@ -138,78 +137,73 @@ export function AIShowcase({ preview = false }) {
   }
 
   return (
-    <div className="showcase-container">
-      <div className="showcase-main">
-        <div className="showcase-image-wrapper">
-          <img
-            src={displayedItems[currentIndex].image}
-            alt={displayedItems[currentIndex].title}
-            className="showcase-main-image"
-          />
-          <div className="showcase-gradient"></div>
-          <div className="showcase-info">
-            <div className="showcase-info-meta">
-              <span className="showcase-main-category">
-                {displayedItems[currentIndex].category}
-              </span>
-              <span className="showcase-company">{displayedItems[currentIndex].company}</span>
-            </div>
-            <h2 className="showcase-main-title">{displayedItems[currentIndex].title}</h2>
-            <p className="showcase-main-description">
-              {displayedItems[currentIndex].description}
-            </p>
-            <div className="showcase-main-stats">
-              <div className="showcase-views">
-                <Eye className="showcase-views-icon" />
-                <span>{displayedItems[currentIndex].views.toLocaleString()} views</span>
+    <div className="bg-slate-50 dark:bg-slate-900/50 py-12 sm:py-16">
+      <div className="container mx-auto px-4">
+        <div className="relative">
+          <div className="relative aspect-video w-full max-w-4xl mx-auto rounded-xl overflow-hidden shadow-2xl">
+            <img
+              src={displayedItems[currentIndex].image}
+              alt={displayedItems[currentIndex].title}
+              className="w-full h-full object-cover transition-transform duration-500 ease-in-out"
+              key={currentIndex}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 text-white">
+               <div className="flex justify-between items-center mb-2">
+                <span className="inline-block bg-sky-500/20 dark:bg-sky-400/20 text-sky-200 dark:text-sky-300 text-xs font-semibold px-3 py-1 rounded-full">{displayedItems[currentIndex].category}</span>
+                <span className="text-xs text-slate-300">{displayedItems[currentIndex].company}</span>
               </div>
-              <button
-                onClick={() => toggleLike(displayedItems[currentIndex].id)}
-                className={`showcase-likes ${
-                  likedItems.has(displayedItems[currentIndex].id) ? 'liked' : ''
-                }`}
-              >
-                <Heart
-                  className={`showcase-likes-icon ${
-                    likedItems.has(displayedItems[currentIndex].id) ? 'liked' : ''
-                  }`}
-                />
-                <span>{displayedItems[currentIndex].likes.toLocaleString()} likes</span>
-              </button>
+              <h2 className="text-2xl md:text-4xl font-bold mb-2 text-shadow-lg">{displayedItems[currentIndex].title}</h2>
+              <p className="text-sm md:text-base text-slate-200/90 clamp-2">{displayedItems[currentIndex].description}</p>
+              <div className="mt-4 flex justify-between items-center text-sm">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-5 h-5" />
+                  <span>{displayedItems[currentIndex].views.toLocaleString()} views</span>
+                </div>
+                <button
+                  onClick={() => toggleLike(displayedItems[currentIndex].id)}
+                  className={`flex items-center gap-2 transition-colors ${likedItems.has(displayedItems[currentIndex].id) ? 'text-red-400' : 'hover:text-red-400'}`}
+                >
+                  <Heart className={`w-5 h-5 ${likedItems.has(displayedItems[currentIndex].id) ? 'fill-current' : ''}`} />
+                  <span>{displayedItems[currentIndex].likes.toLocaleString()} likes</span>
+                </button>
+              </div>
             </div>
+            <button className="absolute inset-0 flex items-center justify-center">
+              <span className="bg-white/20 text-white p-5 rounded-full backdrop-blur-sm shadow-lg transform scale-75 hover:scale-100 transition-transform duration-300">
+                <Play className="w-8 h-8" />
+              </span>
+            </button>
           </div>
-          <button onClick={() => {}} className="showcase-play-main">
-            <Play className="showcase-play-icon" />
+
+          <button
+            onClick={handlePrevious}
+            className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 bg-white/80 dark:bg-slate-700/80 p-3 rounded-full shadow-lg hover:bg-white dark:hover:bg-slate-600 transition-all backdrop-blur-sm z-10"
+          >
+            <ChevronLeft className="w-6 h-6 text-slate-800 dark:text-white" />
+          </button>
+          <button
+            onClick={handleNext}
+            className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 bg-white/80 dark:bg-slate-700/80 p-3 rounded-full shadow-lg hover:bg-white dark:hover:bg-slate-600 transition-all backdrop-blur-sm z-10"
+          >
+            <ChevronRight className="w-6 h-6 text-slate-800 dark:text-white" />
           </button>
         </div>
 
-        <button
-          onClick={handlePrevious}
-          className="showcase-nav-prev"
-        >
-          <ChevronLeft className="showcase-nav-icon" />
-        </button>
-        <button
-          onClick={handleNext}
-          className="showcase-nav-next"
-        >
-          <ChevronRight className="showcase-nav-icon" />
-        </button>
-      </div>
-
-      <div className="showcase-thumbnails">
-        {displayedItems.map((item, index) => (
-          <button
-            key={item.id}
-            onClick={() => setCurrentIndex(index)}
-            className={`showcase-thumbnail ${index === currentIndex ? 'active' : ''}`}
-          >
-            <img src={item.image} alt={item.title} className="showcase-thumbnail-image" />
-            {index === currentIndex && (
-              <div className="showcase-thumbnail-overlay"></div>
-            )}
-          </button>
-        ))}
+        <div className="flex justify-center gap-2 sm:gap-4 mt-8">
+          {displayedItems.map((item, index) => (
+            <button
+              key={item.id}
+              onClick={() => setCurrentIndex(index)}
+              className={`w-16 h-16 sm:w-24 sm:h-24 rounded-lg overflow-hidden transition-all duration-300 transform hover:scale-110 focus:outline-none ring-offset-2 dark:ring-offset-slate-900 ${index === currentIndex ? 'ring-4 ring-sky-500' : 'ring-2 ring-transparent'}`}
+            >
+              <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+              {index === currentIndex && (
+                <div className="absolute inset-0 bg-black/50"></div>
+              )}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
