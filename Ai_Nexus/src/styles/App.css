@@ -1,0 +1,23 @@
+/* App.css - Custom styles for App component */
+
+.app {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  padding-top: 70px;
+}
+
+.app-main {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+.section-title {
+  font-size: 1.875rem;
+  font-weight: bold;
+  color: #0f172a;
+  margin-bottom: 2rem;
+}

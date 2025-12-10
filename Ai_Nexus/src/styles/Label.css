@@ -1,0 +1,22 @@
+/* Label Component Styles */
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--foreground);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.label[data-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.label svg {
+  pointer-events: none;
+  flex-shrink: 0;
+}

@@ -1,0 +1,69 @@
+# TODO: Remove Tailwind CSS and Create Custom CSS Files
+
+## Files to Process:
+- [x] Ai_Nexus/src/components/Header.jsx
+- [x] Ai_Nexus/src/components/Hero.jsx
+- [x] Ai_Nexus/src/App.jsx
+- [ ] Ai_Nexus/src/main.jsx
+- [ ] Ai_Nexus/src/components/Hero.jsx
+- [ ] Ai_Nexus/src/components/AIShowcase.jsx
+- [ ] Ai_Nexus/src/components/NewsFeed.jsx
+- [ ] Ai_Nexus/src/components/ModelDirectory.jsx
+- [ ] Ai_Nexus/src/components/JobBoard.jsx
+- [ ] Ai_Nexus/src/components/Events.jsx
+- [ ] Ai_Nexus/src/components/Community.jsx
+- [ ] Ai_Nexus/src/components/Footer.jsx
+- [ ] Ai_Nexus/src/components/theme-provider.jsx
+- [ ] Ai_Nexus/src/components/ui/accordion.jsx
+- [ ] Ai_Nexus/src/components/ui/alert.jsx
+- [ ] Ai_Nexus/src/components/ui/alert-dialog.jsx
+- [ ] Ai_Nexus/src/components/ui/aspect-ratio.jsx
+- [ ] Ai_Nexus/src/components/ui/avatar.jsx
+- [ ] Ai_Nexus/src/components/ui/badge.jsx
+- [ ] Ai_Nexus/src/components/ui/breadcrumb.jsx
+- [ ] Ai_Nexus/src/components/ui/button.jsx
+- [ ] Ai_Nexus/src/components/ui/calendar.jsx
+- [ ] Ai_Nexus/src/components/ui/card.jsx
+- [ ] Ai_Nexus/src/components/ui/carousel.jsx
+- [ ] Ai_Nexus/src/components/ui/chart.jsx
+- [ ] Ai_Nexus/src/components/ui/checkbox.jsx
+- [ ] Ai_Nexus/src/components/ui/collapsible.jsx
+- [ ] Ai_Nexus/src/components/ui/command.jsx
+- [ ] Ai_Nexus/src/components/ui/context-menu.jsx
+- [ ] Ai_Nexus/src/components/ui/dialog.jsx
+- [ ] Ai_Nexus/src/components/ui/drawer.jsx
+- [ ] Ai_Nexus/src/components/ui/dropdown-menu.jsx
+- [ ] Ai_Nexus/src/components/ui/form.jsx
+- [ ] Ai_Nexus/src/components/ui/hover-card.jsx
+- [ ] Ai_Nexus/src/components/ui/input.jsx
+- [ ] Ai_Nexus/src/components/ui/input-otp.jsx
+- [ ] Ai_Nexus/src/components/ui/label.jsx
+- [ ] Ai_Nexus/src/components/ui/menubar.jsx
+- [ ] Ai_Nexus/src/components/ui/navigation-menu.jsx
+- [ ] Ai_Nexus/src/components/ui/pagination.jsx
+- [ ] Ai_Nexus/src/components/ui/popover.jsx
+- [ ] Ai_Nexus/src/components/ui/progress.jsx
+- [ ] Ai_Nexus/src/components/ui/radio-group.jsx
+- [ ] Ai_Nexus/src/components/ui/resizable.jsx
+- [ ] Ai_Nexus/src/components/ui/scroll-area.jsx
+- [ ] Ai_Nexus/src/components/ui/select.jsx
+- [ ] Ai_Nexus/src/components/ui/separator.jsx
+- [ ] Ai_Nexus/src/components/ui/sheet.jsx
+- [ ] Ai_Nexus/src/components/ui/sidebar.jsx
+- [ ] Ai_Nexus/src/components/ui/skeleton.jsx
+- [ ] Ai_Nexus/src/components/ui/slider.jsx
+- [ ] Ai_Nexus/src/components/ui/sonner.jsx
+- [ ] Ai_Nexus/src/components/ui/switch.jsx
+- [ ] Ai_Nexus/src/components/ui/table.jsx
+- [ ] Ai_Nexus/src/components/ui/tabs.jsx
+- [ ] Ai_Nexus/src/components/ui/textarea.jsx
+- [ ] Ai_Nexus/src/components/ui/toggle.jsx
+- [ ] Ai_Nexus/src/components/ui/toggle-group.jsx
+- [ ] Ai_Nexus/src/components/ui/tooltip.jsx
+- [ ] Ai_Nexus/src/components/ui/use-mobile.jsx
+
+## Progress:
+- Completed JobBoard.jsx: Removed Tailwind classes, replaced with custom classes, created JobBoard.css with equivalent styles, and imported the CSS file.
+- Updated globals.css: Removed Tailwind @apply directives and replaced with custom CSS properties.
+- Checked main components: AIShowcase.jsx, Community.jsx, Events.jsx, Footer.jsx, Header.jsx, Hero.jsx, ModelDirectory.jsx, NewsFeed.jsx, App.jsx - all use custom CSS classes, no Tailwind classes found.
+- UI components in ui/ folder use Tailwind classes as they are part of a UI library.

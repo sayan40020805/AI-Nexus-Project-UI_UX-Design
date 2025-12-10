@@ -1,0 +1,269 @@
+/* Header.css - Custom styles for Header component */
+
+.header {
+  background-color: white;
+  border-bottom: 1px solid #e2e8f0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+}
+
+/* Dark mode header styles */
+:root.dark .header {
+  background-color: #000000;
+  border-bottom: 1px solid #0369a1;
+  box-shadow: 0 1px 10px rgba(3, 105, 161, 0.3);
+}
+
+.header-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 1;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.header-logo:hover {
+  opacity: 0.8;
+}
+
+.header-logo-bg {
+  background-color: #2563eb;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* Dark mode logo background */
+:root.dark .header-logo-bg {
+  background-color: #0369a1;
+}
+
+.header-logo-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: white;
+}
+
+.header-title {
+  font-size: 1.25rem;
+  color: #0f172a;
+  font-weight: 600;
+  transition: color 0.3s ease-in-out;
+}
+
+/* Dark mode title */
+:root.dark .header-title {
+  color: #e0f2fe;
+}
+
+.header-nav {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .header-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+}
+
+.header-nav-item {
+  transition: color 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.header-nav-item.active {
+  color: #2563eb;
+  font-weight: 500;
+}
+
+.header-nav-item.inactive {
+  color: #64748b;
+}
+
+.header-nav-item.inactive:hover {
+  color: #0f172a;
+}
+
+/* Dark mode nav items */
+:root.dark .header-nav-item.active {
+  color: #0369a1;
+}
+
+:root.dark .header-nav-item.inactive {
+  color: #cbd5e1;
+}
+
+:root.dark .header-nav-item.inactive:hover {
+  color: #e0f2fe;
+}
+
+.header-mobile-toggle {
+  display: block;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .header-mobile-toggle {
+    display: none;
+  }
+}
+
+.header-mobile-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #334155;
+}
+
+.header-mobile-menu {
+  display: none;
+}
+
+.header-mobile-menu.open {
+  display: block;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+  transition: border-color 0.3s ease-in-out;
+}
+
+/* Dark mode mobile menu */
+:root.dark .header-mobile-menu.open {
+  border-top: 1px solid #0369a1;
+}
+
+.header-mobile-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.header-mobile-nav-item {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.header-mobile-nav-item.active {
+  background-color: #eff6ff;
+  color: #2563eb;
+  font-weight: 500;
+}
+
+.header-mobile-nav-item.inactive {
+  color: #64748b;
+}
+
+.header-mobile-nav-item.inactive:hover {
+  background-color: #f8fafc;
+}
+
+/* Dark mode mobile nav items */
+:root.dark .header-mobile-nav-item.active {
+  background-color: rgba(3, 105, 161, 0.2);
+  color: #0369a1;
+}
+
+:root.dark .header-mobile-nav-item.inactive {
+  color: #cbd5e1;
+}
+
+:root.dark .header-mobile-nav-item.inactive:hover {
+  background-color: rgba(3, 105, 161, 0.1);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-left: 290px;
+}
+
+@media (max-width: 767px) {
+  .header-right {
+    display: none;
+  }
+}
+
+.header-icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.header-icon-button:hover {
+  background-color: #e0f2fe;
+  transform: scale(1.1);
+}
+
+.header-icon-button:active {
+  transform: scale(0.95);
+}
+
+.header-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #0369a1;
+  transition: color 0.2s ease-in-out;
+}
+
+.header-icon-button:hover .header-icon {
+  color: #0c4a6e;
+}
+
+/* Dark mode icon button styles */
+:root.dark .header-icon-button:hover {
+  background-color: rgba(3, 105, 161, 0.2);
+}
+
+:root.dark .header-icon {
+  color: #0369a1;
+}
+
+:root.dark .header-icon-button:hover .header-icon {
+  color: #e0f2fe;
+}
+
+/* Sky glow theme for active dark mode */
+:root.dark {
+  --sky-glow-primary: #0369a1;
+  --sky-glow-light: #e0f2fe;
+  --black-primary: #000000;
+}

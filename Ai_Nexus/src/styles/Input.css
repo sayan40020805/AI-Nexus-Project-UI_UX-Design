@@ -1,0 +1,49 @@
+/* Input Component Styles */
+
+.input {
+  display: flex;
+  height: 2.25rem;
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background-color: var(--input-background);
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--foreground);
+  transition: all 0.2s ease-in-out;
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--muted-foreground);
+}
+
+.input:focus-visible {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px var(--ring) / 0.5;
+}
+
+.input[aria-invalid="true"] {
+  box-shadow: 0 0 0 3px var(--destructive) / 0.2;
+  border-color: var(--destructive);
+}
+
+.dark .input[aria-invalid="true"] {
+  box-shadow: 0 0 0 3px var(--destructive) / 0.4;
+}
+
+.input:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.dark .input {
+  background-color: var(--input);
+  border-color: var(--input);
+}
+
+.dark .input:focus-visible {
+  border-color: var(--ring);
+}
