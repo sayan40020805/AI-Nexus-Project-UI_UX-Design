@@ -1,5 +1,7 @@
+
 import { useState } from 'react';
 import { Calendar, TrendingUp, Filter, Search } from 'lucide-react';
+import '../styles/NewsFeed.css';
 
 const categories = [
   'All',
@@ -90,27 +92,28 @@ export function NewsFeed({ preview = false }) {
       return 0;
     });
 
+
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="news-feed-container">
       {!preview && (
-        <div className="mb-8 flex flex-col md:flex-row gap-4 md:gap-6">
-          <div className="flex-grow flex flex-col gap-4">
-             <div className="relative flex-grow">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
+        <div className="news-feed-controls">
+          <div className="news-feed-search-section">
+            <div className="news-feed-search-wrapper">
+                <Search className="news-feed-search-icon" />
                 <input
                     type="text"
                     placeholder="Search news..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                    className="news-feed-search-input"
                 />
             </div>
-            <div className="relative">
-                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
+            <div className="news-feed-sort-wrapper">
+                <Filter className="news-feed-sort-icon" />
                 <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="w-full appearance-none pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                    className="news-feed-sort-select"
                 >
                     <option value="date">Latest</option>
                     <option value="popularity">Most Popular</option>
@@ -118,16 +121,12 @@ export function NewsFeed({ preview = false }) {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2 items-start">
+          <div className="news-feed-category-section">
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  selectedCategory === category 
-                    ? 'bg-sky-600 text-white dark:bg-sky-500' 
-                    : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                }`}
+                className={`news-feed-category-btn ${selectedCategory === category ? 'active' : ''}`}
               >
                 {category}
               </button>
@@ -136,29 +135,30 @@ export function NewsFeed({ preview = false }) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      <div className="news-feed-grid">
         {filteredNews.map((item) => (
           <article
             key={item.id}
-            className="bg-white dark:bg-slate-800 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 border border-slate-200 dark:border-slate-700 flex flex-col"
+            className="news-article"
           >
             <img
               src={item.image}
               alt={item.title}
-              className="w-full h-48 object-cover"
+              className="news-article-image"
             />
-            <div className="p-6 flex flex-col flex-grow">
-              <span className="inline-block bg-sky-100 dark:bg-sky-900/50 text-sky-600 dark:text-sky-300 text-xs font-semibold px-3 py-1 rounded-full mb-4 self-start">
+            <div className="news-article-content">
+              <span className="news-article-category">
                 {item.category}
               </span>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 flex-grow clamp-2">{item.title}</h3>
-              <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 clamp-3">{item.summary}</p>
-              <div className="mt-auto flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-700 pt-4">
-                <div className="flex items-center gap-1.5">
+              <h3 className="news-article-title">{item.title}</h3>
+              <p className="news-article-summary">{item.summary}</p>
+              <div className="news-article-footer">
+                <div className="news-article-meta">
                   <Calendar className="w-4 h-4" />
                   <span>{new Date(item.date).toLocaleDateString()}</span>
                 </div>
-                <div className="flex items-center gap-1.5">
+                <div className="news-article-views">
                   <TrendingUp className="w-4 h-4" />
                   <span>{item.views.toLocaleString()} views</span>
                 </div>

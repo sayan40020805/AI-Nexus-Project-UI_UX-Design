@@ -1,5 +1,18 @@
 /* AIShowcase Component Styles */
 
+.ai-showcase-container {
+  margin-top: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background-color: #f8fafc;
+}
+
+.ai-showcase-container * {
+  box-sizing: border-box;
+}
+
 /* Grid Preview Layout */
 .showcase-grid {
   display: grid;
@@ -9,10 +22,9 @@
 
 /* Showcase Card */
 .showcase-card {
-  background: var(--sidebar);
-  border: 1px solid var(--border-glow);
+  background-color: white;
+  border: 1px solid #e2e8f0;
   border-radius: 0.5rem;
-  gap: 20px;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
@@ -81,19 +93,19 @@
 .showcase-category {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--primary);
+  color: #0ea5e9;
   text-transform: uppercase;
 }
 
 .showcase-company {
   font-size: 0.75rem;
-  color: var(--text-muted);
+  color: #6b7280;
 }
 
 .showcase-title {
   font-size: 1.125rem;
   font-weight: 700;
-  color: var(--text);
+  color: #111827;
   margin: 0.5rem 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -103,7 +115,7 @@
 
 .showcase-description {
   font-size: 0.875rem;
-  color: var(--text-muted);
+  color: #6b7280;
   margin-bottom: 1rem;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -117,7 +129,7 @@
   justify-content: space-between;
   align-items: center;
   font-size: 0.875rem;
-  color: var(--text-muted);
+  color: #6b7280;
 }
 
 .showcase-stat {
@@ -133,12 +145,12 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--text-muted);
+  color: #6b7280;
   transition: color 0.3s ease;
 }
 
 .showcase-like-btn:hover {
-  color: var(--accent);
+  color: #f59e0b;
 }
 
 .showcase-like-btn.liked {
@@ -147,7 +159,7 @@
 
 /* Carousel Section */
 .showcase-container {
-  background: var(--background);
+  background-color: #f8fafc;
   padding: 3rem 1rem;
 }
 
@@ -356,8 +368,7 @@
 .showcase-thumbnails {
   display: flex;
   justify-content: center;
-  margin-left: 20px;
-  gap:20px;
+  gap: 1.25rem;
   margin-top: 2rem;
   flex-wrap: wrap;
 }
@@ -395,7 +406,7 @@
 }
 
 .showcase-thumbnail.active {
-  border-color: var(--primary);
+  border-color: #0ea5e9;
 }
 
 .showcase-thumbnail.active::after {
@@ -405,10 +416,63 @@
   background: rgba(0, 0, 0, 0.5);
 }
 
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .ai-showcase-container {
+    background-color: #0f172a;
+    color: #f8fafc;
+  }
+
+  .showcase-card {
+    background-color: #1e293b;
+    border-color: #334155;
+  }
+
+  .showcase-category {
+    color: #38bdf8;
+  }
+
+  .showcase-company,
+  .showcase-description,
+  .showcase-stats,
+  .showcase-like-btn {
+    color: #94a3b8;
+  }
+
+  .showcase-title {
+    color: #f8fafc;
+  }
+
+  .showcase-like-btn:hover {
+    color: #fbbf24;
+  }
+
+  .showcase-container {
+    background-color: #0f172a;
+  }
+
+  .showcase-nav-btn {
+    background: rgba(30, 41, 59, 0.8);
+  }
+
+  .showcase-nav-btn:hover {
+    background: #1e293b;
+  }
+
+  .showcase-nav-btn svg {
+    color: #f8fafc;
+  }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
+  .ai-showcase-container {
+    padding: 1rem 0.5rem;
+  }
+
   .showcase-grid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
   .showcase-main-title {
@@ -418,4 +482,67 @@
   .showcase-main-content {
     padding: 1rem;
   }
+
+  .showcase-thumbnails {
+    gap: 0.75rem;
+    justify-content: center;
+  }
+
+  .showcase-thumbnail {
+    width: 48px;
+    height: 48px;
+  }
+
+  @media (min-width: 640px) {
+    .showcase-thumbnail {
+      width: 64px;
+      height: 64px;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .showcase-content {
+    padding: 1rem;
+  }
+
+  .showcase-image {
+    height: 180px;
+  }
+
+  .showcase-title {
+    font-size: 1rem;
+  }
+
+  .showcase-description {
+    font-size: 0.75rem;
+  }
+
+  .showcase-main {
+    aspect-ratio: 16 / 10;
+  }
+
+  .showcase-main-title {
+    font-size: 1.125rem;
+  }
+
+  .showcase-main-description {
+    font-size: 0.75rem;
+    -webkit-line-clamp: 3;
+  }
+}
+
+/* Utility Classes */
+.ai-showcase-clamp-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.ai-showcase-clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
 }

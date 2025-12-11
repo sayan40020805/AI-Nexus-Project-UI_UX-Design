@@ -1,5 +1,6 @@
+
 import { useEffect, useState } from 'react';
-import { ChevronRight, Home, Newspaper, Sparkles, Cpu, Briefcase, Calendar, Search, User, X } from 'lucide-react';
+import { ChevronRight, Home, Newspaper, Sparkles, Cpu, Briefcase, Calendar, Search, User, X, HelpCircle, BarChart3, Video, Radio, FileText } from 'lucide-react';
 import '../styles/ModernSidebar.css';
 
 export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSidebarOpen }) {
@@ -35,13 +36,13 @@ export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSideb
     };
   }, [isControlled, setOpen]);
 
+
   const sidebarItems = [
-    { id: 'home', label: 'Home', icon: Home },
-    { id: 'news', label: 'AI News', icon: Newspaper },
-    { id: 'showcase', label: 'Showcase', icon: Sparkles },
-    { id: 'models', label: 'Models', icon: Cpu },
-    { id: 'career', label: 'Career', icon: Briefcase },
-    { id: 'events', label: 'Events', icon: Calendar },
+    { id: 'quiz', label: 'Quiz', icon: HelpCircle },
+    { id: 'ats-score', label: 'ATS Score', icon: BarChart3 },
+    { id: 'ai-shorts', label: 'AI Shorts', icon: Video },
+    { id: 'live', label: 'Live', icon: Radio },
+    { id: 'post', label: 'Post', icon: FileText },
   ];
 
   const handleNavClick = (id) => {
@@ -86,7 +87,8 @@ export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSideb
 
         <nav className="sidebar-nav">
           <div className="nav-section">
-            <h4 className="nav-section-title">Main Menu</h4>
+
+            <h4 className="nav-section-title">AI Tools</h4>
 
             <div className="nav-items">
               {sidebarItems.map((item) => {

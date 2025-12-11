@@ -1,5 +1,7 @@
+
 import { useState } from 'react';
 import { Calendar, Clock, MapPin, Users, Video, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
+import '../styles/Events.css';
 
 const eventsData = [
     {
@@ -117,44 +119,46 @@ export function Events() {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
   };
 
+
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      <div className="flex justify-center">
-        <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-lg">
-          <button onClick={() => setSelectedView('calendar')} className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${selectedView === 'calendar' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow' : 'text-slate-600 dark:text-slate-300'}`}>
+    <div className="events-container">
+      <div className="events-view-toggle">
+        <div className="events-toggle-wrapper">
+          <button onClick={() => setSelectedView('calendar')} className={`events-toggle-btn ${selectedView === 'calendar' ? 'active' : ''}`}>
             Calendar View
           </button>
-          <button onClick={() => setSelectedView('list')} className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${selectedView === 'list' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow' : 'text-slate-600 dark:text-slate-300'}`}>
+          <button onClick={() => setSelectedView('list')} className={`events-toggle-btn ${selectedView === 'list' ? 'active' : ''}`}>
             List View
           </button>
         </div>
       </div>
 
+
       {selectedView === 'calendar' && (
-        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+        <div className="events-calendar-wrapper">
+          <div className="events-calendar-header">
+            <h3 className="events-calendar-title">
               {currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
             </h3>
-            <div className="flex items-center gap-2">
-              <button onClick={previousMonth} className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-colors">
+            <div className="events-calendar-nav">
+              <button onClick={previousMonth} className="events-nav-btn">
                 <ChevronLeft className="w-5 h-5" />
               </button>
-              <button onClick={nextMonth} className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-colors">
+              <button onClick={nextMonth} className="events-nav-btn">
                 <ChevronRight className="w-5 h-5" />
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-slate-500 dark:text-slate-400">
+          <div className="events-calendar-grid">
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-              <div key={day} className="py-2">{day}</div>
+              <div key={day} className="events-day-header">{day}</div>
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-1">
+          <div className="events-days-grid">
             {Array.from({ length: startingDayOfWeek }).map((_, index) => (
-              <div key={`empty-${index}`} className="aspect-square"></div>
+              <div key={`empty-${index}`} className="events-day-cell"></div>
             ))}
 
             {Array.from({ length: daysInMonth }).map((_, index) => {
@@ -163,19 +167,17 @@ export function Events() {
               const isToday = day === 9; // Assuming today is Dec 9, 2025
 
               return (
-                <div key={day} className={`aspect-square p-2 border-t border-slate-200 dark:border-slate-700 ${isToday ? 'bg-sky-50 dark:bg-sky-900/30' : ''}`}>
-                  <div className={`text-sm ${isToday ? 'font-bold text-sky-600 dark:text-sky-300' : 'text-slate-700 dark:text-slate-300'}`}>
-                    {day}
-                  </div>
+                <div key={day} className={`events-day-cell ${isToday ? 'today' : ''}`}>
+                  <div className="events-day-number">{day}</div>
                   {dayEvents.length > 0 && (
-                    <div className="mt-1 space-y-1">
+                    <div className="events-day-events">
                       {dayEvents.slice(0, 2).map((event) => (
-                        <div key={event.id} className="text-xs text-white bg-purple-500 dark:bg-purple-600 rounded px-1 py-0.5 truncate" title={event.title}>
+                        <div key={event.id} className="events-day-event" title={event.title}>
                           {event.title}
                         </div>
                       ))}
                       {dayEvents.length > 2 && (
-                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">+{dayEvents.length - 2} more</div>
+                        <div className="events-day-more">+{dayEvents.length - 2} more</div>
                       )}
                     </div>
                   )}
@@ -186,50 +188,53 @@ export function Events() {
         </div>
       )}
 
+
       {selectedView === 'list' && (
-        <div className="space-y-6">
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white">Upcoming Events</h3>
-          {eventsData.map((event) => (
-            <div key={event.id} className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm hover:shadow-lg transition-shadow border border-slate-200 dark:border-slate-700 overflow-hidden md:flex">
-                <img src={event.image} alt={event.title} className="w-full md:w-64 h-48 md:h-auto object-cover" />
-                <div className="p-6 flex-1">
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    <span className="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-purple-900/50 dark:text-purple-300">{event.type}</span>
-                    <span className="bg-sky-100 text-sky-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-sky-900/50 dark:text-sky-300">{event.format}</span>
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">{event.title}</h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 clamp-2">{event.description}</p>
-                  
-                  <div className="grid grid-cols-2 gap-3 text-sm text-slate-500 dark:text-slate-400 mb-3">
-                    <div className="flex items-center gap-2"><Calendar className="w-4 h-4" /><span>{new Date(event.date).toLocaleDateString()}</span></div>
-                    <div className="flex items-center gap-2"><Clock className="w-4 h-4" /><span>{event.time}</span></div>
-                    <div className="flex items-center gap-2">
-                        {event.format === 'Virtual' ? <Video className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}
-                        <span>{event.location}</span>
+        <div className="events-list-wrapper">
+          <h3 className="events-list-title">Upcoming Events</h3>
+          <div className="events-list">
+            {eventsData.map((event) => (
+              <div key={event.id} className="event-card">
+                  <img src={event.image} alt={event.title} className="event-image" />
+                  <div className="event-content">
+                    <div className="event-badges">
+                      <span className="event-badge type">{event.type}</span>
+                      <span className="event-badge format">{event.format}</span>
                     </div>
-                    <div className="flex items-center gap-2"><Users className="w-4 h-4" /><span>{event.attendees.toLocaleString()} attendees</span></div>
-                  </div>
-
-                  <div className="mb-4">
-                      <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Featured Speakers:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {event.speakers.map((speaker) => (
-                          <span key={speaker} className="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-medium px-2 py-1 rounded-full">{speaker}</span>
-                        ))}
+                    <h3 className="event-title">{event.title}</h3>
+                    <p className="event-description events-clamp-2">{event.description}</p>
+                    
+                    <div className="event-details">
+                      <div className="event-detail"><Calendar className="w-4 h-4" /><span>{new Date(event.date).toLocaleDateString()}</span></div>
+                      <div className="event-detail"><Clock className="w-4 h-4" /><span>{event.time}</span></div>
+                      <div className="event-detail">
+                          {event.format === 'Virtual' ? <Video className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}
+                          <span>{event.location}</span>
                       </div>
-                  </div>
+                      <div className="event-detail"><Users className="w-4 h-4" /><span>{event.attendees.toLocaleString()} attendees</span></div>
+                    </div>
 
-                  <div className="flex items-center gap-4">
-                    <button onClick={() => toggleRegistration(event.id)} className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${registeredEvents.has(event.id) ? 'bg-green-600 text-white' : 'bg-sky-600 text-white hover:bg-sky-700 dark:bg-sky-500 dark:hover:bg-sky-600'}`}>
-                      {registeredEvents.has(event.id) ? 'Registered ✓' : 'Register Now'}
-                    </button>
-                    <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 transition-colors">
-                      Details <ExternalLink className="w-4 h-4" />
-                    </button>
+                    <div className="event-speakers">
+                        <p className="event-speakers-title">Featured Speakers:</p>
+                        <div className="event-speakers-list">
+                          {event.speakers.map((speaker) => (
+                            <span key={speaker} className="event-speaker-tag">{speaker}</span>
+                          ))}
+                        </div>
+                    </div>
+
+                    <div className="event-actions">
+                      <button onClick={() => toggleRegistration(event.id)} className={`event-btn primary ${registeredEvents.has(event.id) ? 'registered' : ''}`}>
+                        {registeredEvents.has(event.id) ? 'Registered ✓' : 'Register Now'}
+                      </button>
+                      <button className="event-btn secondary">
+                        Details <ExternalLink className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-                </div>
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
