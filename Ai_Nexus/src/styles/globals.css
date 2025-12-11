@@ -30,6 +30,29 @@
   --card-bg: #0f1428;
 }
 
+.light {
+  --bg: #f0f2f5; /* Light gray background */
+  --bg-secondary: #ffffff; /* White secondary background */
+  --text: #04070c; /* Dark gray text */
+  --text-muted: #4b5563; /* Medium gray for secondary text */
+  --primary: #0ea5e9; /* Sky blue primary */
+  --primary-600: #0284c7; /* Medium sky blue */
+  --primary-dark: #0369a1; /* Deep sky blue */
+  --muted: #6b7b9a; /* Muted gray */
+  --accent: #0891b2; /* Cyan accent */
+  --border-color: rgba(0, 0, 0, 0.1); /* Subtle dark border */
+  --border-glow: 1px solid rgba(2, 132, 199, 0.4); /* Blue glow border */
+  --glow-shadow: 0 0 20px rgba(2, 132, 199, 0.15); /* Subtle glow effect */
+  --glow-shadow-hover: 0 0 30px rgba(2, 132, 199, 0.3); /* Stronger glow on hover */
+
+  /* Legacy compatibility */
+  --primary-color: #0ea5e9;
+  --secondary-color: #0891b2;
+  --background: #f0f2f5;
+  --foreground: #1f2937;
+  --card-bg: #ffffff;
+}
+
 body {
   background-color: var(--bg);
   color: var(--text);
@@ -41,6 +64,7 @@ body {
     radial-gradient(circle at 20% 50%, rgba(125, 211, 252, 0.05) 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
   background-attachment: fixed;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 h1 {
@@ -124,7 +148,7 @@ button {
   border-radius: 8px;
   padding: 0.75rem 1.5rem;
   background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-  color: var(--bg);
+  color: white;
   transition: all 0.3s ease;
   box-shadow: 0 0 20px rgba(125, 211, 252, 0.2);
   position: relative;
@@ -138,6 +162,11 @@ button:hover {
 
 button:active {
   transform: translateY(0);
+}
+
+.light button {
+  color: #ffffff; /* White text for buttons in light mode */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow for better readability */
 }
 
 input, textarea, select {
@@ -179,6 +208,10 @@ input::placeholder {
 
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, var(--accent) 0%, var(--primary) 100%);
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--primary-600) 0%, var(--accent) 100%);
 }
 
 .dark {

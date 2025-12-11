@@ -274,3 +274,5 @@ export function ATSScore() {
     </div>
   );
 }
+
+export default ATSScore;

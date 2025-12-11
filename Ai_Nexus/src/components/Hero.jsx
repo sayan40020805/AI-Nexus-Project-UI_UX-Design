@@ -1,52 +1,108 @@
-import { ArrowRight, Sparkles, Users } from 'lucide-react';
+import React, { useContext, useEffect, useState } from 'react';
 import '../styles/Hero.css';
+import { FeedContext } from '../context/FeedContext';
+import PostCard from './Hero/PostCard';
+import LiveVideoCard from './Hero/LiveVideoCard';
+import { PostSkeleton, LiveVideoSkeleton } from './Hero/SkeletonLoaders';
+import { LeftPanel, CenterPanel, RightPanel, FeedWelcome } from './Hero/FeedLayout';
 
 export function Hero({ onExploreModels, onJoinCommunity }) {
+  const { posts, liveStreams, loading, error } = useContext(FeedContext);
+
+  const handlePostLike = (postId) => {
+    console.log('Liked post:', postId);
+  };
+
+  const handlePostComment = (postId) => {
+    console.log('Comment on post:', postId);
+  };
+
+  const handlePostShare = (postId) => {
+    console.log('Share post:', postId);
+  };
+
+  const handleWatchLive = (liveId) => {
+    console.log('Watching live:', liveId);
+  };
+
   return (
     <div className="hero">
-      <div className="hero-overlay" />
-
       <div className="hero-inner">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="hero-badge">
-            <Sparkles />
-            <span>Welcome to the Future of AI</span>
-          </div>
+        <div className="hero-layout">
+          {/* Left Panel - Profile & Trending */}
+          <LeftPanel />
 
-          <h1 className="hero-title">Your Gateway to the AI Industry</h1>
+          {/* Center Panel - Main Feed */}
+          <CenterPanel>
+            <FeedWelcome onExploreModels={onExploreModels} onJoinCommunity={onJoinCommunity} />
 
-          <p className="hero-subtitle">
-            Explore cutting-edge AI models, stay updated with industry news, advance your career, and connect with the global AI community.
-          </p>
+            <section className="posts-feed">
+              {loading ? (
+                <>
+                  <PostSkeleton />
+                  <PostSkeleton />
+                  <PostSkeleton />
+                </>
+              ) : error ? (
+                <div className="feed-error">
+                  <p>Unable to load posts. Please try again later.</p>
+                </div>
+              ) : posts.length === 0 ? (
+                <div className="feed-empty">
+                  <p>No posts yet. Be the first to share something!</p>
+                </div>
+              ) : (
+                posts.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    onLike={() => handlePostLike(post.id)}
+                    onComment={() => handlePostComment(post.id)}
+                    onShare={() => handlePostShare(post.id)}
+                  />
+                ))
+              )}
+            </section>
+          </CenterPanel>
 
-          <div className="hero-cta-group">
-            <button onClick={onExploreModels} className="hero-btn-primary">
-              Explore AI Models
-              <ArrowRight />
-            </button>
+          {/* Right Panel - Live Videos */}
+          <RightPanel>
+            <div className="live-videos-panel">
+              <div className="panel-header">
+                <h3 className="panel-title">Live Now</h3>
+                <span className="live-indicator">🔴</span>
+              </div>
 
-            <button onClick={onJoinCommunity} className="hero-btn-secondary">
-              <Users />
-              Join Community
-            </button>
-          </div>
-
-          <div className="hero-stats-grid">
-            <div className="hero-stat">
-              <div className="hero-stat-value">500+</div>
-              <div className="hero-stat-label">AI Models</div>
+              <div className="live-videos-list">
+                {loading ? (
+                  <>
+                    <LiveVideoSkeleton />
+                    <LiveVideoSkeleton />
+                  </>
+                ) : error ? (
+                  <div className="panel-error">
+                    <p>Unable to load live streams</p>
+                  </div>
+                ) : liveStreams.length === 0 ? (
+                  <div className="panel-empty">
+                    <p>No live streams at the moment</p>
+                  </div>
+                ) : (
+                  liveStreams.map((live) => (
+                    <LiveVideoCard
+                      key={live.id}
+                      liveStream={live}
+                      onWatch={() => handleWatchLive(live.id)}
+                    />
+                  ))
+                )}
+              </div>
             </div>
-            <div className="hero-stat">
-              <div className="hero-stat-value">10k+</div>
-              <div className="hero-stat-label">Community Members</div>
-            </div>
-            <div className="hero-stat">
-              <div className="hero-stat-value">2k+</div>
-              <div className="hero-stat-label">Job Listings</div>
-            </div>
-          </div>
+          </RightPanel>
         </div>
       </div>
     </div>
   );
 }
+
+export default Hero;

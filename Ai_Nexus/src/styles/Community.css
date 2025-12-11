@@ -1,6 +1,7 @@
 /* Community.css - Modern 3D Design with Glow Effects */
 
 .community-container {
+  margin-top: 4%;
   padding: 2rem;
   max-width: 100%;
   perspective: 1000px;

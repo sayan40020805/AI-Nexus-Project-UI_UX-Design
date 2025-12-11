@@ -8,7 +8,7 @@
 }
 
 .model-directory-container * {
-  margin-top: 15px;
+  margin-top: 4%;
   box-sizing: border-box;
 }
 
@@ -50,7 +50,7 @@
 .model-directory-search-icon {
   position: absolute;
   left: 1rem;
-  top: 40%;
+  top: 25%;
   transform: translateY(-50%);
   width: 1.25rem;
   height: 1.25rem;
@@ -90,7 +90,7 @@
 .model-directory-sort-icon {
   position: absolute;
   left: 1rem;
-  top: 40%;
+  top: 25%;
   transform: translateY(-50%);
   width: 1.25rem;
   height: 1.25rem;

@@ -39,8 +39,8 @@ export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSideb
 
   const sidebarItems = [
     { id: 'quiz', label: 'Quiz', icon: HelpCircle },
-    { id: 'ats-score', label: 'ATS Score', icon: BarChart3 },
-    { id: 'ai-shorts', label: 'AI Shorts', icon: Video },
+    { id: 'ats', label: 'ATS Score', icon: BarChart3 },
+    { id: 'shorts', label: 'AI Shorts', icon: Video },
     { id: 'live', label: 'Live', icon: Radio },
     { id: 'post', label: 'Post', icon: FileText },
   ];

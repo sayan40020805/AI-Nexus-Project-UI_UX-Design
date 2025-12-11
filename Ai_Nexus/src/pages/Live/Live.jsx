@@ -315,3 +315,5 @@ export function Live() {
     </div>
   );
 }
+
+export default Live;

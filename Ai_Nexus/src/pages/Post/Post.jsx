@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { FileText, Image, Link, Tag, Send, Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, Calendar, MapPin, Users } from 'lucide-react';
 import '../../styles/Post.css';
+import { FeedContext } from '../../context/FeedContext';
 
 const postsData = [
   {
@@ -61,20 +62,27 @@ const suggestedTopics = [
 ];
 
 export function Post() {
-  const [posts, setPosts] = useState(postsData);
+  const { addPost, posts: globalPosts } = useContext(FeedContext);
+  // Page should only show my posts
+  const [userPosts, setUserPosts] = useState([]);
   const [newPost, setNewPost] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
   const [showTagInput, setShowTagInput] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
 
+  useEffect(() => {
+    // Initialize user posts from global feed if any belong to 'You'
+    const mine = (globalPosts || []).filter((p) => p.author === 'You');
+    setUserPosts(mine);
+  }, [globalPosts]);
+
   const handleCreatePost = () => {
     if (newPost.trim()) {
       const post = {
-        id: posts.length + 1,
         author: 'You',
         authorAvatar: '👤',
-        timestamp: 'Just now',
+        timestamp: Date.now(),
         content: newPost,
         image: selectedImage,
         tags: selectedTags,
@@ -82,10 +90,11 @@ export function Post() {
         comments: 0,
         shares: 0,
         isLiked: false,
-        isSaved: false
+        isSaved: false,
       };
-      
-      setPosts([post, ...posts]);
+      // update local user posts and global feed
+      setUserPosts((prev) => [post, ...prev]);
+      addPost(post);
       setNewPost('');
       setSelectedTags([]);
       setSelectedImage(null);
@@ -263,15 +272,15 @@ export function Post() {
 
       {/* Posts Feed */}
       <div className="post-feed">
-        {posts.map((post) => (
-          <div key={post.id} className="post-card">
+        {userPosts.map((post, idx) => (
+          <div key={post.id || idx} className="post-card">
             <div className="post-header">
               <div className="post-author">
                 <div className="post-avatar">{post.authorAvatar}</div>
                 <div className="post-author-info">
                   <h4 className="post-author-name">{post.author}</h4>
-                  <div className="post-meta">
-                    <span className="post-timestamp">{post.timestamp}</span>
+                      <div className="post-meta">
+                      <span className="post-timestamp">{typeof post.timestamp === 'number' ? new Date(post.timestamp).toLocaleString() : post.timestamp}</span>
                     <span className="post-privacy">• Public</span>
                   </div>
                 </div>
@@ -368,3 +377,5 @@ export function Post() {
     </div>
   );
 }
+
+export default Post;

@@ -1,7 +1,7 @@
 /* Header.css - Clean & Functional Design */
 
 .header {
-  background: rgba(10, 14, 39, 0.8);
+  background: rgba(10, 10, 10, 0.8);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: var(--border-glow);
@@ -130,7 +130,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: rgba(125, 211, 252, 0.1);
+  background: rgba(254, 253, 253, 0.1);
   transition: left 0.3s ease;
   z-index: -1;
 }
@@ -343,4 +343,91 @@
 .header-auth-button:hover {
   color: var(--primary);
   background: rgba(125, 211, 252, 0.1);
+}
+
+/* Light Mode Overrides */
+.light .header-nav-item {
+  color: #1f2937; /* Dark text in light mode */
+}
+
+.light .header-nav-item.active {
+  color: #0284c7; /* Darker sky blue for active state */
+}
+
+.light .header-nav-item.inactive {
+  color: #4b5563; /* Medium dark gray */
+}
+
+.light .header-nav-item.inactive:hover {
+  color: #0284c7;
+}
+
+.light .header-mobile-nav-item {
+  color: #1f2937; /* Dark text in light mode */
+}
+
+.light .header-mobile-nav-item.active {
+  color: #0284c7;
+}
+
+.light .header-mobile-nav-item.inactive {
+  color: #4b5563;
+}
+
+.light .header-mobile-nav-item.inactive:hover {
+  color: #0284c7;
+}
+
+.light .header-icon-button {
+  color: #1f2937; /* Dark text for icon buttons */
+}
+
+.light .header-icon-button:hover {
+  color: #0284c7; /* Blue on hover */
+}
+
+.light .header-icon {
+  color: #1f2937; /* Dark icon in light mode */
+}
+
+.light .header-icon-button:hover .header-icon {
+  color: #0284c7;
+}
+
+.light .header-auth-button {
+  color: #1f2937; /* Dark text for auth buttons */
+}
+
+.light .header-auth-button:hover {
+  color: #0284c7;
+}
+
+/* Light Mode Header Background & Border */
+.light .header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(2, 132, 199, 0.5);
+  box-shadow: 0 8px 32px rgba(2, 132, 199, 0.1),
+              0 0 50px rgba(2, 132, 199, 0.08);
+}
+
+.light .header-title {
+  color: #000000; /* Black text */
+}
+
+.light .header-logo-icon {
+  color: #000000;
+}
+
+.light .header-sidebar-toggle {
+  background: rgba(2, 132, 199, 0.05);
+  border: 1px solid rgba(2, 132, 199, 0.3);
+  color: #000000;
+}
+
+.light .header-sidebar-toggle:hover {
+  background: rgba(2, 132, 199, 0.1);
+  border-color: rgba(2, 132, 199, 0.5);
+  color: #000000;
 }

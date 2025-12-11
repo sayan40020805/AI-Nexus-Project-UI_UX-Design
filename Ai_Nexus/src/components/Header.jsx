@@ -1,12 +1,12 @@
 import { Menu, X, Sparkles, Sun, Moon } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { useTheme } from 'next-themes';
+import { useThemeContext } from './theme-provider';
 import { Link } from 'react-router-dom';
 import '../styles/Header.css';
 
 export function Header({ activeSection, onNavigate }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { resolvedTheme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useThemeContext();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

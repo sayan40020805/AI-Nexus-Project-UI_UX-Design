@@ -4,8 +4,9 @@ import { Header } from './components/Header';
 import { ModernSidebar } from './components/ModernSidebar';
 import { Hero } from './components/Hero';
 import { AIShowcase } from './components/AIShowcase';
+import AIShowcasePage from './pages/AIShowcase/AIShowcase';
 import { Community } from './components/Community';
-import { Events } from './components/Events';
+import Events from './components/Events';
 import { JobBoard } from './components/JobBoard';
 import { ModelDirectory } from './components/ModelDirectory';
 import { NewsFeed } from './components/NewsFeed';
@@ -13,7 +14,18 @@ import { Footer } from './components/Footer';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 import Dashboard from './pages/Dashboard/Dashboard';
+import Live from './pages/Live/Live';
+import { Quiz } from './pages/Quiz/Quiz';
+import Post from './pages/Post/Post';
+import ATSScore from './pages/ATSScore/ATSScore';
+import AiShorts from './pages/AIShorts/AiShorts';
 import './App.css';
+import './styles/globals.css';
+import './styles/Live.css';
+import './styles/Quiz.css';
+import './styles/Post.css';
+import './styles/ATSScore.css';
+import './styles/AIShorts.css';
 
 const MainApp = () => {
   const [activeSection, setActiveSection] = useState('home');
@@ -38,6 +50,16 @@ const MainApp = () => {
         return <Events />;
       case 'community':
         return <Community />;
+      case 'live':
+        return <Live />;
+      case 'quiz':
+        return <Quiz />;
+      case 'post':
+        return <Post />;
+      case 'ats':
+        return <ATSScore />;
+      case 'shorts':
+        return <AiShorts />;
       case 'about':
         return (
           <div className="app-main" style={{ padding: '4rem 2rem' }}>
@@ -104,6 +126,66 @@ function App() {
             <div className="page-with-header">
               <Header />
               <Dashboard />
+              <Footer />
+            </div>
+          }
+        />
+        <Route
+          path="/live"
+          element={
+            <div className="page-with-header">
+              <Header />
+              <Live />
+              <Footer />
+            </div>
+          }
+        />
+        <Route
+          path="/quiz"
+          element={
+            <div className="page-with-header">
+              <Header />
+              <Quiz />
+              <Footer />
+            </div>
+          }
+        />
+        <Route
+          path="/post"
+          element={
+            <div className="page-with-header">
+              <Header />
+              <Post />
+              <Footer />
+            </div>
+          }
+        />
+        <Route
+          path="/ats"
+          element={
+            <div className="page-with-header">
+              <Header />
+              <ATSScore />
+              <Footer />
+            </div>
+          }
+        />
+        <Route
+          path="/shorts"
+          element={
+            <div className="page-with-header">
+              <Header />
+              <AiShorts />
+              <Footer />
+            </div>
+          }
+        />
+        <Route
+          path="/showcase"
+          element={
+            <div className="page-with-header">
+              <Header />
+              <AIShowcasePage />
               <Footer />
             </div>
           }
