@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Home, Newspaper, Sparkles, Cpu, Briefcase, Calendar, Search, User, X, HelpCircle, BarChart3, Video, Radio, FileText } from 'lucide-react';
 import '../styles/ModernSidebar.css';
 
@@ -7,6 +8,7 @@ export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSideb
   const [localOpen, setLocalOpen] = useState(false);
   const isControlled = typeof sidebarOpen === 'boolean';
   const open = isControlled ? sidebarOpen : localOpen;
+  const navigate = useNavigate();
 
   const setOpen = (val) => {
     if (isControlled) {
@@ -50,6 +52,11 @@ export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSideb
     setOpen(false);
   };
 
+  const handleProfileClick = () => {
+    navigate('/dashboard');
+    setOpen(false);
+  };
+
   return (
     <>
       {open && <div className="sidebar-overlay" onClick={() => setOpen(false)} />}
@@ -74,12 +81,12 @@ export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSideb
         </div>
 
         <div className="sidebar-quick-actions">
-          <button className="quick-action-btn search-btn" onClick={() => setOpen(false)}>
-            <Search className="h-4 w-4" />
-            <span>Search</span>
-          </button>
+          <div className="sidebar-search-bar">
+            <Search className="h-4 w-4 search-icon" />
+            <input type="text" placeholder="Search..." className="search-input" />
+          </div>
 
-          <button className="quick-action-btn profile-btn" onClick={() => setOpen(false)}>
+          <button className="quick-action-btn profile-btn" onClick={handleProfileClick}>
             <User className="h-4 w-4" />
             <span>Profile</span>
           </button>

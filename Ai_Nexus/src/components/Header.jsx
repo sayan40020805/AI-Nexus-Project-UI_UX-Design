@@ -127,6 +127,9 @@ export function Header({ activeSection, onNavigate }) {
                   {item.label}
                 </Link>
               ))}
+              <Link to="/login" className="header-mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>Login</Link>
+              <Link to="/register" className="header-mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>Register</Link>
+              <Link to="/dashboard" className="header-mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
             </div>
           </nav>
         )}

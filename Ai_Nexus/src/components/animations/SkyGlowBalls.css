@@ -1,0 +1,226 @@
+/* 3D Sky Glow Balls Animation Background */
+.sky-glow-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+  perspective: 1000px;
+}
+
+/* Sky gradient overlay for depth */
+.sky-gradient-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse at 20% 80%, 
+    rgba(120, 200, 255, 0.1) 0%, 
+    rgba(30, 60, 120, 0.05) 50%, 
+    transparent 100%
+  ),
+  radial-gradient(
+    ellipse at 80% 20%, 
+    rgba(100, 180, 255, 0.08) 0%, 
+    rgba(20, 40, 80, 0.03) 50%, 
+    transparent 100%
+  );
+  animation: gradientShift 15s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* Base glow ball styles */
+.glow-ball {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Large balls - slow, majestic movement */
+.large-balls {
+  background: radial-gradient(circle at 30% 30%, 
+    rgba(135, 206, 250, 0.9) 0%,
+    rgba(100, 149, 237, 0.7) 40%,
+    rgba(70, 130, 180, 0.4) 70%,
+    rgba(25, 25, 112, 0.2) 100%
+  );
+  box-shadow: 
+    0 0 20px rgba(135, 206, 250, 0.6),
+    0 0 40px rgba(100, 149, 237, 0.4),
+    0 0 80px rgba(70, 130, 180, 0.3),
+    inset 0 0 20px rgba(255, 255, 255, 0.2);
+  animation: largeBallFloat 12s ease-in-out infinite;
+}
+
+@keyframes largeBallFloat {
+  0% { 
+    transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg) scale(1);
+  }
+  25% { 
+    transform: translate3d(60px, -80px, 50px) rotateX(90deg) rotateY(90deg) scale(1.2);
+  }
+  50% { 
+    transform: translate3d(-40px, 60px, -30px) rotateX(180deg) rotateY(180deg) scale(0.9);
+  }
+  75% { 
+    transform: translate3d(40px, -60px, 40px) rotateX(270deg) rotateY(270deg) scale(1.1);
+  }
+  100% { 
+    transform: translate3d(0, 0, 0) rotateX(360deg) rotateY(360deg) scale(1);
+  }
+}
+
+/* Medium balls - balanced movement */
+.medium-balls {
+  background: radial-gradient(circle at 40% 40%, 
+    rgba(173, 216, 230, 0.8) 0%,
+    rgba(135, 206, 235, 0.6) 50%,
+    rgba(70, 130, 180, 0.3) 80%,
+    rgba(25, 25, 112, 0.1) 100%
+  );
+  box-shadow: 
+    0 0 15px rgba(173, 216, 230, 0.5),
+    0 0 30px rgba(135, 206, 235, 0.4),
+    0 0 60px rgba(70, 130, 180, 0.2),
+    inset 0 0 15px rgba(255, 255, 255, 0.3);
+  animation: mediumBallFloat 8s ease-in-out infinite;
+}
+
+@keyframes mediumBallFloat {
+  0% { 
+    transform: translate3d(0, 0, 0) rotateZ(0deg) scale(1);
+  }
+  33% { 
+    transform: translate3d(-50px, -70px, 30px) rotateZ(120deg) scale(1.1);
+  }
+  66% { 
+    transform: translate3d(70px, 50px, -20px) rotateZ(240deg) scale(0.9);
+  }
+  100% { 
+    transform: translate3d(0, 0, 0) rotateZ(360deg) scale(1);
+  }
+}
+
+/* Small balls - energetic movement */
+.small-balls {
+  background: radial-gradient(circle at 50% 50%, 
+    rgba(176, 224, 230, 0.7) 0%,
+    rgba(173, 216, 230, 0.5) 60%,
+    rgba(135, 206, 235, 0.3) 100%
+  );
+  box-shadow: 
+    0 0 10px rgba(176, 224, 230, 0.4),
+    0 0 25px rgba(173, 216, 230, 0.3),
+    inset 0 0 10px rgba(255, 255, 255, 0.4);
+  animation: smallBallFloat 6s ease-in-out infinite;
+}
+
+@keyframes smallBallFloat {
+  0% { 
+    transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg) scale(1);
+  }
+  50% { 
+    transform: translate3d(80px, -100px, 60px) rotateX(180deg) rotateY(180deg) scale(1.3);
+  }
+  100% { 
+    transform: translate3d(0, 0, 0) rotateX(360deg) rotateY(360deg) scale(1);
+  }
+}
+
+/* Tiny balls - very fast and sparkly */
+.tiny-balls {
+  background: radial-gradient(circle at 60% 60%, 
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(200, 220, 255, 0.6) 70%,
+    rgba(150, 180, 255, 0.3) 100%
+  );
+  box-shadow: 
+    0 0 8px rgba(255, 255, 255, 0.6),
+    0 0 15px rgba(200, 220, 255, 0.4),
+    0 0 25px rgba(150, 180, 255, 0.2);
+  animation: tinyBallFloat 4s ease-in-out infinite;
+}
+
+@keyframes tinyBallFloat {
+  0% { 
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.7;
+  }
+  25% { 
+    transform: translate3d(30px, -50px, 40px) scale(1.2);
+    opacity: 1;
+  }
+  50% { 
+    transform: translate3d(-20px, 30px, -20px) scale(0.8);
+    opacity: 0.8;
+  }
+  75% { 
+    transform: translate3d(40px, -40px, 30px) scale(1.1);
+    opacity: 0.9;
+  }
+  100% { 
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.7;
+  }
+}
+
+/* Floating particles for additional depth */
+.floating-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.floating-particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2));
+  border-radius: 50%;
+  animation: particleFloat 10s linear infinite;
+}
+
+@keyframes particleFloat {
+  0% { 
+    transform: translateY(100vh) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { 
+    transform: translateY(-10vh) translateX(50px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .large-balls {
+    animation-duration: 15s;
+  }
+  
+  .medium-balls {
+    animation-duration: 10s;
+  }
+  
+  .small-balls {
+    animation-duration: 8s;
+  }
+  
+  .tiny-balls {
+    animation-duration: 6s;
+  }
+}

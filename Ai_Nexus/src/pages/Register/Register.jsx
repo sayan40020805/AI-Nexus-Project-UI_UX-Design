@@ -1,6 +1,10 @@
+
+
+
+
 import React, { useState, Suspense } from 'react';
 import './Register.css';
-import NetworkAnimation from '../../components/animations/NetworkAnimation';
+import SkyGlowBalls from '../../components/animations/SkyGlowBalls';
 
 const Register = () => {
   const [isCompany, setIsCompany] = useState(false);
@@ -30,9 +34,10 @@ const Register = () => {
           Already have an account? <a href="/login">Login here</a>
         </p>
       </div>
+
       <div className="animation-container">
         <Suspense fallback={<div>Loading...</div>}>
-          <NetworkAnimation />
+          <SkyGlowBalls />
         </Suspense>
       </div>
     </div>

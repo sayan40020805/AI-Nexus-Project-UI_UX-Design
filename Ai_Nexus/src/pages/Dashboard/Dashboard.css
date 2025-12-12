@@ -1,27 +1,19 @@
-:root {
-  --dashboard-bg-color: #0d0d12;
-  --card-bg-color: #1a1a2e;
-  --text-color: #e0e0e0;
-  --glow-color-light: rgba(125, 211, 252, 0.7); /* Sky blue glow */
-  --glow-color-dark: rgba(6, 182, 212, 0.5); /* Deeper sky blue/cyan */
-  --border-color: rgba(125, 211, 252, 0.3);
-  --button-bg-color: #0a73b7;
-  --button-hover-bg-color: #085e92;
-  --input-bg-color: #2a2a4a;
-  --input-border-color: #3f3f6c;
-}
 
 .dashboard-container {
+  margin: 0;
   display: flex;
   flex-direction: column;
-  background-color: var(--dashboard-bg-color);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--bg-secondary) 100%);
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(125, 211, 252, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
   min-height: 100vh;
-  color: var(--text-color);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  padding: 0;
-  margin-top: 95px; /* Adjust for fixed header height */
+  color: var(--text);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  padding: 95px 0 0;
   box-sizing: border-box;
 }
+
 
 .cover-photo {
   width: 100%;
@@ -30,39 +22,45 @@
   background-position: center;
   position: relative;
   border-bottom: 2px solid var(--border-color);
-  box-shadow: 0 4px 20px var(--glow-color-dark);
+  box-shadow: 0 4px 20px var(--glow-shadow);
 }
 
 .profile-pic-large {
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  border: 5px solid var(--dashboard-bg-color);
+  border: 5px solid var(--bg);
   position: absolute;
-  bottom: -75px; /* Half of height to center it */
+  bottom: -75px;
   left: 50%;
   transform: translateX(-50%);
   object-fit: cover;
-  box-shadow: 0 0 15px var(--glow-color-light), inset 0 0 10px rgba(0,0,0,0.5);
+  box-shadow: 0 0 15px var(--glow-shadow), inset 0 0 10px rgba(0,0,0,0.5);
 }
+
 
 .dashboard-header {
   text-align: center;
-  padding: 90px 2rem 1rem; /* Adjust top padding to clear profile pic */
-  background-color: var(--dashboard-bg-color);
+  padding: 90px 2rem 1rem;
+  background: linear-gradient(135deg, var(--bg) 0%, var(--bg-secondary) 100%);
   border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--glow-shadow);
 }
 
 .user-name {
   margin: 0.5rem 0 0.2rem;
   font-size: 2.5rem;
   font-weight: 700;
-  color: var(--glow-color-light);
-  text-shadow: 0 0 10px var(--glow-color-light);
+  color: var(--primary);
+  text-shadow: 0 0 10px var(--glow-shadow);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .username {
-  color: var(--border-color);
+  color: var(--text-muted);
   font-size: 1.1rem;
   margin-bottom: 1rem;
 }
@@ -72,7 +70,7 @@
   margin: 0 auto 1.5rem;
   font-size: 1rem;
   line-height: 1.6;
-  color: var(--text-color);
+  color: var(--text);
 }
 
 .user-stats {
@@ -85,8 +83,9 @@
 .user-stats span {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--glow-color-light);
+  color: var(--primary);
 }
+
 
 .profile-actions {
   display: flex;
@@ -101,31 +100,33 @@
   padding: 0.7rem 1.5rem;
   border: none;
   border-radius: 25px;
-  background-color: var(--button-bg-color);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
   color: white;
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 0 8px var(--glow-color-dark);
+  box-shadow: 0 0 8px var(--glow-shadow);
 }
 
 .follow-button:hover,
 .message-button:hover,
 .create-post-button:hover {
-  background-color: var(--button-hover-bg-color);
-  box-shadow: 0 0 15px var(--glow-color-light);
+  box-shadow: 0 0 15px var(--glow-shadow-hover);
   transform: translateY(-2px);
 }
+
 
 .dashboard-tabs {
   display: flex;
   justify-content: center;
-  background-color: var(--dashboard-bg-color);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--bg-secondary) 100%);
   border-bottom: 1px solid var(--border-color);
   margin-bottom: 1.5rem;
   position: sticky;
-  top: 95px; /* Stick below header */
+  top: 95px;
   z-index: 40;
+  box-shadow: var(--glow-shadow);
 }
 
 .tab-button {
@@ -133,19 +134,20 @@
   border: none;
   padding: 1rem 2rem;
   font-size: 1.1rem;
-  color: var(--text-color);
+  color: var(--text-muted);
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
+  font-weight: 600;
 }
 
 .tab-button:hover {
-  color: var(--glow-color-light);
+  color: var(--primary);
 }
 
 .tab-button.active {
-  color: var(--glow-color-light);
-  font-weight: 600;
+  color: var(--primary);
+  font-weight: 700;
 }
 
 .tab-button.active::after {
@@ -156,8 +158,8 @@
   transform: translateX(-50%);
   width: 70%;
   height: 3px;
-  background-color: var(--glow-color-light);
-  box-shadow: 0 0 10px var(--glow-color-light);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  box-shadow: 0 0 10px var(--glow-shadow);
   border-radius: 2px;
 }
 
@@ -176,30 +178,48 @@
   gap: 1.5rem;
 }
 
+
 .post-creator-card,
 .about-card {
-  background-color: var(--card-bg-color);
-  padding: 1.5rem;
-  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
   border: 1px solid var(--border-color);
-  box-shadow: 0 0 10px var(--glow-color-dark);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: var(--glow-shadow), 0 8px 24px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
 }
 
+.post-creator-card:hover,
+.about-card:hover {
+  border-color: rgba(125, 211, 252, 0.3);
+  box-shadow: var(--glow-shadow-hover), 0 12px 32px rgba(125, 211, 252, 0.15);
+  transform: translateY(-2px);
+}
+
+
 .post-creator-card textarea {
-  width: calc(100% - 1rem); /* Adjust for padding */
-  padding: 0.5rem;
-  background-color: var(--input-bg-color);
-  border: 1px solid var(--input-border-color);
+  width: calc(100% - 1rem);
+  padding: 0.75rem;
+  background: rgba(15, 20, 40, 0.8);
+  border: var(--border-glow);
   border-radius: 8px;
-  color: var(--text-color);
+  color: var(--text);
   resize: vertical;
   min-height: 80px;
   margin-bottom: 1rem;
-  box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.post-creator-card textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 30px rgba(125, 211, 252, 0.3), inset 0 0 15px rgba(125, 211, 252, 0.05);
 }
 
 .post-creator-card textarea::placeholder {
-  color: rgba(224, 224, 224, 0.6);
+  color: var(--muted);
 }
 
 .create-post-button {
@@ -212,12 +232,39 @@
   gap: 1.5rem;
 }
 
+
 .post-card {
-  background-color: var(--card-bg-color);
-  padding: 1.5rem;
-  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
   border: 1px solid var(--border-color);
-  box-shadow: 0 0 10px var(--glow-color-dark);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: var(--glow-shadow), 0 8px 24px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.post-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(125, 211, 252, 0.05) 50%, transparent 100%);
+  transition: left 0.4s ease;
+  pointer-events: none;
+}
+
+.post-card:hover {
+  border-color: rgba(125, 211, 252, 0.3);
+  box-shadow: var(--glow-shadow-hover), 0 12px 32px rgba(125, 211, 252, 0.15);
+  transform: translateY(-4px);
+}
+
+.post-card:hover::before {
+  left: 100%;
 }
 
 .post-author-info {
@@ -225,25 +272,34 @@
   align-items: center;
   gap: 0.8rem;
   margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
 }
 
 .post-author-pic {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--glow-color-light);
+  border: 2px solid var(--primary);
+  background: linear-gradient(135deg, rgba(125, 211, 252, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
 }
 
 .post-author-name {
-  font-weight: 600;
-  color: var(--glow-color-light);
+  font-weight: 700;
+  color: var(--text);
   font-size: 1.1rem;
 }
 
 .post-timestamp {
   font-size: 0.85rem;
-  color: rgba(224, 224, 224, 0.6);
+  color: var(--text-muted);
   margin-left: 0.5rem;
 }
 
@@ -351,7 +407,212 @@
   transition: color 0.3s ease;
 }
 
+
 .social-links-list a:hover {
   color: var(--glow-color-dark);
   text-decoration: underline;
+}
+
+/* ===== LIGHT MODE ===== */
+.light .dashboard-container {
+  background: linear-gradient(135deg, #f0f2f5 0%, #e8eaed 100%);
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(2, 132, 199, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(8, 145, 178, 0.03) 0%, transparent 50%);
+  color: #1f2937;
+}
+
+.light .cover-photo {
+  border-bottom: 2px solid rgba(2, 132, 199, 0.2);
+  box-shadow: 0 4px 20px rgba(2, 132, 199, 0.08);
+}
+
+.light .profile-pic-large {
+  border: 5px solid #ffffff;
+  box-shadow: 0 0 15px rgba(2, 132, 199, 0.15), inset 0 0 10px rgba(0,0,0,0.1);
+}
+
+.light .dashboard-header {
+  background: linear-gradient(135deg, #f0f2f5 0%, #ffffff 100%);
+  border-bottom: 1px solid rgba(2, 132, 199, 0.15);
+  box-shadow: 0 4px 20px rgba(2, 132, 199, 0.08);
+}
+
+.light .user-name {
+  color: #0284c7;
+  text-shadow: 0 0 10px rgba(2, 132, 199, 0.1);
+}
+
+.light .username {
+  color: #4b5563;
+}
+
+.light .user-bio {
+  color: #1f2937;
+}
+
+.light .user-stats span {
+  color: #0284c7;
+}
+
+.light .follow-button,
+.light .message-button,
+.light .create-post-button {
+  background: linear-gradient(135deg, #0284c7 0%, #0891b2 100%);
+  color: white;
+  box-shadow: 0 0 8px rgba(2, 132, 199, 0.2);
+}
+
+.light .follow-button:hover,
+.light .message-button:hover,
+.light .create-post-button:hover {
+  box-shadow: 0 0 15px rgba(2, 132, 199, 0.3);
+}
+
+.light .dashboard-tabs {
+  background: linear-gradient(135deg, #f0f2f5 0%, #ffffff 100%);
+  border-bottom: 1px solid rgba(2, 132, 199, 0.15);
+  box-shadow: 0 4px 20px rgba(2, 132, 199, 0.08);
+}
+
+.light .tab-button {
+  color: #4b5563;
+}
+
+.light .tab-button:hover {
+  color: #0284c7;
+}
+
+.light .tab-button.active {
+  color: #0284c7;
+}
+
+.light .tab-button.active::after {
+  background: linear-gradient(135deg, #0284c7 0%, #0891b2 100%);
+  box-shadow: 0 0 10px rgba(2, 132, 199, 0.15);
+}
+
+.light .post-creator-card,
+.light .about-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.95) 100%);
+  border: 1px solid rgba(2, 132, 199, 0.15);
+  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.08);
+}
+
+.light .post-creator-card:hover,
+.light .about-card:hover {
+  border-color: rgba(2, 132, 199, 0.3);
+  box-shadow: 0 12px 32px rgba(2, 132, 199, 0.15);
+}
+
+.light .post-creator-card textarea {
+  background: rgba(248, 249, 250, 0.9);
+  border: 1px solid rgba(2, 132, 199, 0.2);
+  color: #1f2937;
+}
+
+.light .post-creator-card textarea:focus {
+  border-color: #0284c7;
+  box-shadow: 0 0 30px rgba(2, 132, 199, 0.2), inset 0 0 15px rgba(2, 132, 199, 0.05);
+}
+
+.light .post-creator-card textarea::placeholder {
+  color: #6b7b9a;
+}
+
+.light .post-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.95) 100%);
+  border: 1px solid rgba(2, 132, 199, 0.15);
+  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.08);
+}
+
+.light .post-card:hover {
+  border-color: rgba(2, 132, 199, 0.3);
+  box-shadow: 0 12px 32px rgba(2, 132, 199, 0.15);
+}
+
+.light .post-author-pic {
+  border: 2px solid #0284c7;
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.15) 0%, rgba(8, 145, 178, 0.15) 100%);
+  color: #0284c7;
+}
+
+.light .post-author-name {
+  color: #000000;
+}
+
+.light .post-timestamp {
+  color: #4b5563;
+}
+
+.light .post-content-text {
+  color: #1f2937;
+}
+
+.light .post-image {
+  border: 1px solid rgba(2, 132, 199, 0.15);
+}
+
+.light .post-card:hover .post-image {
+  border-color: rgba(2, 132, 199, 0.3);
+  box-shadow: 0 0 20px rgba(2, 132, 199, 0.1);
+}
+
+.light .post-actions {
+  border-top: 1px solid rgba(2, 132, 199, 0.1);
+}
+
+.light .post-actions button {
+  color: #4b5563;
+}
+
+.light .post-actions button:hover {
+  color: #0284c7;
+}
+
+.light .post-comments {
+  border-top: 1px dashed rgba(2, 132, 199, 0.15);
+}
+
+.light .comment-item {
+  background: rgba(2, 132, 199, 0.03);
+  border: 1px solid rgba(2, 132, 199, 0.15);
+  color: #1f2937;
+}
+
+.light .comment-item strong {
+  color: #0284c7;
+}
+
+.light .comment-timestamp {
+  color: #6b7b9a;
+}
+
+.light .about-card h3 {
+  color: #0284c7;
+  text-shadow: 0 0 8px rgba(2, 132, 199, 0.1);
+}
+
+.light .about-card p {
+  color: #1f2937;
+}
+
+.light .about-card h4 {
+  color: #0284c7;
+}
+
+.light .skills-list li,
+.light .social-links-list li {
+  background: rgba(2, 132, 199, 0.08);
+  color: #0284c7;
+  border: 1px solid rgba(2, 132, 199, 0.2);
+  box-shadow: 0 0 5px rgba(2, 132, 199, 0.1);
+}
+
+.light .social-links-list a {
+  color: #0284c7;
+}
+
+.light .social-links-list a:hover {
+  color: #0891b2;
 }
