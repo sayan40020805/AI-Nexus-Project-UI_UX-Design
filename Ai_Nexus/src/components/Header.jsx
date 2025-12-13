@@ -1,5 +1,5 @@
+import React, { useState, useEffect } from 'react';
 import { Menu, X, Sparkles, Sun, Moon } from 'lucide-react';
-import { useState, useEffect } from 'react';
 import { useThemeContext } from './theme-provider';
 import { Link } from 'react-router-dom';
 import '../styles/Header.css';
@@ -12,6 +12,7 @@ export function Header({ activeSection, onNavigate }) {
   useEffect(() => {
     setMounted(true);
   }, []);
+
 
   const navItems = [
     { id: 'home', label: 'Home' },
@@ -87,11 +88,11 @@ export function Header({ activeSection, onNavigate }) {
             ))}
           </nav>
 
+
           {/* Right side icons */}
           <div className="header-right">
             <Link to="/login" className="header-auth-button">Login</Link>
             <Link to="/register" className="header-auth-button">Register</Link>
-            <Link to="/dashboard" className="header-auth-button">Dashboard</Link>
             <button
               className="header-icon-button"
               onClick={toggleDarkMode}
@@ -127,9 +128,9 @@ export function Header({ activeSection, onNavigate }) {
                   {item.label}
                 </Link>
               ))}
+
               <Link to="/login" className="header-mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>Login</Link>
               <Link to="/register" className="header-mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>Register</Link>
-              <Link to="/dashboard" className="header-mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
             </div>
           </nav>
         )}

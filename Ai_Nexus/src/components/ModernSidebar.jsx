@@ -1,7 +1,7 @@
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { ChevronRight, Sparkles, Search, User, X, HelpCircle, BarChart3, Video, Radio, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Home, Newspaper, Sparkles, Cpu, Briefcase, Calendar, Search, User, X, HelpCircle, BarChart3, Video, Radio, FileText } from 'lucide-react';
 import '../styles/ModernSidebar.css';
 
 export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSidebarOpen }) {
@@ -43,6 +43,7 @@ export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSideb
     { id: 'quiz', label: 'Quiz', icon: HelpCircle },
     { id: 'ats', label: 'ATS Score', icon: BarChart3 },
     { id: 'shorts', label: 'AI Shorts', icon: Video },
+    { id: 'create-post', label: 'Create Post', icon: FileText },
     { id: 'live', label: 'Live', icon: Radio },
     { id: 'post', label: 'Post', icon: FileText },
   ];

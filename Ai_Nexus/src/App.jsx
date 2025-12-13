@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Header } from './components/Header';
@@ -26,6 +27,8 @@ import './styles/Quiz.css';
 import './styles/Post.css';
 import './styles/ATSScore.css';
 import './styles/AIShorts.css';
+import { PostForm } from './components/PostCreation';
+
 
 const MainApp = () => {
   const [activeSection, setActiveSection] = useState('home');
@@ -44,6 +47,8 @@ const MainApp = () => {
         return <AIShowcase />;
       case 'models':
         return <ModelDirectory />;
+      case 'create-post':
+        return <PostForm />;
       case 'career':
         return <JobBoard />;
       case 'events':
@@ -186,6 +191,16 @@ function App() {
             <div className="page-with-header">
               <Header />
               <AIShowcasePage />
+              <Footer />
+            </div>
+          }
+        />
+        <Route
+          path="/create-post"
+          element={
+            <div className="page-with-header">
+              <Header />
+              <PostForm />
               <Footer />
             </div>
           }
