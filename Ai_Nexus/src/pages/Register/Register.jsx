@@ -45,19 +45,87 @@ const Register = () => {
 };
 
 const UserRegister = () => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: name, email, password }),
+      });
+
+      // Check if response is ok before parsing JSON
+      if (!response.ok) {
+        const contentType = response.headers.get('content-type');
+        let errorMsg = 'Registration failed';
+        
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          errorMsg = errorData.msg || errorMsg;
+        } else {
+          errorMsg = `HTTP ${response.status}: ${response.statusText}`;
+        }
+        
+        alert(`Registration failed: ${errorMsg}`);
+        return;
+      }
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('Registration successful!');
+        // TODO: Redirect to login or dashboard
+        console.log('Token:', data.token);
+      } else {
+        alert(`Registration failed: ${data.msg}`);
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      alert(`An error occurred during registration: ${error.message}`);
+    }
+  };
+
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <div className="input-group">
         <label htmlFor="name">Full Name</label>
-        <input type="text" id="name" name="name" required />
+        <input
+          type="text"
+          id="name"
+          name="name"
+          required
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
       </div>
       <div className="input-group">
         <label htmlFor="email">Email</label>
-        <input type="email" id="email" name="email" required />
+        <input
+          type="email"
+          id="email"
+          name="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
       </div>
       <div className="input-group">
         <label htmlFor="password">Password</label>
-        <input type="password" id="password" name="password" required />
+        <input
+          type="password"
+          id="password"
+          name="password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
       </div>
       <div className="input-group">
         <label htmlFor="profile-pic">Profile Picture</label>
@@ -69,6 +137,7 @@ const UserRegister = () => {
 };
 
 const CompanyRegister = () => {
+  // TODO: Implement company registration
   return (
     <form>
       <div className="input-group">
