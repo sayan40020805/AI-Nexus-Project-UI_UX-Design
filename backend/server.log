@@ -1,0 +1,8 @@
+(node:77874) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:77874) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:77874) [MONGOOSE] Warning: Duplicate schema index on {"email":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+Server started on port 5000
+Environment: development
+Uploads served from: /workspaces/AI-Nexus-Project-UI_UX-Design/backend/uploads
+MongoDB Connected: ac-nxn5qqk-shard-00-00.cg391uu.mongodb.net

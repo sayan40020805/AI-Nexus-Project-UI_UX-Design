@@ -1,42 +1,124 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import './Login.css';
 
 const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store the token in localStorage
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        alert('Login successful!');
+        
+        // Redirect based on user role
+        if (data.user.role === 'company') {
+          window.location.href = '/dashboard?tab=company';
+        } else {
+          window.location.href = '/dashboard?tab=user';
+        }
+      } else {
+        setError(data.msg || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('An error occurred during login. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="login-container">
-
       {/* LEFT SIDE ANIMATION */}
       <div className="animation-container">
-  <div className="ball" style={{ top: "40px", left: "50px", animationDelay: "0s" }}></div>
-  <div className="ball" style={{ top: "150px", left: "120px", animationDelay: "1s" }}></div>
-  <div className="ball" style={{ top: "260px", left: "30px", animationDelay: "2s" }}></div>
-  <div className="ball" style={{ top: "370px", left: "140px", animationDelay: "3s" }}></div>
-  <div className="ball" style={{ top: "480px", left: "60px", animationDelay: "1.5s" }}></div>
-  <div className="ball" style={{ top: "600px", left: "110px", animationDelay: "2.8s" }}></div>
-</div>
+        <div className="ball" style={{ top: "40px", left: "50px", animationDelay: "0s" }}></div>
+        <div className="ball" style={{ top: "150px", left: "120px", animationDelay: "1s" }}></div>
+        <div className="ball" style={{ top: "260px", left: "30px", animationDelay: "2s" }}></div>
+        <div className="ball" style={{ top: "370px", left: "140px", animationDelay: "3s" }}></div>
+        <div className="ball" style={{ top: "480px", left: "60px", animationDelay: "1.5s" }}></div>
+        <div className="ball" style={{ top: "600px", left: "110px", animationDelay: "2.8s" }}></div>
+      </div>
 
       {/* RIGHT SIDE LOGIN FORM */}
       <div className="login-form">
         <h2>Login</h2>
-        <form>
+        
+        {error && (
+          <div className="error-message" style={{ 
+            background: '#ff4444', 
+            color: 'white', 
+            padding: '10px', 
+            borderRadius: '4px', 
+            marginBottom: '15px',
+            fontSize: '14px'
+          }}>
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label htmlFor="email">Email</label>
-            <input type="email" id="email" name="email" required />
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              disabled={loading}
+            />
           </div>
 
           <div className="input-group">
             <label htmlFor="password">Password</label>
-            <input type="password" id="password" name="password" required />
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              disabled={loading}
+            />
           </div>
 
-          <button type="submit" className="login-button">Login</button>
+          <button 
+            type="submit" 
+            className="login-button"
+            disabled={loading}
+          >
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
         </form>
 
         <p className="register-link">
           Don't have an account? <a href="/register">Register here</a>
         </p>
       </div>
-
     </div>
   );
 };
