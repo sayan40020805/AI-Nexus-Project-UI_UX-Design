@@ -1,4 +1,7 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { validateEmail, validatePassword, validateRole } from '../utils/validation';
+import { handleApiError, createLoadingState } from '../utils/errorHandler';
 
 const AuthContext = createContext();
 
@@ -26,8 +29,9 @@ export const AuthProvider = ({ children }) => {
           setToken(storedToken);
           setUser(JSON.parse(storedUser));
           
+
           // Verify token with backend
-          const response = await fetch('/api/auth/me', {
+          const response = await fetch('/auth/me', {
             headers: {
               'Authorization': `Bearer ${storedToken}`
             }
@@ -52,20 +56,41 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
+
+
   const login = async (email, password) => {
+    // Validate parameters using utility functions
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      return { success: false, error: emailValidation.error };
+    }
+
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      return { success: false, error: passwordValidation.error };
+    }
+
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ 
+          email: emailValidation.email, 
+          password 
+        }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
         const { token: newToken, user: userData } = data;
+        
+        // Validate response data
+        if (!newToken || !userData) {
+          return { success: false, error: 'Invalid response from server' };
+        }
         
         // Store auth data
         localStorage.setItem('token', newToken);
@@ -76,17 +101,27 @@ export const AuthProvider = ({ children }) => {
         
         return { success: true, user: userData };
       } else {
-        return { success: false, error: data.msg || 'Login failed' };
+        return { 
+          success: false, 
+          error: data.msg || data.message || 'Login failed. Please check your credentials.' 
+        };
       }
     } catch (error) {
-      console.error('Login error:', error);
-      return { success: false, error: 'Network error. Please try again.' };
+      const errorResult = handleApiError(error);
+      return errorResult;
     }
   };
 
+
+
   const register = async (formData) => {
     try {
-      const response = await fetch('/api/auth/signup', {
+      // Validate FormData presence
+      if (!(formData instanceof FormData)) {
+        return { success: false, error: 'Invalid form data provided' };
+      }
+
+      const response = await fetch('/auth/signup', {
         method: 'POST',
         body: formData, // Don't set Content-Type header for FormData
       });
@@ -96,6 +131,11 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         const { token: newToken, user: userData } = data;
         
+        // Validate response data
+        if (!newToken || !userData) {
+          return { success: false, error: 'Invalid response from server' };
+        }
+        
         // Store auth data
         localStorage.setItem('token', newToken);
         localStorage.setItem('user', JSON.stringify(userData));
@@ -105,11 +145,14 @@ export const AuthProvider = ({ children }) => {
         
         return { success: true, user: userData };
       } else {
-        return { success: false, error: data.msg || 'Registration failed' };
+        return { 
+          success: false, 
+          error: data.msg || data.message || 'Registration failed. Please check your information.' 
+        };
       }
     } catch (error) {
-      console.error('Registration error:', error);
-      return { success: false, error: 'Network error. Please try again.' };
+      const errorResult = handleApiError(error);
+      return errorResult;
     }
   };
 
