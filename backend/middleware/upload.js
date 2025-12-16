@@ -8,7 +8,6 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-
 // Configure storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -61,9 +60,20 @@ const upload = multer({
   fileFilter: fileFilter,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB limit
-    files: 2, // Maximum 2 files
+    files: 1, // Maximum 1 file
   },
 });
+
+
+// Flexible upload middleware that handles optional file fields
+// This middleware accepts both user and company files without role dependency
+const uploadFlexible = (req, res, next) => {
+  // Allow both optional file types without role checking
+  upload.fields([
+    { name: 'profile-pic', maxCount: 1 },
+    { name: 'company-logo', maxCount: 1 }
+  ])(req, res, next);
+};
 
 // Middleware functions for different upload scenarios
 const uploadProfilePicture = upload.single('profile-pic');
@@ -80,7 +90,7 @@ const handleUploadError = (err, req, res, next) => {
       return res.status(400).json({ msg: 'File too large. Maximum size is 5MB.' });
     }
     if (err.code === 'LIMIT_FILE_COUNT') {
-      return res.status(400).json({ msg: 'Too many files. Maximum is 2 files.' });
+      return res.status(400).json({ msg: 'Too many files. Maximum is 1 file.' });
     }
     if (err.code === 'LIMIT_UNEXPECTED_FILE') {
       return res.status(400).json({ msg: 'Unexpected file field.' });
@@ -99,5 +109,6 @@ module.exports = {
   uploadProfilePicture,
   uploadCompanyLogo,
   uploadMultiple,
+  uploadFlexible, // Use this for flexible role-based uploads
   handleUploadError,
 };

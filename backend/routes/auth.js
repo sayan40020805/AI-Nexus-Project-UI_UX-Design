@@ -8,60 +8,45 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-const { uploadProfilePicture, uploadCompanyLogo, uploadMultiple, handleUploadError } = require('../middleware/upload');
+
+const { uploadProfilePicture, uploadCompanyLogo, uploadMultiple, uploadFlexible, handleUploadError } = require('../middleware/upload');
 
 const router = express.Router();
+
 
 
 
 // @route   POST /api/auth/signup
 // @desc    Register a new user or company
 router.post('/signup', 
-  // Handle both user and company uploads
-  uploadMultiple,
+  // Handle flexible uploads (optional files)
+  uploadFlexible,
   handleUploadError,
   // Registration logic
   async (req, res) => {
     const { role, username, email, password, companyName, companyDescription } = req.body;
 
-
-
     try {
-      console.log('=== SIGNUP DEBUG INFO ===');
-      console.log('Request body:', JSON.stringify(req.body, null, 2));
-      console.log('Request files:', req.files ? Object.keys(req.files) : 'No files');
-      console.log('Request headers:', JSON.stringify(req.headers, null, 2));
-      console.log('Content-Type:', req.headers['content-type']);
-      console.log('=== END DEBUG ===');
-      
-      console.log('Signup request received:', { role, email, username, companyName, hasFile: !!req.file });
-      
       // Basic validation
       if (!role || !email || !password) {
-        console.log('Validation failed: missing required fields');
-        console.log('role:', role, 'email:', email, 'password:', password);
         return res.status(400).json({ msg: 'Role, email, and password are required' });
       }
 
       if (role === 'user' && !username) {
-        console.log('Validation failed: missing username for user');
         return res.status(400).json({ msg: 'Username is required for user registration' });
       }
 
       if (role === 'company' && !companyName) {
-        console.log('Validation failed: missing company name');
         return res.status(400).json({ msg: 'Company name is required for company registration' });
       }
 
       if (password.length < 6) {
-        console.log('Validation failed: password too short');
         return res.status(400).json({ msg: 'Password must be at least 6 characters long' });
       }
 
       // Password complexity check
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/;
       if (!passwordRegex.test(password)) {
-        console.log('Validation failed: password complexity');
         return res.status(400).json({ msg: 'Password must contain at least one uppercase letter, one lowercase letter, and one number' });
       }
 
@@ -86,19 +71,28 @@ router.post('/signup',
         role,
       };
 
+
       // Add role-specific fields
       if (role === 'user') {
         userData.username = username;
-        if (req.file) {
-          userData.profilePicture = `/uploads/profiles/${req.file.filename}`;
+        if (req.files) {
+          // Find profile picture file
+          const profileFile = req.files.find(f => f.fieldname === 'profile-pic' || f.fieldname === 'profilePicture');
+          if (profileFile) {
+            userData.profilePicture = `/uploads/profiles/${profileFile.filename}`;
+          }
         }
       } else if (role === 'company') {
         userData.companyName = companyName;
         if (companyDescription) {
           userData.companyDescription = companyDescription;
         }
-        if (req.file) {
-          userData.companyLogo = `/uploads/companies/${req.file.filename}`;
+        if (req.files) {
+          // Find company logo file
+          const logoFile = req.files.find(f => f.fieldname === 'company-logo' || f.fieldname === 'companyLogo');
+          if (logoFile) {
+            userData.companyLogo = `/uploads/companies/${logoFile.filename}`;
+          }
         }
       }
 

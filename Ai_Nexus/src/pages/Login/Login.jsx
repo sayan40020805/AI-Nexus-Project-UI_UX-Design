@@ -1,8 +1,14 @@
 
+
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import './Login.css';
 
+
 const Login = () => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -14,31 +20,17 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const result = await login(email, password);
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Store the token in localStorage
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
-        alert('Login successful!');
-        
+      if (result.success) {
         // Redirect based on user role
-        if (data.user.role === 'company') {
-          window.location.href = '/dashboard?tab=company';
-        } else {
-          window.location.href = '/dashboard?tab=user';
-        }
+        const dashboardPath = result.user.role === 'company' 
+          ? '/dashboard?tab=company' 
+          : '/dashboard?tab=user';
+        
+        navigate(dashboardPath);
       } else {
-        setError(data.msg || 'Login failed');
+        setError(result.error || 'Login failed');
       }
     } catch (error) {
       console.error('Login error:', error);

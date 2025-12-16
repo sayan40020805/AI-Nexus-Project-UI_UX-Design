@@ -1,17 +1,32 @@
+
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Sparkles, Sun, Moon } from 'lucide-react';
+import { Menu, X, Sparkles, Sun, Moon, LogOut, User, Building } from 'lucide-react';
 import { useThemeContext } from './theme-provider';
-import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Header.css';
+
 
 export function Header({ activeSection, onNavigate }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { resolvedTheme, setTheme } = useThemeContext();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  const getDashboardLink = () => {
+    if (!user) return '/dashboard';
+    return user.role === 'company' ? '/dashboard?tab=company' : '/dashboard?tab=user';
+  };
 
 
   const navItems = [
@@ -89,10 +104,42 @@ export function Header({ activeSection, onNavigate }) {
           </nav>
 
 
+
           {/* Right side icons */}
           <div className="header-right">
-            <Link to="/login" className="header-auth-button">Login</Link>
-            <Link to="/register" className="header-auth-button">Register</Link>
+            {user ? (
+              // Authenticated user UI
+              <>
+                <Link to={getDashboardLink()} className="header-auth-button">
+                  {user.role === 'company' ? (
+                    <>
+                      <Building className="header-icon" size={16} />
+                      Company Dashboard
+                    </>
+                  ) : (
+                    <>
+                      <User className="header-icon" size={16} />
+                      My Dashboard
+                    </>
+                  )}
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="header-auth-button header-logout-button"
+                  title="Logout"
+                >
+                  <LogOut className="header-icon" size={16} />
+                  Logout
+                </button>
+              </>
+            ) : (
+              // Guest user UI
+              <>
+                <Link to="/login" className="header-auth-button">Login</Link>
+                <Link to="/register" className="header-auth-button">Register</Link>
+              </>
+            )}
+            
             <button
               className="header-icon-button"
               onClick={toggleDarkMode}
@@ -112,6 +159,7 @@ export function Header({ activeSection, onNavigate }) {
           </div>
         </div>
 
+
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <nav className="header-mobile-menu open">
@@ -129,8 +177,44 @@ export function Header({ activeSection, onNavigate }) {
                 </Link>
               ))}
 
-              <Link to="/login" className="header-mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>Login</Link>
-              <Link to="/register" className="header-mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>Register</Link>
+              {user ? (
+                // Authenticated user UI for mobile
+                <>
+                  <Link 
+                    to={getDashboardLink()} 
+                    className="header-mobile-nav-item" 
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {user.role === 'company' ? (
+                      <>
+                        <Building className="header-icon" size={16} />
+                        Company Dashboard
+                      </>
+                    ) : (
+                      <>
+                        <User className="header-icon" size={16} />
+                        My Dashboard
+                      </>
+                    )}
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="header-mobile-nav-item header-mobile-logout"
+                  >
+                    <LogOut className="header-icon" size={16} />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                // Guest user UI for mobile
+                <>
+                  <Link to="/login" className="header-mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>Login</Link>
+                  <Link to="/register" className="header-mobile-nav-item" onClick={() => setMobileMenuOpen(false)}>Register</Link>
+                </>
+              )}
             </div>
           </nav>
         )}

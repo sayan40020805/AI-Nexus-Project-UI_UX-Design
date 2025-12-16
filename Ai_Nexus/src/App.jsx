@@ -1,4 +1,5 @@
 
+
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Header } from './components/Header';
@@ -12,6 +13,8 @@ import { JobBoard } from './components/JobBoard';
 import { ModelDirectory } from './components/ModelDirectory';
 import { NewsFeed } from './components/NewsFeed';
 import { Footer } from './components/Footer';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 import Dashboard from './pages/Dashboard/Dashboard';
@@ -100,113 +103,118 @@ const MainApp = () => {
   );
 };
 
+
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<MainApp />} />
-        <Route
-          path="/login"
-          element={
-            <div className="page-with-header">
-              <Header />
-              <Login />
-              <Footer />
-            </div>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <div className="page-with-header">
-              <Header />
-              <Register />
-              <Footer />
-            </div>
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            <div className="page-with-header">
-              <Header />
-              <Dashboard />
-              <Footer />
-            </div>
-          }
-        />
-        <Route
-          path="/live"
-          element={
-            <div className="page-with-header">
-              <Header />
-              <Live />
-              <Footer />
-            </div>
-          }
-        />
-        <Route
-          path="/quiz"
-          element={
-            <div className="page-with-header">
-              <Header />
-              <Quiz />
-              <Footer />
-            </div>
-          }
-        />
-        <Route
-          path="/post"
-          element={
-            <div className="page-with-header">
-              <Header />
-              <Post />
-              <Footer />
-            </div>
-          }
-        />
-        <Route
-          path="/ats"
-          element={
-            <div className="page-with-header">
-              <Header />
-              <ATSScore />
-              <Footer />
-            </div>
-          }
-        />
-        <Route
-          path="/shorts"
-          element={
-            <div className="page-with-header">
-              <Header />
-              <AiShorts />
-              <Footer />
-            </div>
-          }
-        />
-        <Route
-          path="/showcase"
-          element={
-            <div className="page-with-header">
-              <Header />
-              <AIShowcasePage />
-              <Footer />
-            </div>
-          }
-        />
-        <Route
-          path="/create-post"
-          element={
-            <div className="page-with-header">
-              <Header />
-              <PostForm />
-              <Footer />
-            </div>
-          }
-        />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<MainApp />} />
+          <Route
+            path="/login"
+            element={
+              <div className="page-with-header">
+                <Header />
+                <Login />
+                <Footer />
+              </div>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <div className="page-with-header">
+                <Header />
+                <Register />
+                <Footer />
+              </div>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <div className="page-with-header">
+                  <Header />
+                  <Dashboard />
+                  <Footer />
+                </div>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/live"
+            element={
+              <div className="page-with-header">
+                <Header />
+                <Live />
+                <Footer />
+              </div>
+            }
+          />
+          <Route
+            path="/quiz"
+            element={
+              <div className="page-with-header">
+                <Header />
+                <Quiz />
+                <Footer />
+              </div>
+            }
+          />
+          <Route
+            path="/post"
+            element={
+              <div className="page-with-header">
+                <Header />
+                <Post />
+                <Footer />
+              </div>
+            }
+          />
+          <Route
+            path="/ats"
+            element={
+              <div className="page-with-header">
+                <Header />
+                <ATSScore />
+                <Footer />
+              </div>
+            }
+          />
+          <Route
+            path="/shorts"
+            element={
+              <div className="page-with-header">
+                <Header />
+                <AiShorts />
+                <Footer />
+              </div>
+            }
+          />
+          <Route
+            path="/showcase"
+            element={
+              <div className="page-with-header">
+                <Header />
+                <AIShowcasePage />
+                <Footer />
+              </div>
+            }
+          />
+          <Route
+            path="/create-post"
+            element={
+              <div className="page-with-header">
+                <Header />
+                <PostForm />
+                <Footer />
+              </div>
+            }
+          />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

@@ -3,11 +3,17 @@
 
 
 
+
 import React, { useState, Suspense } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import './Register.css';
 import SkyGlowBalls from '../../components/animations/SkyGlowBalls';
 
+
 const Register = () => {
+  const { register } = useAuth();
+  const navigate = useNavigate();
   const [isCompany, setIsCompany] = useState(false);
 
   return (
@@ -45,16 +51,29 @@ const Register = () => {
   );
 };
 
+
 const UserRegister = () => {
+  const { register } = useAuth();
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [profilePic, setProfilePic] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
+
+    // Password complexity check
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/;
+    if (!passwordRegex.test(password)) {
+      setError('Password must contain at least one uppercase letter, one lowercase letter, and one number');
+      setLoading(false);
+      return;
+    }
     
     try {
       // Create FormData for file upload
@@ -68,28 +87,17 @@ const UserRegister = () => {
         formData.append('profile-pic', profilePic);
       }
 
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        body: formData, // Don't set Content-Type header for FormData
-      });
+      const result = await register(formData);
 
-      const data = await response.json();
-
-      if (response.ok) {
-        alert('Registration successful! You can now log in.');
-        // Optionally redirect to login page
-        window.location.href = '/login';
+      if (result.success) {
+        // Redirect to user dashboard
+        navigate('/dashboard?tab=user');
       } else {
-        const errorMessages = data.errors ? data.errors.map(err => err.msg).join('\n') : (data.msg || 'Unknown error');
-        alert(`Registration failed:\n${errorMessages}`);
+        setError(result.error || 'Registration failed');
       }
     } catch (error) {
       console.error('Registration error:', error);
-      if (error instanceof TypeError && error.message === 'Failed to fetch') {
-        alert('Registration failed. Please ensure the backend server is running and accessible.');
-      } else {
-        alert(`An error occurred during registration: ${error.message}`);
-      }
+      setError('An error occurred during registration. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -109,7 +117,21 @@ const UserRegister = () => {
   };
 
   return (
+
     <form onSubmit={handleSubmit}>
+      {error && (
+        <div className="error-message" style={{ 
+          background: '#ff4444', 
+          color: 'white', 
+          padding: '10px', 
+          borderRadius: '4px', 
+          marginBottom: '15px',
+          fontSize: '14px'
+        }}>
+          {error}
+        </div>
+      )}
+      
       <div className="input-group">
         <label htmlFor="username">Username</label>
         <input
@@ -164,17 +186,30 @@ const UserRegister = () => {
   );
 };
 
+
 const CompanyRegister = () => {
+  const { register } = useAuth();
+  const navigate = useNavigate();
   const [companyName, setCompanyName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [companyDescription, setCompanyDescription] = useState('');
   const [companyLogo, setCompanyLogo] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
+
+    // Password complexity check
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/;
+    if (!passwordRegex.test(password)) {
+      setError('Password must contain at least one uppercase letter, one lowercase letter, and one number');
+      setLoading(false);
+      return;
+    }
     
     try {
       // Create FormData for file upload
@@ -192,28 +227,17 @@ const CompanyRegister = () => {
         formData.append('company-logo', companyLogo);
       }
 
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        body: formData, // Don't set Content-Type header for FormData
-      });
+      const result = await register(formData);
 
-      const data = await response.json();
-
-      if (response.ok) {
-        alert('Company registration successful! You can now log in.');
-        // Optionally redirect to login page
-        window.location.href = '/login';
+      if (result.success) {
+        // Redirect to company dashboard
+        navigate('/dashboard?tab=company');
       } else {
-        const errorMessages = data.errors ? data.errors.map(err => err.msg).join('\n') : (data.msg || 'Unknown error');
-        alert(`Registration failed:\n${errorMessages}`);
+        setError(result.error || 'Registration failed');
       }
     } catch (error) {
       console.error('Registration error:', error);
-      if (error instanceof TypeError && error.message === 'Failed to fetch') {
-        alert('Registration failed. Please ensure the backend server is running and accessible.');
-      } else {
-        alert(`An error occurred during registration: ${error.message}`);
-      }
+      setError('An error occurred during registration. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -233,7 +257,21 @@ const CompanyRegister = () => {
   };
 
   return (
+
     <form onSubmit={handleSubmit}>
+      {error && (
+        <div className="error-message" style={{ 
+          background: '#ff4444', 
+          color: 'white', 
+          padding: '10px', 
+          borderRadius: '4px', 
+          marginBottom: '15px',
+          fontSize: '14px'
+        }}>
+          {error}
+        </div>
+      )}
+      
       <div className="input-group">
         <label htmlFor="company-name">Company Name</label>
         <input
