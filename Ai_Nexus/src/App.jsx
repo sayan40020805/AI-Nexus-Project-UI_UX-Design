@@ -1,6 +1,3 @@
-
-
-
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Header } from './components/Header';
@@ -35,9 +32,6 @@ import './styles/ATSScore.css';
 import './styles/AIShorts.css';
 import './styles/Messaging.css';
 import { PostForm } from './components/PostCreation';
-
-
-
 
 const MainApp = () => {
   const [activeSection, setActiveSection] = useState('home');
@@ -93,138 +87,157 @@ const MainApp = () => {
       default:
         return <Hero onExploreModels={() => handleNavigate('models')} onJoinCommunity={() => handleNavigate('community')} />;
     }
-  }
+  };
 
   return (
-    <FeedProvider>
-      <div className="app-layout">
-        <Header activeSection={activeSection} onNavigate={handleNavigate} />
-        <div className="app-main-content">
-          <ModernSidebar activeSection={activeSection} onNavigate={handleNavigate} />
-          <main className="app-content">
-            <section className="app-content-wrapper">{renderSection()}</section>
-          </main>
-        </div>
-        <Footer />
-        <FloatingMessageButton />
+    <div className="app-layout">
+      <Header activeSection={activeSection} onNavigate={handleNavigate} />
+      <div className="app-main-content">
+        <ModernSidebar activeSection={activeSection} onNavigate={handleNavigate} />
+        <main className="app-content">
+          <section className="app-content-wrapper">{renderSection()}</section>
+        </main>
       </div>
+      <Footer />
+    </div>
+  );
+};
+
+// Layout component that wraps content with FeedProvider (needs to be within AuthProvider)
+const FeedLayout = ({ children }) => {
+  return (
+    <FeedProvider>
+      {children}
     </FeedProvider>
   );
 };
 
+// Layout wrapper for pages with header and footer
+const PageLayout = ({ children }) => {
+  return (
+    <div className="page-with-header">
+      <Header />
+      {children}
+      <Footer />
+    </div>
+  );
+};
 
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <Routes>
-          <Route path="/" element={<MainApp />} />
-          <Route
-            path="/login"
-            element={
-              <div className="page-with-header">
-                <Header />
-                <Login />
-                <Footer />
-              </div>
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              <div className="page-with-header">
-                <Header />
-                <Register />
-                <Footer />
-              </div>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <div className="page-with-header">
-                  <Header />
-                  <Dashboard />
-                  <Footer />
-                </div>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/live"
-            element={
-              <div className="page-with-header">
-                <Header />
-                <Live />
-                <Footer />
-              </div>
-            }
-          />
-          <Route
-            path="/quiz"
-            element={
-              <div className="page-with-header">
-                <Header />
-                <Quiz />
-                <Footer />
-              </div>
-            }
-          />
-          <Route
-            path="/post"
-            element={
-              <div className="page-with-header">
-                <Header />
-                <Post />
-                <Footer />
-              </div>
-            }
-          />
-          <Route
-            path="/ats"
-            element={
-              <div className="page-with-header">
-                <Header />
-                <ATSScore />
-                <Footer />
-              </div>
-            }
-          />
-          <Route
-            path="/shorts"
-            element={
-              <div className="page-with-header">
-                <Header />
-                <AiShorts />
-                <Footer />
-              </div>
-            }
-          />
-          <Route
-            path="/showcase"
-            element={
-              <div className="page-with-header">
-                <Header />
-                <AIShowcasePage />
-                <Footer />
-              </div>
-            }
-          />
-          <Route
-            path="/create-post"
-            element={
-              <div className="page-with-header">
-                <Header />
-                <PostForm />
-                <Footer />
-              </div>
-            }
-          />
-        </Routes>
+        <GlobalLayout>
+          <Routes>
+            <Route 
+              path="/" 
+              element={
+                <FeedLayout>
+                  <MainApp />
+                </FeedLayout>
+              } 
+            />
+            <Route
+              path="/login"
+              element={
+                <PageLayout>
+                  <Login />
+                </PageLayout>
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <PageLayout>
+                  <Register />
+                </PageLayout>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <PageLayout>
+                    <Dashboard />
+                  </PageLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/live"
+              element={
+                <PageLayout>
+                  <Live />
+                </PageLayout>
+              }
+            />
+            <Route
+              path="/quiz"
+              element={
+                <PageLayout>
+                  <Quiz />
+                </PageLayout>
+              }
+            />
+            <Route
+              path="/post"
+              element={
+                <PageLayout>
+                  <Post />
+                </PageLayout>
+              }
+            />
+            <Route
+              path="/ats"
+              element={
+                <PageLayout>
+                  <ATSScore />
+                </PageLayout>
+              }
+            />
+            <Route
+              path="/shorts"
+              element={
+                <PageLayout>
+                  <AiShorts />
+                </PageLayout>
+              }
+            />
+            <Route
+              path="/showcase"
+              element={
+                <PageLayout>
+                  <AIShowcasePage />
+                </PageLayout>
+              }
+            />
+            <Route
+              path="/create-post"
+              element={
+                <PageLayout>
+                  <PostForm />
+                </PageLayout>
+              }
+            />
+          </Routes>
+        </GlobalLayout>
       </Router>
     </AuthProvider>
   );
 }
 
+
+// Global layout that includes FloatingMessageButton for all pages
+const GlobalLayout = ({ children }) => {
+  return (
+    <div className="global-layout-container">
+      {children}
+      <div className="content-relative-messaging">
+        <FloatingMessageButton />
+      </div>
+    </div>
+  );
+};
+
 export default App;
+

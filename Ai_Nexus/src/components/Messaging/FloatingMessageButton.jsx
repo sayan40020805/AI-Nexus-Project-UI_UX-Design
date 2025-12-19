@@ -19,7 +19,8 @@ const FloatingMessageButton = () => {
     if (!token) return;
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/messages/conversations`, {
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/messages/conversations`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -48,7 +49,8 @@ const FloatingMessageButton = () => {
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/search?q=${encodeURIComponent(query)}`, {
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/search?q=${encodeURIComponent(query)}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -69,7 +71,8 @@ const FloatingMessageButton = () => {
     if (!token) return;
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/messages/conversations/${conversationId}/messages`, {
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/messages/conversations/${conversationId}/messages`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -90,7 +93,8 @@ const FloatingMessageButton = () => {
     if (!token || !content.trim()) return;
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/messages`, {
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/messages`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
