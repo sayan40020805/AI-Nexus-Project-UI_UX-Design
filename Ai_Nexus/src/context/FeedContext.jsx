@@ -1,85 +1,200 @@
+
 import React, { createContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 export const FeedContext = createContext(null);
 
-const initialPosts = [
-  // sample global posts (read-only samples)
-  {
-    id: 1,
-    author: 'AI Researcher',
-    authorAvatar: '🤖',
-    timestamp: Date.now() - 1000 * 60 * 60 * 2,
-    content:
-      "Just published our latest paper on multimodal AI systems! The results are promising.",
-    image: null,
-    likes: 127,
-    comments: 23,
-  },
-  {
-    id: 2,
-    author: 'ML Engineer',
-    authorAvatar: '💻',
-    timestamp: Date.now() - 1000 * 60 * 60 * 4,
-    content:
-      'Building a real-time sentiment analysis system for social media. Any optimization tips?',
-    image: null,
-    likes: 89,
-    comments: 34,
-  },
-];
-
-const sampleLive = [
-  {
-    id: 'l1',
-    title: 'Live: Building AI Chatbots with GPT-4',
-    streamer: 'AI Developer Hub',
-    thumbnail:
-      'https://images.unsplash.com/photo-1625314887424-9f190599bd56?auto=format&fit=crop&w=1200&q=60',
-    viewers: 1247,
-    isLive: true,
-  },
-  {
-    id: 'l2',
-    title: 'Machine Learning Q&A Session',
-    streamer: 'ML Academy',
-    thumbnail:
-      'https://images.unsplash.com/photo-1584291527908-033f4d6542c8?auto=format&fit=crop&w=1200&q=60',
-    viewers: 634,
-    isLive: true,
-  },
-];
-
 export function FeedProvider({ children }) {
-  const [posts, setPosts] = useState(initialPosts);
-  const [liveStreams, setLiveStreams] = useState(sampleLive);
+  const [posts, setPosts] = useState([]);
+  const [liveStreams, setLiveStreams] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { token, user } = useAuth();
+
+  // Fetch home feed (posts from followed users/companies)
+  const fetchHomeFeed = async () => {
+    if (!token) return;
+    
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/feed/home`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPosts(data.posts || []);
+      } else {
+        throw new Error('Failed to fetch feed');
+      }
+    } catch (err) {
+      console.error('Fetch feed error:', err);
+      setError('Failed to load feed');
+      // Fallback to empty array
+      setPosts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch live streams
+  const fetchLiveStreams = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/live`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setLiveStreams(data.sessions || []);
+      }
+    } catch (err) {
+      console.error('Fetch live streams error:', err);
+    }
+  };
+
+  // Like a post
+  const likePost = async (postId) => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/posts/${postId}/like`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Update local posts state
+        setPosts(prev => prev.map(post => 
+          post._id === postId 
+            ? { 
+                ...post, 
+                likes: data.likes,
+                isLiked: data.isLiked 
+              }
+            : post
+        ));
+      }
+    } catch (err) {
+      console.error('Like post error:', err);
+    }
+  };
+
+  // Comment on a post
+  const commentOnPost = async (postId, content) => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/posts/${postId}/comments`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ content })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Update local posts state
+        setPosts(prev => prev.map(post => 
+          post._id === postId 
+            ? { 
+                ...post, 
+                comments: data.comments 
+              }
+            : post
+        ));
+        
+        return data.comment;
+      }
+    } catch (err) {
+      console.error('Comment post error:', err);
+      throw err;
+    }
+  };
+
+  // Share a post
+  const sharePost = async (postId) => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/posts/${postId}/share`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Update local posts state
+        setPosts(prev => prev.map(post => 
+          post._id === postId 
+            ? { 
+                ...post, 
+                shares: data.shares 
+              }
+            : post
+        ));
+      }
+    } catch (err) {
+      console.error('Share post error:', err);
+    }
+  };
+
+  // Add new post to feed
+  const addPost = (post) => {
+    setPosts(prev => [post, ...prev]);
+  };
+
+  // Add new live stream
+  const addLive = (live) => {
+    setLiveStreams(prev => [live, ...prev]);
+  };
 
   useEffect(() => {
-    // placeholder for fetching remote feed if needed
-    // currently using sample data; setLoading can simulate delay
-    let mounted = true;
-    setLoading(true);
-    const t = setTimeout(() => {
-      if (mounted) setLoading(false);
-    }, 600);
-    return () => {
-      mounted = false;
-      clearTimeout(t);
-    };
-  }, []);
-
-  const addPost = (post) => {
-    // post should include timestamp (ms) and author fields
-    setPosts((prev) => [{ ...post, id: Date.now() }, ...prev]);
-  };
-
-  const addLive = (live) => {
-    setLiveStreams((prev) => [{ ...live, id: `l-${Date.now()}` }, ...prev]);
-  };
+    if (token) {
+      fetchHomeFeed();
+      fetchLiveStreams();
+    } else {
+      // Clear data when not authenticated
+      setPosts([]);
+      setLiveStreams([]);
+    }
+  }, [token]);
 
   return (
-    <FeedContext.Provider value={{ posts, liveStreams, addPost, addLive, loading, error }}>
+    <FeedContext.Provider value={{ 
+      posts, 
+      liveStreams, 
+      loading, 
+      error,
+      addPost, 
+      addLive,
+      likePost,
+      commentOnPost,
+      sharePost,
+      refreshFeed: fetchHomeFeed
+    }}>
       {children}
     </FeedContext.Provider>
   );

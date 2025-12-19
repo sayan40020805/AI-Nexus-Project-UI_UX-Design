@@ -1,4 +1,6 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import { Radio, Users, Eye, MessageCircle, ThumbsUp, Share2, Settings, Mic, MicOff, Video, VideoOff, Phone, PhoneOff } from 'lucide-react';
 import '../../styles/Live.css';
 
@@ -113,20 +115,138 @@ const chatMessages = [
   }
 ];
 
+
 export function Live() {
-  const [selectedStream, setSelectedStream] = useState(liveStreamsData[0]);
+  const [liveStreams, setLiveStreams] = useState([]);
+  const [selectedStream, setSelectedStream] = useState(null);
   const [isMicOn, setIsMicOn] = useState(false);
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [isPhoneOn, setIsPhoneOn] = useState(false);
   const [chatMessage, setChatMessage] = useState('');
   const [showChat, setShowChat] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [isCreatingSession, setIsCreatingSession] = useState(false);
+  const { user, token } = useAuth();
 
-  const handleSendMessage = () => {
-    if (chatMessage.trim()) {
-      // Add message logic here
-      setChatMessage('');
+  // Fetch live streams
+  const fetchLiveStreams = async () => {
+    if (!token) return;
+    
+    try {
+      setLoading(true);
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/live`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setLiveStreams(data.sessions || []);
+        
+        // Set first stream as selected if none selected
+        if (data.sessions && data.sessions.length > 0 && !selectedStream) {
+          setSelectedStream(data.sessions[0]);
+        }
+      }
+    } catch (err) {
+      console.error('Fetch live streams error:', err);
+    } finally {
+      setLoading(false);
     }
   };
+
+  // Create new live session (companies only)
+  const createLiveSession = async (sessionData) => {
+    if (!token || user?.role !== 'company') {
+      alert('Only companies can create live sessions');
+      return;
+    }
+
+    try {
+      setIsCreatingSession(true);
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/live`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(sessionData)
+      });
+
+      if (response.ok) {
+        const newSession = await response.json();
+        setLiveStreams(prev => [newSession, ...prev]);
+        setSelectedStream(newSession);
+        alert('Live session created successfully!');
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.msg || 'Failed to create session');
+      }
+    } catch (err) {
+      console.error('Create live session error:', err);
+      alert(`Error creating session: ${err.message}`);
+    } finally {
+      setIsCreatingSession(false);
+    }
+  };
+
+  // Join live session
+  const joinLiveSession = async (sessionId) => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/live/${sessionId}/join`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Joined live session:', data);
+      }
+    } catch (err) {
+      console.error('Join live session error:', err);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!chatMessage.trim() || !selectedStream) return;
+    
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/live/${selectedStream._id}/chat`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ content: chatMessage.trim() })
+      });
+
+      if (response.ok) {
+        setChatMessage('');
+        // Refresh chat messages
+        // TODO: Implement real-time chat updates
+      }
+    } catch (err) {
+      console.error('Send message error:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchLiveStreams();
+  }, [token]);
+
+  // Auto-join first stream if user is viewer
+  useEffect(() => {
+    if (selectedStream && token && user?.role === 'user') {
+      joinLiveSession(selectedStream._id);
+    }
+  }, [selectedStream, token, user]);
 
   return (
     <div className="live-container">
@@ -139,7 +259,23 @@ export function Live() {
             {liveStreamsData.length} live now
           </span>
         </div>
+
         <div className="live-actions">
+          {user?.role === 'company' && (
+            <button 
+              className="live-action-btn"
+              onClick={() => {
+                const title = prompt('Enter live session title:');
+                if (title) {
+                  createLiveSession({ title, description: '' });
+                }
+              }}
+              disabled={isCreatingSession}
+            >
+              <Radio className="w-4 h-4" />
+              {isCreatingSession ? 'Creating...' : 'Start Live'}
+            </button>
+          )}
           <button className="live-action-btn">
             <Settings className="w-4 h-4" />
             Settings

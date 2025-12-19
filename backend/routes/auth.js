@@ -1,28 +1,139 @@
 
-
-
-
-
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-
-
-const { uploadProfilePicture, uploadCompanyLogo, uploadMultiple, uploadFlexible, handleUploadError } = require('../middleware/upload');
+const { uploadFlexible, handleUploadError } = require('../middleware/upload');
+const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 
+// ========================
+// HELPERS
+// ========================
+
+// Generate JWT token
+const generateToken = (user) => {
+  const payload = {
+    user: { 
+      id: user.id, 
+      role: user.role 
+    }
+  };
 
 
+  return jwt.sign(
+    payload,
+    process.env.JWT_SECRET || 'fallback_secret_key_for_development',
+    { expiresIn: '24h' }
+  );
+};
 
-// @route   POST /api/auth/signup
-// @desc    Register a new user or company
-router.post('/signup', 
-  // Handle flexible uploads (optional files)
+// Return user data (exclude password)
+const getUserData = (user) => {
+  return {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    username: user.username,
+    companyName: user.companyName,
+    companyDescription: user.companyDescription,
+    profilePicture: user.profilePicture,
+    companyLogo: user.companyLogo,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
+};
+
+// ========================
+// LOGIN ROUTE
+// ========================
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Basic validation
+    if (!email || !password) {
+      return res.status(400).json({ msg: 'Email and password are required' });
+    }
+
+
+    // Find user by email (include password for comparison)
+    const user = await User.findOne({ email }).select('+password');
+    if (!user) {
+      return res.status(400).json({ msg: 'Invalid credentials' });
+    }
+
+    // Check password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ msg: 'Invalid credentials' });
+    }
+
+    // Generate token
+    const token = generateToken(user);
+
+    // Return success response
+    res.json({
+      token,
+      user: getUserData(user)
+    });
+
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ msg: 'Server error during login' });
+  }
+});
+
+// ========================
+// GET CURRENT USER (ME)
+// ========================
+router.get('/me', authMiddleware, async (req, res) => {
+  try {
+    // Return current user data
+    res.json({
+      user: getUserData(req.user)
+    });
+  } catch (err) {
+    console.error('Get user error:', err);
+    res.status(500).json({ msg: 'Server error getting user data' });
+  }
+});
+
+// ========================
+// LOGOUT ROUTE (CLIENT-SIDE ONLY)
+// ========================
+router.post('/logout', (req, res) => {
+  // Since we're using JWT, logout is handled client-side
+  // This endpoint exists for consistency but doesn't need server-side logic
+  res.json({ msg: 'Logged out successfully' });
+});
+
+// ========================
+// REFRESH TOKEN ROUTE
+// ========================
+router.post('/refresh', authMiddleware, async (req, res) => {
+  try {
+    // Generate new token
+    const token = generateToken(req.user);
+
+    res.json({
+      token,
+      user: getUserData(req.user)
+    });
+  } catch (err) {
+    console.error('Token refresh error:', err);
+    res.status(500).json({ msg: 'Server error during token refresh' });
+  }
+});
+
+// ==========================
+// REGISTER (USER / COMPANY)
+// ==========================
+router.post(
+  '/signup',
   uploadFlexible,
   handleUploadError,
-  // Registration logic
   async (req, res) => {
     const { role, username, email, password, companyName, companyDescription } = req.body;
 
@@ -40,208 +151,82 @@ router.post('/signup',
         return res.status(400).json({ msg: 'Company name is required for company registration' });
       }
 
-      if (password.length < 6) {
-        return res.status(400).json({ msg: 'Password must be at least 6 characters long' });
-      }
-
-      // Password complexity check
+      // Password complexity
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/;
-      if (!passwordRegex.test(password)) {
-        return res.status(400).json({ msg: 'Password must contain at least one uppercase letter, one lowercase letter, and one number' });
+      if (password.length < 6 || !passwordRegex.test(password)) {
+        return res.status(400).json({
+          msg: 'Password must be at least 6 characters and include uppercase, lowercase, and number'
+        });
       }
 
-      // Check if user/company already exists
-      let existingUser = await User.findOne({ email });
+      // Email exists?
+      const existingUser = await User.findOne({ email });
       if (existingUser) {
         return res.status(400).json({ msg: 'An account with this email already exists' });
       }
 
-      // Check username uniqueness for users
-      if (role === 'user' && username) {
+      // Username unique (user only)
+      if (role === 'user') {
         const existingUsername = await User.findOne({ username, role: 'user' });
         if (existingUsername) {
           return res.status(400).json({ msg: 'This username is already taken' });
         }
       }
 
-      // Create user/company object based on role
+      // Create base user object
       const userData = {
         email,
         password,
         role,
       };
 
-
-      // Add role-specific fields
+      // =====================
+      // USER ROLE
+      // =====================
       if (role === 'user') {
         userData.username = username;
-        if (req.files) {
-          // Find profile picture file
-          const profileFile = req.files.find(f => f.fieldname === 'profile-pic' || f.fieldname === 'profilePicture');
-          if (profileFile) {
-            userData.profilePicture = `/uploads/profiles/${profileFile.filename}`;
-          }
-        }
-      } else if (role === 'company') {
-        userData.companyName = companyName;
-        if (companyDescription) {
-          userData.companyDescription = companyDescription;
-        }
-        if (req.files) {
-          // Find company logo file
-          const logoFile = req.files.find(f => f.fieldname === 'company-logo' || f.fieldname === 'companyLogo');
-          if (logoFile) {
-            userData.companyLogo = `/uploads/companies/${logoFile.filename}`;
-          }
+
+        if (req.files && req.files['profile-pic']) {
+          userData.profilePicture =
+            `/uploads/profiles/${req.files['profile-pic'][0].filename}`;
         }
       }
 
-      // Create new user/company
-      const user = new User(userData);
+      // =====================
+      // COMPANY ROLE
+      // =====================
+      if (role === 'company') {
+        userData.companyName = companyName;
+        if (companyDescription) userData.companyDescription = companyDescription;
+
+        if (req.files && req.files['company-logo']) {
+          userData.companyLogo =
+            `/uploads/companies/${req.files['company-logo'][0].filename}`;
+        }
+      }
 
       // Hash password
       const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(password, salt);
+      userData.password = await bcrypt.hash(password, salt);
 
-      // Save to database
+
+      // Save user
+      const user = new User(userData);
       await user.save();
 
-      // Generate JWT token
-      const payload = {
-        user: {
-          id: user.id,
-          role: user.role,
-        },
-      };
+      // Generate token and get user data
+      const token = generateToken(user);
+      const userResponse = getUserData(user);
 
-      jwt.sign(
-        payload,
-        process.env.JWT_SECRET || 'fallback_secret_key_for_development',
-        { expiresIn: '5h' },
-        (err, token) => {
-          if (err) throw err;
-          res.status(201).json({ 
-            token,
-            user: {
-              id: user.id,
-              email: user.email,
-              role: user.role,
-              username: user.username,
-              companyName: user.companyName,
-              profilePicture: user.profilePicture,
-              companyLogo: user.companyLogo,
-            }
-          });
-        }
-      );
+      res.status(201).json({
+        token,
+        user: userResponse
+      });
     } catch (err) {
-      console.error('Registration error:', err.message);
-      
-      // Handle validation errors
-      if (err.name === 'ValidationError') {
-        const messages = Object.values(err.errors).map(val => val.message);
-        return res.status(400).json({ msg: messages.join(', ') });
-      }
-      
+      console.error('Registration error:', err);
       res.status(500).json({ msg: 'Server error during registration' });
     }
   }
 );
-
-
-
-// @route   POST /api/auth/login
-// @desc    Authenticate user & get token
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    // Basic validation
-    if (!email || !password) {
-      return res.status(400).json({ msg: 'Email and password are required' });
-    }
-
-    const user = await User.findOne({ email }).select('+password');
-    if (!user) {
-      return res.status(400).json({ msg: 'Invalid credentials' });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ msg: 'Invalid credentials' });
-    }
-
-    const payload = {
-      user: {
-        id: user.id,
-        role: user.role,
-      },
-    };
-
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET || 'fallback_secret_key_for_development',
-      { expiresIn: '5h' },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ 
-          token,
-          user: {
-            id: user.id,
-            email: user.email,
-            role: user.role,
-            username: user.username,
-            companyName: user.companyName,
-            profilePicture: user.profilePicture,
-            companyLogo: user.companyLogo,
-          }
-        });
-      }
-    );
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
-  }
-});
-
-// @route   GET /api/auth/me
-// @desc    Get current user profile
-router.get('/me', async (req, res) => {
-  try {
-    // Get token from header
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    
-    if (!token) {
-      return res.status(401).json({ msg: 'No token, authorization denied' });
-    }
-
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key_for_development');
-    
-    // Get user from database
-    const user = await User.findById(decoded.user.id);
-    
-    if (!user) {
-      return res.status(401).json({ msg: 'Token is not valid' });
-    }
-
-    res.json({
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        username: user.username,
-        companyName: user.companyName,
-        profilePicture: user.profilePicture,
-        companyLogo: user.companyLogo,
-        companyDescription: user.companyDescription,
-        createdAt: user.createdAt,
-      }
-    });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ msg: 'Server error' });
-  }
-});
 
 module.exports = router;

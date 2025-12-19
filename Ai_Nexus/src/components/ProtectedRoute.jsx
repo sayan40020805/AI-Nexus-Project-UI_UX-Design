@@ -1,9 +1,11 @@
+
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute = ({ children, requiredRole }) => {
   const { user, token, loading } = useAuth();
+  const location = useLocation();
 
   // Show loading state while checking authentication
   if (loading) {
@@ -23,7 +25,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
   // If not authenticated, redirect to login
   if (!user || !token) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   // If specific role required, check user's role
@@ -33,7 +35,32 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     return <Navigate to={redirectPath} replace />;
   }
 
+  // For dashboard routes, ensure proper role-based redirect
+  if (location.pathname === '/dashboard') {
+    const expectedTab = user.role === 'company' ? 'company' : 'user';
+    const currentTab = new URLSearchParams(location.search).get('tab');
+    
+    if (currentTab !== expectedTab) {
+      const redirectPath = `/dashboard?tab=${expectedTab}`;
+      return <Navigate to={redirectPath} replace />;
+    }
+  }
+
   return children;
+};
+
+// Hook to check if user has required role
+export const useRole = (requiredRoles) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) return false;
+  if (!user) return false;
+  
+  if (Array.isArray(requiredRoles)) {
+    return requiredRoles.includes(user.role);
+  }
+  
+  return user.role === requiredRoles;
 };
 
 export default ProtectedRoute;

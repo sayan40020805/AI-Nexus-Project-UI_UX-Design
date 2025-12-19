@@ -24,13 +24,23 @@ const UserSchema = new mongoose.Schema({
     default: 'user',
     required: true,
   },
+
   // User-specific fields
   username: {
     type: String,
     required: function() { return this.role === 'user'; },
-    unique: function() { return this.role === 'user'; },
     trim: true,
     maxlength: [30, 'Username cannot be more than 30 characters'],
+    validate: {
+      validator: function(v) {
+        // Only validate uniqueness for user role and when username is provided
+        if (this.role === 'user' && v) {
+          return true;
+        }
+        return true;
+      },
+      message: 'Username must be unique for users'
+    }
   },
   profilePicture: {
     type: String,

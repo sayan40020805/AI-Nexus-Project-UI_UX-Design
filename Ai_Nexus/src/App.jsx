@@ -1,5 +1,6 @@
 
 
+
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Header } from './components/Header';
@@ -14,6 +15,7 @@ import { ModelDirectory } from './components/ModelDirectory';
 import { NewsFeed } from './components/NewsFeed';
 import { Footer } from './components/Footer';
 import { AuthProvider } from './context/AuthContext';
+import { FeedProvider } from './context/FeedContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
@@ -23,6 +25,7 @@ import { Quiz } from './pages/Quiz/Quiz';
 import Post from './pages/Post/Post';
 import ATSScore from './pages/ATSScore/ATSScore';
 import AiShorts from './pages/AIShorts/AiShorts';
+import FloatingMessageButton from './components/Messaging/FloatingMessageButton';
 import './App.css';
 import './styles/globals.css';
 import './styles/Live.css';
@@ -30,7 +33,10 @@ import './styles/Quiz.css';
 import './styles/Post.css';
 import './styles/ATSScore.css';
 import './styles/AIShorts.css';
+import './styles/Messaging.css';
 import { PostForm } from './components/PostCreation';
+
+
 
 
 const MainApp = () => {
@@ -90,16 +96,19 @@ const MainApp = () => {
   }
 
   return (
-    <div className="app-layout">
-      <Header activeSection={activeSection} onNavigate={handleNavigate} />
-      <div className="app-main-content">
-        <ModernSidebar activeSection={activeSection} onNavigate={handleNavigate} />
-        <main className="app-content">
-          <section className="app-content-wrapper">{renderSection()}</section>
-        </main>
+    <FeedProvider>
+      <div className="app-layout">
+        <Header activeSection={activeSection} onNavigate={handleNavigate} />
+        <div className="app-main-content">
+          <ModernSidebar activeSection={activeSection} onNavigate={handleNavigate} />
+          <main className="app-content">
+            <section className="app-content-wrapper">{renderSection()}</section>
+          </main>
+        </div>
+        <Footer />
+        <FloatingMessageButton />
       </div>
-      <Footer />
-    </div>
+    </FeedProvider>
   );
 };
 

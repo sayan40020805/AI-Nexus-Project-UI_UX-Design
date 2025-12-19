@@ -1,4 +1,7 @@
+
 import React, { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import PostTypeSelector from './PostTypeSelector';
 import AiNewsForm from './forms/AiNewsForm';
 import AiShortsForm from './forms/AiShortsForm';
@@ -11,22 +14,97 @@ import './PostCreation.css';
 const PostForm = () => {
   const [selectedType, setSelectedType] = useState(null);
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user, token } = useAuth();
+  const navigate = useNavigate();
+
+  // Post type mapping for navigation
+  const getPostTypeNavigation = (postType) => {
+    const typeMap = {
+      'ai_news': 'news',
+      'ai_shorts': 'shorts',
+      'ai_models': 'models',
+      'ai_showcase': 'showcase',
+      'career': 'career',
+      'event': 'events',
+      'normal_post': 'home'
+    };
+    return typeMap[postType] || 'home';
+  };
 
   const handleTypeChange = (typeId) => {
     setSelectedType(typeId);
     setFormSubmitted(false);
   };
 
-  const handleFormSubmit = (data) => {
-    console.log('Form submitted:', data);
+  const handleFormSubmit = async (data) => {
+    if (!token || !user) {
+      alert('Please log in to create a post');
+      return;
+    }
+
+    // Role-based restrictions
+    const restrictedTypesForUsers = ['ai_news', 'career', 'event'];
+    if (user.role === 'user' && restrictedTypesForUsers.includes(data.type)) {
+      alert('Only company accounts can create this type of post');
+      return;
+    }
+
+    setIsSubmitting(true);
     setFormSubmitted(true);
 
-    // Simulate success feedback
-    setTimeout(() => {
-      alert(`Post created successfully!\n\nType: ${data.type}\n${JSON.stringify(data, null, 2)}`);
-      setSelectedType(null);
-      setFormSubmitted(false);
-    }, 1500);
+    try {
+      const formData = new FormData();
+      
+      // Add post data
+      Object.keys(data).forEach(key => {
+        if (key !== 'media') {
+          formData.append(key, data[key]);
+        }
+      });
+
+      // Add media files if present
+      if (data.media) {
+        if (Array.isArray(data.media)) {
+          data.media.forEach((file, index) => {
+            formData.append(`media_${index}`, file);
+          });
+        } else {
+          formData.append('media', data.media);
+        }
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/posts`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        
+        // Show success message
+        alert(`Post created successfully!\n\nType: ${data.type}`);
+        
+        // Navigate to appropriate page based on post type
+        const navigateTo = getPostTypeNavigation(data.type);
+        navigate(`#${navigateTo}`);
+        
+        // Reset form
+        setSelectedType(null);
+        setFormSubmitted(false);
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.msg || 'Failed to create post');
+      }
+    } catch (error) {
+      console.error('Post creation error:', error);
+      alert(`Error creating post: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderForm = () => {

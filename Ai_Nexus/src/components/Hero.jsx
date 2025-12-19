@@ -1,3 +1,4 @@
+
 import React, { useContext, useEffect, useState } from 'react';
 import '../styles/Hero.css';
 import { FeedContext } from '../context/FeedContext';
@@ -5,24 +6,35 @@ import PostCard from './Hero/PostCard';
 import LiveVideoCard from './Hero/LiveVideoCard';
 import { PostSkeleton, LiveVideoSkeleton } from './Hero/SkeletonLoaders';
 import { LeftPanel, CenterPanel, RightPanel, FeedWelcome } from './Hero/FeedLayout';
+import { useAuth } from '../context/AuthContext';
+
 
 export function Hero({ onExploreModels, onJoinCommunity }) {
-  const { posts, liveStreams, loading, error } = useContext(FeedContext);
+  const { posts, liveStreams, loading, error, likePost, commentOnPost, sharePost } = useContext(FeedContext);
+  const { user, token } = useAuth();
 
-  const handlePostLike = (postId) => {
-    console.log('Liked post:', postId);
+  const handlePostLike = async (postId) => {
+    await likePost(postId);
   };
 
-  const handlePostComment = (postId) => {
-    console.log('Comment on post:', postId);
+  const handlePostComment = async (postId) => {
+    const content = prompt('Enter your comment:');
+    if (content) {
+      try {
+        await commentOnPost(postId, content);
+      } catch (err) {
+        alert('Failed to add comment');
+      }
+    }
   };
 
-  const handlePostShare = (postId) => {
-    console.log('Share post:', postId);
+  const handlePostShare = async (postId) => {
+    await sharePost(postId);
   };
 
   const handleWatchLive = (liveId) => {
-    console.log('Watching live:', liveId);
+    // Navigate to live stream
+    window.location.href = `/live/${liveId}`;
   };
 
   return (

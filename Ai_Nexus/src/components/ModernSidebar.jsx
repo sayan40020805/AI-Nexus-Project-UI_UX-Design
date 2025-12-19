@@ -1,14 +1,22 @@
 
-import React, { useEffect, useState } from 'react';
+
+import React, { useEffect, useState, useRef } from 'react';
 import { ChevronRight, Sparkles, Search, User, X, HelpCircle, BarChart3, Video, Radio, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import '../styles/ModernSidebar.css';
+
 
 export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSidebarOpen }) {
   const [localOpen, setLocalOpen] = useState(false);
-  const isControlled = typeof sidebarOpen === 'boolean';
-  const open = isControlled ? sidebarOpen : localOpen;
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef(null);
+  const { user, token } = useAuth();
   const navigate = useNavigate();
+
 
   const setOpen = (val) => {
     if (isControlled) {
@@ -16,6 +24,73 @@ export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSideb
     } else {
       setLocalOpen(val);
     }
+  };
+
+  const isControlled = typeof sidebarOpen === 'boolean';
+  const open = isControlled ? sidebarOpen : localOpen;
+
+  // Search functionality
+  const performSearch = async (query) => {
+    if (!query.trim() || !token) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    try {
+      setIsSearching(true);
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/search?q=${encodeURIComponent(query)}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data.results || []);
+        setShowSearchResults(true);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Set new timeout for debounced search
+    searchTimeoutRef.current = setTimeout(() => {
+      performSearch(query);
+    }, 300);
+  };
+
+  const handleSearchResultClick = (result) => {
+    // Navigate to user/company profile
+    if (result.type === 'user') {
+      navigate(`/profile/${result.id}`);
+    } else {
+      navigate(`/company/${result.id}`);
+    }
+    setShowSearchResults(false);
+    setSearchQuery('');
+    setOpen(false);
+  };
+
+  const handleSearchBlur = () => {
+    // Delay hiding results to allow clicking
+    setTimeout(() => {
+      setShowSearchResults(false);
+    }, 200);
   };
 
   useEffect(() => {
@@ -81,11 +156,51 @@ export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSideb
           </div>
         </div>
 
+
         <div className="sidebar-quick-actions">
           <div className="sidebar-search-bar">
             <Search className="h-4 w-4 search-icon" />
-            <input type="text" placeholder="Search..." className="search-input" />
+            <input 
+              type="text" 
+              placeholder="Search users, companies..." 
+              className="search-input"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onBlur={handleSearchBlur}
+            />
+            {isSearching && <div className="search-spinner">...</div>}
           </div>
+          
+          {/* Search Results Dropdown */}
+          {showSearchResults && searchResults.length > 0 && (
+            <div className="search-results-dropdown">
+              {searchResults.map((result) => (
+                <div
+                  key={`${result.type}-${result.id}`}
+                  className="search-result-item"
+                  onClick={() => handleSearchResultClick(result)}
+                >
+                  <div className="search-result-avatar">
+                    <img 
+                      src={result.profilePicture || '/default-avatar.png'} 
+                      alt={result.name}
+                      onError={(e) => { e.target.src = '/default-avatar.png'; }}
+                    />
+                  </div>
+                  <div className="search-result-info">
+                    <div className="search-result-name">{result.name}</div>
+                    <div className="search-result-type">{result.type}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {showSearchResults && searchQuery && searchResults.length === 0 && !isSearching && (
+            <div className="search-results-dropdown">
+              <div className="search-no-results">No results found</div>
+            </div>
+          )}
 
           <button className="quick-action-btn profile-btn" onClick={handleProfileClick}>
             <User className="h-4 w-4" />

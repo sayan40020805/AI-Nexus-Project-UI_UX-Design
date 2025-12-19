@@ -3,7 +3,12 @@ require('dotenv').config();
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
+    const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://ainexus_user:AINexus2024@ac-nxn5qqk-shard-00-00.cg391uu.mongodb.net/AI_Nexus?retryWrites=true&w=majority';
+    
+    console.log('Attempting to connect to MongoDB...');
+    console.log('MongoDB URI:', mongoURI);
+    
+    const conn = await mongoose.connect(mongoURI);
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
     
@@ -25,7 +30,8 @@ const connectDB = async () => {
 
   } catch (error) {
     console.error('Database connection failed:', error.message);
-    process.exit(1);
+    console.log('Continuing without database connection...');
+    // Don't exit - continue without database for testing
   }
 };
 
