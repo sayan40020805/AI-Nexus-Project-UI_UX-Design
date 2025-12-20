@@ -1,0 +1,387 @@
+/* PostContent.css - Post Content Styling */
+
+.post-content {
+  margin-bottom: 12px;
+}
+
+.post-content.compact {
+  margin-bottom: 8px;
+}
+
+/* Post Type Badge */
+.post-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #475569;
+}
+
+.post-type-badge svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Post Title */
+.post-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 8px 0;
+  line-height: 1.4;
+}
+
+.post-content.compact .post-title {
+  font-size: 16px;
+}
+
+/* Post Text Content */
+.post-text-content {
+  margin-bottom: 12px;
+}
+
+.post-text {
+  color: #374151;
+  line-height: 1.6;
+  font-size: 14px;
+  word-wrap: break-word;
+}
+
+.post-content.compact .post-text {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.post-text a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.post-text a:hover {
+  text-decoration: underline;
+}
+
+.show-more-btn,
+.show-less-btn {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 0;
+  margin-top: 4px;
+  transition: color 0.2s ease;
+}
+
+.show-more-btn:hover,
+.show-less-btn:hover {
+  color: #374151;
+}
+
+/* Media Content */
+.post-media {
+  margin-bottom: 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f9fafb;
+}
+
+/* Images */
+.post-images {
+  display: grid;
+  gap: 4px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.post-images .post-image {
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.post-images .post-image img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.post-images .post-image:hover img {
+  transform: scale(1.02);
+}
+
+.post-images .post-image.single {
+  aspect-ratio: 16/9;
+}
+
+.post-images .post-image:not(.single) {
+  aspect-ratio: 1;
+}
+
+/* Image Placeholder */
+.image-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16/9;
+  background: #f3f4f6;
+  color: #9ca3af;
+  gap: 8px;
+}
+
+/* Video */
+.post-video {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.post-video video {
+  width: 100%;
+  height: auto;
+  max-height: 500px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Document */
+.post-document {
+  padding: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.document-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #374151;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.document-link:hover {
+  color: #2563eb;
+}
+
+.document-link svg:last-child {
+  margin-left: auto;
+  opacity: 0.6;
+}
+
+/* External Link */
+.post-link {
+  margin-bottom: 8px;
+}
+
+.link-preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #374151;
+  text-decoration: none;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.link-preview:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.link-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Location and Event Date */
+.post-location,
+.post-event-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #6b7280;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.post-location svg,
+.post-event-date svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Tags */
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.post-tag {
+  background: #eff6ff;
+  color: #2563eb;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid #bfdbfe;
+}
+
+/* Image Lightbox */
+.image-lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  animation: scaleIn 0.3s ease;
+}
+
+.lightbox-content img {
+  width: 100%;
+  height: auto;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 24px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Compact Mode Adjustments */
+.post-content.compact .post-type-badge {
+  margin-bottom: 6px;
+  padding: 3px 6px;
+  font-size: 11px;
+}
+
+.post-content.compact .post-media {
+  margin-bottom: 8px;
+}
+
+.post-content.compact .post-tags {
+  margin-top: 6px;
+}
+
+.post-content.compact .post-tag {
+  font-size: 11px;
+  padding: 1px 6px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .post-title {
+    font-size: 16px;
+  }
+  
+  .post-text {
+    font-size: 13px;
+  }
+  
+  .post-images .post-image.single {
+    aspect-ratio: 4/3;
+  }
+  
+  .post-video video {
+    max-height: 300px;
+  }
+  
+  .document-link {
+    font-size: 13px;
+  }
+  
+  .lightbox-content {
+    max-width: 95vw;
+    max-height: 95vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-title {
+    font-size: 15px;
+  }
+  
+  .post-text {
+    font-size: 13px;
+  }
+  
+  .post-tags {
+    gap: 4px;
+  }
+  
+  .post-tag {
+    font-size: 11px;
+    padding: 1px 5px;
+  }
+  
+  .link-preview {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+}
+

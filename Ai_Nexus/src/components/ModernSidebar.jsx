@@ -1,13 +1,10 @@
-
-
 import React, { useEffect, useState, useRef } from 'react';
 import { ChevronRight, Sparkles, Search, User, X, HelpCircle, BarChart3, Video, Radio, FileText } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/ModernSidebar.css';
 
-
-export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSidebarOpen }) {
+export function ModernSidebar({ sidebarOpen, setSidebarOpen }) {
   const [localOpen, setLocalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -16,7 +13,7 @@ export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSideb
   const searchTimeoutRef = useRef(null);
   const { user, token } = useAuth();
   const navigate = useNavigate();
-
+  const location = useLocation();
 
   const setOpen = (val) => {
     if (isControlled) {
@@ -29,6 +26,11 @@ export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSideb
   const isControlled = typeof sidebarOpen === 'boolean';
   const open = isControlled ? sidebarOpen : localOpen;
 
+  // Get current path for active state
+  const getCurrentPath = () => {
+    return location.pathname;
+  };
+
   // Search functionality
   const performSearch = async (query) => {
     if (!query.trim() || !token) {
@@ -39,7 +41,7 @@ export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSideb
 
     try {
       setIsSearching(true);
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/search?q=${encodeURIComponent(query)}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/search?q=${encodeURIComponent(query)}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -113,24 +115,24 @@ export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSideb
     };
   }, [isControlled, setOpen]);
 
-
   const sidebarItems = [
-    { id: 'quiz', label: 'Quiz', icon: HelpCircle },
-    { id: 'ats', label: 'ATS Score', icon: BarChart3 },
-    { id: 'shorts', label: 'AI Shorts', icon: Video },
-    { id: 'create-post', label: 'Create Post', icon: FileText },
-    { id: 'live', label: 'Live', icon: Radio },
-    { id: 'post', label: 'Post', icon: FileText },
+    { id: 'tools', label: 'AI Tools', icon: Sparkles, path: '/tools' },
+    { id: 'quiz', label: 'Quiz', icon: HelpCircle, path: '/quiz' },
+    { id: 'ats', label: 'ATS Score', icon: BarChart3, path: '/ats' },
+    { id: 'shorts', label: 'AI Shorts', icon: Video, path: '/shorts' },
+    { id: 'create-post', label: 'Create Post', icon: FileText, path: '/create-post' },
+    { id: 'live', label: 'Live', icon: Radio, path: '/live' },
   ];
-
-  const handleNavClick = (id) => {
-    onNavigate(id);
-    setOpen(false);
-  };
 
   const handleProfileClick = () => {
     navigate('/dashboard');
     setOpen(false);
+  };
+
+  const isActivePath = (path) => {
+    const current = getCurrentPath();
+    if (!path || path === '/') return current === '/';
+    return current.startsWith(path);
   };
 
   return (
@@ -145,8 +147,7 @@ export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSideb
                 <Sparkles className="h-8 w-6" />
               </div>
               <div className="sidebar-brand-text">
-                <h3>AI Nexus</h3>
-                <p>Navigation</p>
+                <h3>AI Nexus Platform</h3>
               </div>
             </div>
 
@@ -156,13 +157,12 @@ export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSideb
           </div>
         </div>
 
-
         <div className="sidebar-quick-actions">
           <div className="sidebar-search-bar">
             <Search className="h-4 w-4 search-icon" />
             <input 
               type="text" 
-              placeholder="Search users, companies..." 
+              placeholder="Search users, companies…" 
               className="search-input"
               value={searchQuery}
               onChange={handleSearchChange}
@@ -182,9 +182,9 @@ export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSideb
                 >
                   <div className="search-result-avatar">
                     <img 
-                      src={result.profilePicture || '/default-avatar.png'} 
+                      src={result.profilePicture || '/default-avatar.svg'} 
                       alt={result.name}
-                      onError={(e) => { e.target.src = '/default-avatar.png'; }}
+                      onError={(e) => { e.target.src = '/default-avatar.svg'; }}
                     />
                   </div>
                   <div className="search-result-info">
@@ -210,19 +210,19 @@ export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSideb
 
         <nav className="sidebar-nav">
           <div className="nav-section">
-
             <h4 className="nav-section-title">AI Tools</h4>
 
             <div className="nav-items">
               {sidebarItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = activeSection === item.id;
+                const isActive = isActivePath(item.path);
 
                 return (
-                  <button
+                  <Link
                     key={item.id}
+                    to={item.path}
                     className={`nav-item ${isActive ? 'active' : ''}`}
-                    onClick={() => handleNavClick(item.id)}
+                    onClick={() => setOpen(false)}
                   >
                     <div className="nav-item-icon-wrapper">
                       <Icon className="nav-item-icon" />
@@ -232,7 +232,7 @@ export function ModernSidebar({ activeSection, onNavigate, sidebarOpen, setSideb
                     <span className="nav-item-label">{item.label}</span>
 
                     {isActive && <ChevronRight className="nav-item-arrow" />}
-                  </button>
+                  </Link>
                 );
               })}
             </div>

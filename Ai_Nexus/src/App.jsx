@@ -1,15 +1,22 @@
-import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Header } from './components/Header';
 import { ModernSidebar } from './components/ModernSidebar';
 import { Hero } from './components/Hero';
-import { AIShowcase } from './components/AIShowcase';
 import AIShowcasePage from './pages/AIShowcase/AIShowcase';
-import { Community } from './components/Community';
-import Events from './components/Events';
-import { JobBoard } from './components/JobBoard';
-import { ModelDirectory } from './components/ModelDirectory';
 import { NewsFeed } from './components/NewsFeed';
+import { ModelDirectory } from './components/ModelDirectory';
+import { JobBoard } from './components/JobBoard';
+import Events from './components/Events';
+import PostForm from './components/PostCreation/PostForm';
+import Live from './pages/Live/Live';
+import { Quiz } from './pages/Quiz/Quiz';
+import Post from './pages/Post/Post';
+import ATSScore from './pages/ATSScore/ATSScore';
+import AiShorts from './pages/AIShorts/AiShorts';
+import ProfilePage from './pages/Profile/ProfilePage';
+import CompanyPage from './pages/Company/CompanyPage';
+import ToolsPage from './pages/Tools/ToolsPage';
+import SearchResults from './pages/Search/SearchResults';
 import { Footer } from './components/Footer';
 import { AuthProvider } from './context/AuthContext';
 import { FeedProvider } from './context/FeedContext';
@@ -17,11 +24,6 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 import Dashboard from './pages/Dashboard/Dashboard';
-import Live from './pages/Live/Live';
-import { Quiz } from './pages/Quiz/Quiz';
-import Post from './pages/Post/Post';
-import ATSScore from './pages/ATSScore/ATSScore';
-import AiShorts from './pages/AIShorts/AiShorts';
 import FloatingMessageButton from './components/Messaging/FloatingMessageButton';
 import './App.css';
 import './styles/globals.css';
@@ -31,73 +33,29 @@ import './styles/Post.css';
 import './styles/ATSScore.css';
 import './styles/AIShorts.css';
 import './styles/Messaging.css';
-import { PostForm } from './components/PostCreation';
 
-const MainApp = () => {
-  const [activeSection, setActiveSection] = useState('home');
-
-  const handleNavigate = (section) => {
-    setActiveSection(section);
-  };
-
-  const renderSection = () => {
-    switch (activeSection) {
-      case 'home':
-        return <Hero onExploreModels={() => handleNavigate('models')} onJoinCommunity={() => handleNavigate('community')} />;
-      case 'news':
-        return <NewsFeed />;
-      case 'showcase':
-        return <AIShowcase />;
-      case 'models':
-        return <ModelDirectory />;
-      case 'create-post':
-        return <PostForm />;
-      case 'career':
-        return <JobBoard />;
-      case 'events':
-        return <Events />;
-      case 'community':
-        return <Community />;
-      case 'live':
-        return <Live />;
-      case 'quiz':
-        return <Quiz />;
-      case 'post':
-        return <Post />;
-      case 'ats':
-        return <ATSScore />;
-      case 'shorts':
-        return <AiShorts />;
-      case 'about':
-        return (
-          <div className="app-main" style={{ padding: '4rem 2rem' }}>
-            <section className="app-section">
-              <div className="app-section-header">
-                <h2 className="section-title">About AI Nexus</h2>
-                <div className="section-underline" />
-              </div>
-              <div className="app-section-content">
-                <p style={{ color: 'var(--text-muted)', maxWidth: 820 }}>
-                  AI Nexus is a community-driven hub for models, tools, and resources in AI. This About page is a placeholder — replace with real content when ready.
-                </p>
-              </div>
-            </section>
-          </div>
-        );
-      default:
-        return <Hero onExploreModels={() => handleNavigate('models')} onJoinCommunity={() => handleNavigate('community')} />;
-    }
-  };
-
+// Layout for main app with sidebar and header
+const MainLayout = ({ children }) => {
   return (
     <div className="app-layout">
-      <Header activeSection={activeSection} onNavigate={handleNavigate} />
+      <Header />
       <div className="app-main-content">
-        <ModernSidebar activeSection={activeSection} onNavigate={handleNavigate} />
+        <ModernSidebar />
         <main className="app-content">
-          <section className="app-content-wrapper">{renderSection()}</section>
+          <section className="app-content-wrapper">{children}</section>
         </main>
       </div>
+      <Footer />
+    </div>
+  );
+};
+
+// Layout wrapper for pages with header and footer only
+const PageLayout = ({ children }) => {
+  return (
+    <div className="page-with-header">
+      <Header />
+      {children}
       <Footer />
     </div>
   );
@@ -112,31 +70,177 @@ const FeedLayout = ({ children }) => {
   );
 };
 
-// Layout wrapper for pages with header and footer
-const PageLayout = ({ children }) => {
-  return (
-    <div className="page-with-header">
-      <Header />
-      {children}
-      <Footer />
-    </div>
-  );
-};
-
 function App() {
   return (
     <AuthProvider>
       <Router>
         <GlobalLayout>
           <Routes>
+            {/* Home route with main layout */}
             <Route 
               path="/" 
               element={
                 <FeedLayout>
-                  <MainApp />
+                  <MainLayout>
+                    <Hero />
+                  </MainLayout>
                 </FeedLayout>
               } 
             />
+            
+            {/* Main app routes with sidebar */}
+            <Route
+              path="/news"
+              element={
+                <FeedLayout>
+                  <MainLayout>
+                    <NewsFeed />
+                  </MainLayout>
+                </FeedLayout>
+              }
+            />
+            <Route
+              path="/showcase"
+              element={
+                <FeedLayout>
+                  <MainLayout>
+                    <AIShowcasePage />
+                  </MainLayout>
+                </FeedLayout>
+              }
+            />
+            <Route
+              path="/models"
+              element={
+                <FeedLayout>
+                  <MainLayout>
+                    <ModelDirectory />
+                  </MainLayout>
+                </FeedLayout>
+              }
+            />
+            <Route
+              path="/career"
+              element={
+                <FeedLayout>
+                  <MainLayout>
+                    <JobBoard />
+                  </MainLayout>
+                </FeedLayout>
+              }
+            />
+            <Route
+              path="/events"
+              element={
+                <FeedLayout>
+                  <MainLayout>
+                    <Events />
+                  </MainLayout>
+                </FeedLayout>
+              }
+            />
+            <Route
+              path="/create-post"
+              element={
+                <FeedLayout>
+                  <MainLayout>
+                    <PostForm />
+                  </MainLayout>
+                </FeedLayout>
+              }
+            />
+            <Route
+              path="/live"
+              element={
+                <FeedLayout>
+                  <MainLayout>
+                    <Live />
+                  </MainLayout>
+                </FeedLayout>
+              }
+            />
+            <Route
+              path="/quiz"
+              element={
+                <FeedLayout>
+                  <MainLayout>
+                    <Quiz />
+                  </MainLayout>
+                </FeedLayout>
+              }
+            />
+            <Route
+              path="/post"
+              element={
+                <FeedLayout>
+                  <MainLayout>
+                    <Post />
+                  </MainLayout>
+                </FeedLayout>
+              }
+            />
+            <Route
+              path="/ats"
+              element={
+                <FeedLayout>
+                  <MainLayout>
+                    <ATSScore />
+                  </MainLayout>
+                </FeedLayout>
+              }
+            />
+            <Route
+              path="/shorts"
+              element={
+                <FeedLayout>
+                  <MainLayout>
+                    <AiShorts />
+                  </MainLayout>
+                </FeedLayout>
+              }
+            />
+            <Route
+              path="/tools"
+              element={
+                <FeedLayout>
+                  <MainLayout>
+                    <ToolsPage />
+                  </MainLayout>
+                </FeedLayout>
+              }
+            />
+            <Route
+              path="/profile/:id"
+              element={
+                <FeedLayout>
+                  <MainLayout>
+                    <ProfilePage />
+                  </MainLayout>
+                </FeedLayout>
+              }
+            />
+            <Route
+              path="/company/:id"
+              element={
+                <FeedLayout>
+                  <MainLayout>
+                    <CompanyPage />
+                  </MainLayout>
+                </FeedLayout>
+              }
+            />
+            <Route
+              path="/search"
+              element={
+                <FeedLayout>
+                  <MainLayout>
+                    <SearchResults />
+                  </MainLayout>
+                </FeedLayout>
+              }
+            />
+            
+            {/* Auth routes */}
             <Route
               path="/login"
               element={
@@ -153,6 +257,8 @@ function App() {
                 </PageLayout>
               }
             />
+            
+            {/* Protected routes */}
             <Route
               path="/dashboard"
               element={
@@ -161,62 +267,6 @@ function App() {
                     <Dashboard />
                   </PageLayout>
                 </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/live"
-              element={
-                <PageLayout>
-                  <Live />
-                </PageLayout>
-              }
-            />
-            <Route
-              path="/quiz"
-              element={
-                <PageLayout>
-                  <Quiz />
-                </PageLayout>
-              }
-            />
-            <Route
-              path="/post"
-              element={
-                <PageLayout>
-                  <Post />
-                </PageLayout>
-              }
-            />
-            <Route
-              path="/ats"
-              element={
-                <PageLayout>
-                  <ATSScore />
-                </PageLayout>
-              }
-            />
-            <Route
-              path="/shorts"
-              element={
-                <PageLayout>
-                  <AiShorts />
-                </PageLayout>
-              }
-            />
-            <Route
-              path="/showcase"
-              element={
-                <PageLayout>
-                  <AIShowcasePage />
-                </PageLayout>
-              }
-            />
-            <Route
-              path="/create-post"
-              element={
-                <PageLayout>
-                  <PostForm />
-                </PageLayout>
               }
             />
           </Routes>

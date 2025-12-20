@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
           setUser(parsedUser);
 
           // Then verify token with server
-          const res = await fetch('/api/auth/me', {
+          const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/me`, {
             headers: {
               Authorization: `Bearer ${storedToken}`,
             },
@@ -69,7 +69,7 @@ export const AuthProvider = ({ children }) => {
   // =========================
   const login = async (email, password) => {
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -102,7 +102,7 @@ export const AuthProvider = ({ children }) => {
         return { success: false, error: 'Invalid form data' };
       }
 
-      const res = await fetch('/api/auth/signup', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/signup`, {
         method: 'POST',
         body: formData, // ⚠️ DO NOT SET CONTENT-TYPE
       });
@@ -133,7 +133,7 @@ export const AuthProvider = ({ children }) => {
     try {
       // Optional: Call logout endpoint to invalidate token on server
       if (token) {
-        await fetch('/api/auth/logout', {
+        await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/logout`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,

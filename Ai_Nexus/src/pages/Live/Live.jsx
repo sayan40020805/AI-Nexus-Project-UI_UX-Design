@@ -118,14 +118,21 @@ const chatMessages = [
 
 export function Live() {
   const [liveStreams, setLiveStreams] = useState([]);
+  const [upcomingStreams, setUpcomingStreams] = useState([]);
   const [selectedStream, setSelectedStream] = useState(null);
   const [isMicOn, setIsMicOn] = useState(false);
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [isPhoneOn, setIsPhoneOn] = useState(false);
   const [chatMessage, setChatMessage] = useState('');
+  const [chatMessages, setChatMessages] = useState([]);
   const [showChat, setShowChat] = useState(true);
   const [loading, setLoading] = useState(true);
   const [isCreatingSession, setIsCreatingSession] = useState(false);
+  const [creatingSessionData, setCreatingSessionData] = useState({
+    title: '',
+    description: '',
+    category: 'Development'
+  });
   const { user, token } = useAuth();
 
   // Fetch live streams
@@ -134,51 +141,150 @@ export function Live() {
     
     try {
       setLoading(true);
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/live`, {
+      
+      // Fetch live sessions
+      const liveResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/live/active`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setLiveStreams(data.sessions || []);
+      if (liveResponse.ok) {
+        const liveData = await liveResponse.json();
+        const activeSessions = liveData.sessions || [];
+        
+        // Format live streams for display
+        const formattedLiveStreams = activeSessions.map(session => ({
+          id: session._id,
+          title: session.title,
+          streamer: session.streamer?.companyName || session.streamer?.username || 'Unknown',
+          streamerAvatar: session.streamer?.companyLogo || session.streamer?.profilePicture || '🎥',
+          viewers: session.viewers?.length || 0,
+          description: session.description || '',
+          category: session.category || 'General',
+          isLive: true,
+          thumbnail: session.thumbnail || 'https://images.unsplash.com/photo-1625314887424-9f190599bd56?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxBSSUyMHJvYm90JTIwZnV0dXJpc3RpY3xlbnwxfHx8fDE3NjUyNjMwODZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
+          tags: session.tags || [],
+          startTime: new Date(session.startTime).toLocaleTimeString(),
+          duration: calculateDuration(session.startTime),
+          _id: session._id,
+          streamer: session.streamer
+        }));
+        
+        setLiveStreams(formattedLiveStreams);
         
         // Set first stream as selected if none selected
-        if (data.sessions && data.sessions.length > 0 && !selectedStream) {
-          setSelectedStream(data.sessions[0]);
+        if (formattedLiveStreams.length > 0 && !selectedStream) {
+          setSelectedStream(formattedLiveStreams[0]);
         }
       }
+
+      // Fetch upcoming sessions
+      const upcomingResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/live/upcoming`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (upcomingResponse.ok) {
+        const upcomingData = await upcomingResponse.json();
+        const upcomingSessions = upcomingData.sessions || [];
+        
+        // Format upcoming streams for display
+        const formattedUpcomingStreams = upcomingSessions.map(session => ({
+          id: session._id,
+          title: session.title,
+          streamer: session.streamer?.companyName || session.streamer?.username || 'Unknown',
+          streamerAvatar: session.streamer?.companyLogo || session.streamer?.profilePicture || '🎥',
+          scheduledTime: new Date(session.scheduledTime).toLocaleTimeString(),
+          description: session.description || '',
+          category: session.category || 'General',
+          _id: session._id
+        }));
+        
+        setUpcomingStreams(formattedUpcomingStreams);
+      }
+      
     } catch (err) {
       console.error('Fetch live streams error:', err);
+      // Fallback to empty arrays if API fails
+      setLiveStreams([]);
+      setUpcomingStreams([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // Helper function to calculate duration
+  const calculateDuration = (startTime) => {
+    const start = new Date(startTime);
+    const now = new Date();
+    const diffMs = now - start;
+    const diffMins = Math.floor(diffMs / 60000);
+    const hours = Math.floor(diffMins / 60);
+    const mins = diffMins % 60;
+    
+    if (hours > 0) {
+      return `${hours}h ${mins}m`;
+    }
+    return `${mins}m`;
+  };
+
   // Create new live session (companies only)
-  const createLiveSession = async (sessionData) => {
+  const createLiveSession = async () => {
     if (!token || user?.role !== 'company') {
       alert('Only companies can create live sessions');
       return;
     }
 
+    if (!creatingSessionData.title.trim()) {
+      alert('Please enter a session title');
+      return;
+    }
+
     try {
       setIsCreatingSession(true);
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/live`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/live`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(sessionData)
+        body: JSON.stringify({
+          title: creatingSessionData.title,
+          description: creatingSessionData.description,
+          category: creatingSessionData.category
+        })
       });
 
       if (response.ok) {
         const newSession = await response.json();
-        setLiveStreams(prev => [newSession, ...prev]);
-        setSelectedStream(newSession);
+        
+        // Format the new session for display
+        const formattedSession = {
+          id: newSession.session._id,
+          title: newSession.session.title,
+          streamer: user.companyName || 'Company',
+          streamerAvatar: user.companyLogo || '🎥',
+          viewers: 0,
+          description: newSession.session.description || '',
+          category: newSession.session.category || 'General',
+          isLive: true,
+          thumbnail: 'https://images.unsplash.com/photo-1625314887424-9f190599bd56?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxBSSUyMHJvYm90JTIwZnV0dXJpc3RpY3xlbnwxfHx8fDE3NjUyNjMwODZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
+          tags: [],
+          startTime: new Date(newSession.session.startTime).toLocaleTimeString(),
+          duration: '0m',
+          _id: newSession.session._id,
+          streamer: user
+        };
+        
+        setLiveStreams(prev => [formattedSession, ...prev]);
+        setSelectedStream(formattedSession);
+        
+        // Reset form
+        setCreatingSessionData({ title: '', description: '', category: 'Development' });
         alert('Live session created successfully!');
       } else {
         const errorData = await response.json();
@@ -197,7 +303,7 @@ export function Live() {
     if (!token) return;
     
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/live/${sessionId}/join`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/live/${sessionId}/join`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -218,7 +324,7 @@ export function Live() {
     if (!chatMessage.trim() || !selectedStream) return;
     
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/live/${selectedStream._id}/chat`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/live/${selectedStream._id}/chat`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -256,7 +362,7 @@ export function Live() {
           <h1>Live Streams</h1>
           <span className="live-status">
             <span className="live-indicator"></span>
-            {liveStreamsData.length} live now
+            {liveStreams.length} live now
           </span>
         </div>
 
@@ -402,11 +508,11 @@ export function Live() {
         <div className="live-streams-section">
           <h3>Live Now</h3>
           <div className="live-streams-list">
-            {liveStreamsData.map((stream) => (
+            {liveStreams.length > 0 ? liveStreams.map((stream) => (
               <div 
                 key={stream.id}
                 onClick={() => setSelectedStream(stream)}
-                className={`live-stream-item ${selectedStream.id === stream.id ? 'active' : ''}`}
+                className={`live-stream-item ${selectedStream?.id === stream.id ? 'active' : ''}`}
               >
                 <div className="live-stream-thumbnail">
                   <img src={stream.thumbnail} alt={stream.title} />
@@ -425,7 +531,11 @@ export function Live() {
                   </div>
                 </div>
               </div>
-            ))}
+            )) : (
+              <div className="live-empty-state">
+                <p>No live streams at the moment</p>
+              </div>
+            )}
           </div>
         </div>
 

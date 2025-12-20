@@ -5,7 +5,7 @@ import { PostForm } from '../../components/PostCreation';
  * Create Post Page
  * 
  * This page demonstrates the Post Creation feature.
- * Users can create different types of posts (AI News, AI Shorts, AI Models, AI Showcase, Normal Post)
+ * Users can create different types of posts (AI News, AI Shorts, AI Models, AI Showcase)
  * with dynamic forms that change based on the selected post type.
  * 
  * Features:

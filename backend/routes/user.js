@@ -1,8 +1,34 @@
 const express = require('express');
 const { authMiddleware, roleMiddleware } = require('../middleware/auth');
 const User = require('../models/User');
+const Post = require('../models/Post');
+const multer = require('multer');
+const path = require('path');
 
 const router = express.Router();
+
+// Configure multer for profile picture uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/profiles/');
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'profile_pic-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: function (req, file, cb) {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'), false);
+    }
+  }
+});
 
 // All routes require authentication and user role
 router.use(authMiddleware);
@@ -24,17 +50,25 @@ router.get('/profile', async (req, res) => {
 // ========================
 // UPDATE USER PROFILE
 // ========================
-router.put('/profile', async (req, res) => {
+router.put('/profile', upload.single('profilePicture'), async (req, res) => {
   try {
-    const { username } = req.body;
+    const { username, bio } = req.body;
+    
+    const updateData = {
+      username: username || req.user.username,
+      bio: bio || req.user.bio,
+      updatedAt: new Date()
+    };
+    
+    // Add profile picture if uploaded
+    if (req.file) {
+      updateData.profilePicture = `/uploads/profiles/${req.file.filename}`;
+    }
     
     // Update user info
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
-      {
-        username: username || req.user.username,
-        updatedAt: new Date()
-      },
+      updateData,
       { new: true, select: '-password' }
     );
 
@@ -45,6 +79,35 @@ router.put('/profile', async (req, res) => {
   } catch (err) {
     console.error('Update user profile error:', err);
     res.status(500).json({ msg: 'Server error updating user profile' });
+  }
+});
+
+// ========================
+// GET USER'S POSTS
+// ========================
+router.get('/posts', async (req, res) => {
+  try {
+    const { page = 1, limit = 20 } = req.query;
+    
+    const posts = await Post.find({ author: req.user.id })
+      .populate('author', 'username profilePicture role')
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+    
+    const total = await Post.countDocuments({ author: req.user.id });
+    
+    res.json({
+      posts,
+      pagination: {
+        current: page,
+        pages: Math.ceil(total / limit),
+        total
+      }
+    });
+  } catch (err) {
+    console.error('Get user posts error:', err);
+    res.status(500).json({ msg: 'Server error getting user posts' });
   }
 });
 

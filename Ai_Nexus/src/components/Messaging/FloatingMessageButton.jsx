@@ -209,9 +209,9 @@ const FloatingMessageButton = () => {
                         onClick={() => startConversation(result)}
                       >
                         <img 
-                          src={result.profilePicture || '/default-avatar.png'} 
+                          src={result.profilePicture || '/default-avatar.svg'} 
                           alt={result.name}
-                          onError={(e) => { e.target.src = '/default-avatar.png'; }}
+                          onError={(e) => { e.target.src = '/default-avatar.svg'; }}
                         />
                         <div>
                           <div className="result-name">{result.name}</div>
@@ -237,9 +237,9 @@ const FloatingMessageButton = () => {
                       onClick={() => setSelectedConversation(conv)}
                     >
                       <img 
-                        src={conv.participant.profilePicture || '/default-avatar.png'} 
+                        src={conv.participant.profilePicture || '/default-avatar.svg'} 
                         alt={conv.participant.username || conv.participant.companyName}
-                        onError={(e) => { e.target.src = '/default-avatar.png'; }}
+                        onError={(e) => { e.target.src = '/default-avatar.svg'; }}
                       />
                       <div className="conversation-info">
                         <div className="conversation-name">

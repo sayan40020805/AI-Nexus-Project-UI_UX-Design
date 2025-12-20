@@ -6,7 +6,14 @@ const PostSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    maxlength: [2000, 'Post content cannot exceed 2000 characters']
+    maxlength: [5000, 'Post content cannot exceed 5000 characters']
+  },
+  
+  // Title field for enhanced posts
+  title: {
+    type: String,
+    trim: true,
+    maxlength: [200, 'Title cannot exceed 200 characters']
   },
   
   // Media fields
@@ -21,15 +28,126 @@ const PostSchema = new mongoose.Schema({
     type: String,
     enum: [
       'normal', // → Home
-      'shorts', // → AI Shorts  
-      'news', // → AI News
-      'model', // → Models
+      'ai_short', // → AI Shorts  
+      'ai_news', // → AI News
+      'ai_models', // → Models
+      'ai_showcase', // → Showcase
       'career', // → Career
-      'event', // → Events
-      'showcase' // → Showcase
+      'event' // → Events
     ],
     required: true,
     default: 'normal'
+  },
+
+  // Enhanced fields for Normal Posts
+  feeling: {
+    type: String,
+    trim: true
+  },
+  
+  location: {
+    type: String,
+    trim: true
+  },
+  
+  tags: [{
+    type: String,
+    trim: true
+  }],
+  
+  privacy: {
+    type: String,
+    enum: ['public', 'friends', 'private'],
+    default: 'public'
+  },
+
+  // Enhanced fields for AI Models
+  modelName: {
+    type: String,
+    trim: true
+  },
+  
+  modelType: {
+    type: String,
+    enum: [
+      'language-model',
+      'vision-model', 
+      'audio-model',
+      'multimodal',
+      'generative',
+      'classification',
+      'other'
+    ]
+  },
+  
+  capabilities: [{
+    type: String,
+    trim: true
+  }],
+  
+  useCases: [{
+    type: String,
+    trim: true
+  }],
+  
+  pricing: {
+    type: String,
+    enum: ['free', 'freemium', 'paid', 'enterprise'],
+    default: 'free'
+  },
+  
+  performance: {
+    type: String,
+    trim: true
+  },
+  
+  limitations: {
+    type: String,
+    trim: true
+  },
+  
+  githubUrl: {
+    type: String,
+    trim: true
+  },
+  
+  demoUrl: {
+    type: String,
+    trim: true
+  },
+  
+  paperUrl: {
+    type: String,
+    trim: true
+  },
+  
+  category: {
+    type: String,
+    enum: [
+      'nlp',
+      'cv',
+      'audio', 
+      'robotics',
+      'recommendation',
+      'prediction',
+      'other'
+    ],
+    default: 'other'
+  },
+  
+  releaseDate: {
+    type: Date
+  },
+  
+  company: {
+    type: String,
+    trim: true
+  },
+  
+  license: {
+    type: String,
+    enum: ['open-source', 'commercial', 'research', 'proprietary'],
+    default: 'open-source'
   },
   
   // Author information
@@ -72,6 +190,39 @@ const PostSchema = new mongoose.Schema({
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  
+  // Save/Bookmark tracking
+  savedBy: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  
+  // Report tracking
+  reports: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    reason: {
+      type: String,
+      enum: ['spam', 'inappropriate', 'harassment', 'misinformation', 'other'],
+      required: true
+    },
+    description: {
+      type: String,
+      maxlength: 500
     },
     createdAt: {
       type: Date,

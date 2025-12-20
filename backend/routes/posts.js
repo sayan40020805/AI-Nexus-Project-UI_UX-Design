@@ -1,7 +1,6 @@
 const express = require('express');
 const Post = require('../models/Post');
 const { authMiddleware } = require('../middleware/auth');
-const { validationResult } = require('express-validator');
 const User = require('../models/User');
 
 const router = express.Router();
@@ -51,35 +50,85 @@ router.get('/', async (req, res) => {
 // ========================
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { content, postType, media } = req.body;
+    const { 
+      content, 
+      postType, 
+      media,
+      // Normal post fields
+      feeling,
+      location,
+      tags,
+      privacy,
+      // AI Models fields
+      modelName,
+      modelType,
+      capabilities,
+      useCases,
+      pricing,
+      performance,
+      limitations,
+      githubUrl,
+      demoUrl,
+      paperUrl,
+      category,
+      releaseDate,
+      company,
+      license,
+      title
+    } = req.body;
+    
+    // Map frontend post types to backend post types
+    const postTypeMap = {
+      'normal': 'normal',           // Normal posts show on home page
+      'ai_news': 'ai_news',
+      'ai_short': 'ai_short',       // AI Shorts  
+      'ai_models': 'ai_models',     // Models
+      'ai_showcase': 'ai_showcase'  // Showcase
+    };
+    
+    const backendPostType = postTypeMap[postType] || postType;
+    
+    console.log('Creating post:', { content, postType, backendPostType, media });
     
     // Validate post type and role restrictions
     const userRole = req.user.role;
-    const restrictedTypes = ['news', 'career', 'event'];
+    const restrictedTypes = ['ai_news', 'career', 'event'];
     
-    if (restrictedTypes.includes(postType) && userRole !== 'company') {
+    if (restrictedTypes.includes(backendPostType) && userRole !== 'company') {
       return res.status(403).json({ 
         msg: 'Only companies can create news, career, and event posts' 
       });
     }
-    
-    if (postType === 'live' && userRole !== 'company') {
-      return res.status(403).json({ 
-        msg: 'Only companies can create live posts' 
-      });
-    }
 
-    // Create new post
+    // Create new post with all fields
     const newPost = new Post({
       content,
-      postType,
+      title,
+      postType: backendPostType,
       media: media || {},
-      author: req.user.id
+      author: req.user.id,
+      
+      // Normal post fields
+      feeling,
+      location,
+      tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map(tag => tag.trim()).filter(tag => tag) : []),
+      privacy: privacy || 'public',
+      
+      // AI Models fields
+      modelName,
+      modelType,
+      capabilities: Array.isArray(capabilities) ? capabilities : [],
+      useCases: Array.isArray(useCases) ? useCases : [],
+      pricing,
+      performance,
+      limitations,
+      githubUrl,
+      demoUrl,
+      paperUrl,
+      category,
+      releaseDate: releaseDate ? new Date(releaseDate) : null,
+      company,
+      license
     });
 
     await newPost.save();
@@ -217,11 +266,6 @@ router.post('/:id/like', authMiddleware, async (req, res) => {
 // ========================
 router.post('/:id/comment', authMiddleware, async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const { content } = req.body;
     
     const post = await Post.findById(req.params.id);
@@ -282,6 +326,88 @@ router.post('/:id/share', authMiddleware, async (req, res) => {
 });
 
 // ========================
+// SAVE/UNSAVE POST
+// ========================
+router.post('/:id/save', authMiddleware, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    
+    if (!post) {
+      return res.status(404).json({ msg: 'Post not found' });
+    }
+    
+    // Check if user already saved this post
+    const existingSave = post.savedBy.find(
+      save => save.user.toString() === req.user.id
+    );
+    
+    if (existingSave) {
+      // Unsave the post
+      post.savedBy = post.savedBy.filter(
+        save => save.user.toString() !== req.user.id
+      );
+    } else {
+      // Save the post
+      post.savedBy.push({ user: req.user.id });
+    }
+    
+    await post.save();
+    await post.populate('author', 'username companyName profilePicture companyLogo role');
+    
+    res.json({
+      post,
+      isSaved: !existingSave,
+      savedCount: post.savedBy.length
+    });
+  } catch (err) {
+    console.error('Save post error:', err);
+    res.status(500).json({ msg: 'Server error saving post' });
+  }
+});
+
+// ========================
+// REPORT POST
+// ========================
+router.post('/:id/report', authMiddleware, async (req, res) => {
+  try {
+    const { reason, description } = req.body;
+    
+    if (!reason) {
+      return res.status(400).json({ msg: 'Report reason is required' });
+    }
+    
+    const post = await Post.findById(req.params.id);
+    
+    if (!post) {
+      return res.status(404).json({ msg: 'Post not found' });
+    }
+    
+    // Check if user already reported this post
+    const existingReport = post.reports.find(
+      report => report.user.toString() === req.user.id
+    );
+    
+    if (existingReport) {
+      return res.status(400).json({ msg: 'You have already reported this post' });
+    }
+    
+    // Add report
+    post.reports.push({
+      user: req.user.id,
+      reason,
+      description: description || ''
+    });
+    
+    await post.save();
+    
+    res.json({ msg: 'Post reported successfully' });
+  } catch (err) {
+    console.error('Report post error:', err);
+    res.status(500).json({ msg: 'Server error reporting post' });
+  }
+});
+
+// ========================
 // GET POST STATISTICS
 // ========================
 router.get('/:id/stats', authMiddleware, async (req, res) => {
@@ -296,8 +422,12 @@ router.get('/:id/stats', authMiddleware, async (req, res) => {
       likes: post.likes.length,
       comments: post.comments.length,
       shares: post.shares.length,
+      saves: post.savedBy.length,
+      reports: post.reports.length,
       isLiked: post.likes.some(like => like.user.toString() === req.user.id),
-      isShared: post.shares.some(share => share.user.toString() === req.user.id)
+      isShared: post.shares.some(share => share.user.toString() === req.user.id),
+      isSaved: post.savedBy.some(save => save.user.toString() === req.user.id),
+      isReported: post.reports.some(report => report.user.toString() === req.user.id)
     };
     
     res.json(stats);

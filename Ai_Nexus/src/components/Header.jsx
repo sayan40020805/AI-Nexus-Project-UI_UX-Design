@@ -1,17 +1,16 @@
-
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Sparkles, Sun, Moon, LogOut, User, Building } from 'lucide-react';
 import { useThemeContext } from './theme-provider';
 import { useAuth } from '../context/AuthContext';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Header.css';
 
-
-export function Header({ activeSection, onNavigate }) {
+export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { resolvedTheme, setTheme } = useThemeContext();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -28,20 +27,16 @@ export function Header({ activeSection, onNavigate }) {
     return user.role === 'company' ? '/dashboard?tab=company' : '/dashboard?tab=user';
   };
 
-
   const navItems = [
-    { id: 'home', label: 'Home' },
-    { id: 'news', label: 'AI News' },
-    { id: 'showcase', label: 'Showcase' },
-    { id: 'models', label: 'Models' },
-    { id: 'career', label: 'Career' },
-    { id: 'events', label: 'Events' },
+    { id: 'home', label: 'Home', path: '/' },
+    { id: 'news', label: 'AI News', path: '/news' },
+    { id: 'showcase', label: 'Showcase', path: '/showcase' },
+    { id: 'models', label: 'Models', path: '/models' },
+    { id: 'career', label: 'Career', path: '/career' },
+    { id: 'events', label: 'Events', path: '/events' },
   ];
 
-  const handleNavClick = (id) => {
-    if (onNavigate) {
-      onNavigate(id);
-    }
+  const handleNavClick = () => {
     setMobileMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -52,9 +47,15 @@ export function Header({ activeSection, onNavigate }) {
     setTheme(isDark ? 'light' : 'dark');
   };
 
-  // 👉 FIXED — This triggers ModernSidebar toggle
   const toggleSidebar = () => {
     window.dispatchEvent(new Event("toggle-modern-sidebar"));
+  };
+
+  const isActivePath = (path) => {
+    if (path === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(path);
   };
 
   return (
@@ -62,7 +63,6 @@ export function Header({ activeSection, onNavigate }) {
       <div className="header-container">
         <div className="header-flex">
           <div className="header-left">
-
             {/* Sidebar Toggle Button */}
             <button
               className="header-icon-button header-sidebar-toggle"
@@ -75,7 +75,7 @@ export function Header({ activeSection, onNavigate }) {
             {/* Logo */}
             <Link
               to="/"
-              onClick={() => handleNavClick('home')}
+              onClick={handleNavClick}
               className="header-logo"
             >
               <div className="header-logo-bg">
@@ -90,10 +90,10 @@ export function Header({ activeSection, onNavigate }) {
             {navItems.map((item) => (
               <Link
                 key={item.id}
-                to="/"
-                onClick={() => handleNavClick(item.id)}
+                to={item.path}
+                onClick={handleNavClick}
                 className={
-                  activeSection === item.id
+                  isActivePath(item.path)
                     ? 'header-nav-item active'
                     : 'header-nav-item inactive'
                 }
@@ -102,8 +102,6 @@ export function Header({ activeSection, onNavigate }) {
               </Link>
             ))}
           </nav>
-
-
 
           {/* Right side icons */}
           <div className="header-right">
@@ -159,7 +157,6 @@ export function Header({ activeSection, onNavigate }) {
           </div>
         </div>
 
-
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <nav className="header-mobile-menu open">
@@ -167,10 +164,10 @@ export function Header({ activeSection, onNavigate }) {
               {navItems.map((item) => (
                 <Link
                   key={item.id}
-                  to="/"
-                  onClick={() => handleNavClick(item.id)}
+                  to={item.path}
+                  onClick={handleNavClick}
                   className={`header-mobile-nav-item ${
-                    activeSection === item.id ? 'active' : 'inactive'
+                    isActivePath(item.path) ? 'active' : 'inactive'
                   }`}
                 >
                   {item.label}

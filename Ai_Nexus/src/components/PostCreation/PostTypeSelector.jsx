@@ -30,13 +30,6 @@ const POST_TYPES = [
     icon: '🎥',
     color: '#FFD93D',
   },
-  {
-    id: 'normal_post',
-    label: 'Normal Post',
-    description: 'Regular text and image posts',
-    icon: '📝',
-    color: '#A8D8EA',
-  },
 ];
 
 const PostTypeSelector = ({ selectedType, onTypeChange }) => {

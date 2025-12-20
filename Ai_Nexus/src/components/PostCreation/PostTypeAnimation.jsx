@@ -47,12 +47,7 @@ const PostTypeAnimation = ({ selectedType }) => {
           speed: 0.8,
           emoji: '🎥',
         },
-        normal_post: {
-          color: '#A8D8EA',
-          shape: 'pyramid',
-          speed: 0.6,
-          emoji: '📝',
-        },
+        // 'normal' animation removed from Create Post flow
       };
       return configs[type];
     };
@@ -284,7 +279,6 @@ const PostTypeAnimation = ({ selectedType }) => {
             {selectedType === 'ai_shorts' && '🎬 AI Shorts'}
             {selectedType === 'ai_models' && '🤖 AI Models'}
             {selectedType === 'ai_showcase' && '🎥 AI Showcase'}
-            {selectedType === 'normal_post' && '📝 Normal Post'}
           </div>
         </>
       ) : (

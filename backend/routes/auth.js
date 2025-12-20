@@ -31,6 +31,8 @@ const generateToken = (user) => {
 
 // Return user data (exclude password)
 const getUserData = (user) => {
+  const baseUrl = process.env.BASE_URL || 'http://localhost:5001';
+  
   return {
     id: user.id,
     email: user.email,
@@ -38,8 +40,8 @@ const getUserData = (user) => {
     username: user.username,
     companyName: user.companyName,
     companyDescription: user.companyDescription,
-    profilePicture: user.profilePicture,
-    companyLogo: user.companyLogo,
+    profilePicture: user.profilePicture ? `${baseUrl}${user.profilePicture}` : '',
+    companyLogo: user.companyLogo ? `${baseUrl}${user.companyLogo}` : '',
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };

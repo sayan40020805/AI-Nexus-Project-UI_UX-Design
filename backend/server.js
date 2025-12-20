@@ -1,5 +1,3 @@
-
-
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
@@ -29,7 +27,18 @@ const limiter = rateLimit({
   max: 100, // limit each IP to 100 requests per windowMs
   message: 'Too many requests from this IP, please try again later.'
 });
+
+// More restrictive limiter for auth endpoints
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // limit each IP to 10 auth requests per windowMs (more restrictive)
+  message: 'Too many authentication attempts, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 app.use('/api/', limiter);
+app.use('/api/auth', authLimiter);
 
 
 // CORS configuration
@@ -37,8 +46,14 @@ app.use(cors({
   origin: [
     process.env.FRONTEND_URL || 'http://localhost:5173',
     'http://localhost:5174',
+    'http://localhost:5176',
     'http://localhost:3000',
-    'http://localhost:5175'
+    'http://localhost:5175',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:5174',
+    'http://127.0.0.1:5176',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:5175'
   ],
   credentials: true,
 }));
@@ -63,8 +78,14 @@ const io = socketIo(server, {
     origin: [
       process.env.FRONTEND_URL || 'http://localhost:5173',
       'http://localhost:5174',
+      'http://localhost:5176',
       'http://localhost:3000',
-      'http://localhost:5175'
+      'http://localhost:5175',
+      'http://127.0.0.1:5173',
+      'http://127.0.0.1:5174',
+      'http://127.0.0.1:5176',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:5175'
     ],
     credentials: true
   }
@@ -210,6 +231,7 @@ const followRouter = require('./routes/follow');
 const feedRouter = require('./routes/feed');
 const messagesRouter = require('./routes/messages');
 const liveRouter = require('./routes/live');
+const settingsRouter = require('./routes/settings');
 
 app.use('/api/auth', authRouter);
 app.use('/api/company', companyRouter);
@@ -220,6 +242,7 @@ app.use('/api/follow', followRouter);
 app.use('/api/feed', feedRouter);
 app.use('/api/messages', messagesRouter);
 app.use('/api/live', liveRouter);
+app.use('/api/settings', settingsRouter);
 app.use('/api/projects', require('./routes/projectRoutes'));
 
 // Health check endpoint

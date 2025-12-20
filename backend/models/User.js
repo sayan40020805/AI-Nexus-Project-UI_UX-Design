@@ -62,6 +62,49 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
+  
+  // Bio and other profile fields
+  bio: {
+    type: String,
+    maxlength: [200, 'Bio cannot be more than 200 characters'],
+    default: 'AI enthusiast exploring the future of technology'
+  },
+  
+  // Settings for privacy and preferences
+  settings: {
+    privacy: {
+      type: String,
+      enum: ['public', 'private', 'connections'],
+      default: 'public'
+    },
+    notifications: {
+      email: { type: Boolean, default: true },
+      push: { type: Boolean, default: true },
+      sms: { type: Boolean, default: false }
+    },
+    messaging: {
+      allowDirectMessages: { type: Boolean, default: true },
+      allowConnectionsOnly: { type: Boolean, default: false }
+    },
+    profile: {
+      showEmail: { type: Boolean, default: false },
+      showPhone: { type: Boolean, default: false },
+      showLocation: { type: Boolean, default: false }
+    }
+  },
+
+  // Saved/bookmarked posts
+  savedPosts: [{
+    post: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Post'
+    },
+    savedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+
   // Timestamps
   createdAt: {
     type: Date,

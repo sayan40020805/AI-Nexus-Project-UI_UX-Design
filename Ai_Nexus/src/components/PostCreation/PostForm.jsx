@@ -7,7 +7,6 @@ import AiNewsForm from './forms/AiNewsForm';
 import AiShortsForm from './forms/AiShortsForm';
 import AiModelsForm from './forms/AiModelsForm';
 import AiShowcaseForm from './forms/AiShowcaseForm';
-import NormalPostForm from './forms/NormalPostForm';
 import PostTypeAnimation from './PostTypeAnimation';
 import './PostCreation.css';
 
@@ -21,15 +20,12 @@ const PostForm = () => {
   // Post type mapping for navigation
   const getPostTypeNavigation = (postType) => {
     const typeMap = {
-      'ai_news': 'news',
-      'ai_shorts': 'shorts',
-      'ai_models': 'models',
-      'ai_showcase': 'showcase',
-      'career': 'career',
-      'event': 'events',
-      'normal_post': 'home'
+      'ai_news': '/news',
+      'ai_shorts': '/shorts',
+      'ai_models': '/models',
+      'ai_showcase': '/showcase'
     };
-    return typeMap[postType] || 'home';
+    return typeMap[postType] || '/';
   };
 
   const handleTypeChange = (typeId) => {
@@ -74,7 +70,7 @@ const PostForm = () => {
         }
       }
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/posts`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/posts`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -90,7 +86,7 @@ const PostForm = () => {
         
         // Navigate to appropriate page based on post type
         const navigateTo = getPostTypeNavigation(data.type);
-        navigate(`#${navigateTo}`);
+        navigate(navigateTo);
         
         // Reset form
         setSelectedType(null);
@@ -119,8 +115,6 @@ const PostForm = () => {
         return <AiModelsForm {...formProps} />;
       case 'ai_showcase':
         return <AiShowcaseForm {...formProps} />;
-      case 'normal_post':
-        return <NormalPostForm {...formProps} />;
       default:
         return null;
     }

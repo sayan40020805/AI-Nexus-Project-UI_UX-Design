@@ -1,0 +1,257 @@
+/* PostCard.css - Main Post Card Styling */
+
+.post-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.post-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
+}
+
+.post-card.compact {
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.post-card.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Error Banner */
+.post-error-banner {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.post-error-banner button {
+  background: none;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+}
+
+/* Post Header */
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.post-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.post-author-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f3f4f6;
+}
+
+.post-author-info {
+  flex: 1;
+}
+
+.post-author-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.verified-badge {
+  color: #3b82f6;
+  font-size: 12px;
+}
+
+.post-meta {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.post-timestamp {
+  color: #6b7280;
+}
+
+.post-privacy {
+  color: #9ca3af;
+}
+
+.post-type {
+  color: #9ca3af;
+}
+
+/* Menu Container */
+.post-menu-container {
+  position: relative;
+}
+
+/* Post Actions */
+.post-actions {
+  border-top: 1px solid #f3f4f6;
+  padding-top: 12px;
+  margin-top: 12px;
+}
+
+.post-actions.compact {
+  padding-top: 8px;
+  margin-top: 8px;
+}
+
+.post-action-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.post-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  color: #6b7280;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+  justify-content: center;
+}
+
+.post-action-btn:hover {
+  background: #f9fafb;
+  color: #374151;
+}
+
+.post-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Like Button */
+.like-btn.liked {
+  color: #ef4444;
+}
+
+.like-btn.liked .action-icon.filled {
+  fill: currentColor;
+}
+
+/* Save Button */
+.save-btn.saved {
+  color: #f59e0b;
+}
+
+.save-btn.saved .action-icon.filled {
+  fill: currentColor;
+}
+
+.action-icon {
+  transition: transform 0.2s ease;
+}
+
+.post-action-btn:active .action-icon {
+  transform: scale(0.9);
+}
+
+.action-count {
+  font-weight: 500;
+  font-size: 13px;
+}
+
+/* Share Container */
+.share-container,
+.more-options-container {
+  position: relative;
+}
+
+/* Menu Overlay */
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .post-card {
+    margin-bottom: 12px;
+    padding: 12px;
+  }
+  
+  .post-author-avatar {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .post-author-name {
+    font-size: 13px;
+  }
+  
+  .post-action-btn {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+  
+  .action-count {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-card {
+    margin-bottom: 8px;
+    padding: 10px;
+    border-radius: 8px;
+  }
+  
+  .post-action-buttons {
+    gap: 4px;
+  }
+  
+  .post-action-btn {
+    padding: 8px;
+    flex: 1;
+  }
+  
+  .action-icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
