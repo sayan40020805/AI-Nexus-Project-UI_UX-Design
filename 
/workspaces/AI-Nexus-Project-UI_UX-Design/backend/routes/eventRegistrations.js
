@@ -1,0 +1,493 @@
+
+const express = require('express');
+const Event = require('../models/Event');
+const EventRegistration = require('../models/EventRegistration');
+const authMiddleware = require('../middleware/auth');
+const roleMiddleware = require('../middleware/validation');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const router = express.Router();
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = 'backend/uploads/events';
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'event-doc-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+  fileFilter: function (req, file, cb) {
+    // Allow common document and image formats
+    const allowedTypes = /jpeg|jpg|png|gif|pdf|doc|docx|txt/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Only documents and images are allowed'));
+    }
+  }
+});
+
+// ========================
+// REGISTER FOR EVENT (User Only)
+// ========================
+router.post('/events/:eventId/register', authMiddleware, roleMiddleware('user'), upload.array('documents', 10), async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const {
+      firstName,
+      lastName,
+      email,
+      phone,
+      profession,
+      company,
+      experience,
+      education,
+      motivation,
+      expectations,
+      aiExperience,
+      skills,
+      portfolio,
+      github,
+      linkedin,
+      emergencyContactName,
+      emergencyContactRelationship,
+      emergencyContactPhone,
+      dietaryRestrictions,
+      accessibilityNeeds,
+      specialRequests
+    } = req.body;
+
+    // Check if event exists and is published
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ msg: 'Event not found' });
+    }
+
+    if (event.status !== 'published') {
+      return res.status(400).json({ msg: 'This event is not accepting registrations' });
+    }
+
+    // Check if registration deadline has passed
+    if (new Date() > new Date(event.registrationDeadline)) {
+      return res.status(400).json({ msg: 'Registration deadline has passed' });
+    }
+
+    // Check if user already registered
+    const existingRegistration = await EventRegistration.findOne({
+      event: eventId,
+      attendee: req.user.id
+    });
+
+    if (existingRegistration) {
+      return res.status(400).json({ msg: 'You have already registered for this event' });
+    }
+
+    // Check if event is full
+    if (event.currentAttendees >= event.maxAttendees && !event.allowWaitlist) {
+      return res.status(400).json({ msg: 'Event is full. Waitlist is not available.' });
+    }
+
+    // Process uploaded documents
+    const uploadedDocuments = [];
+    if (req.files && req.files.length > 0) {
+      req.files.forEach(file => {
+        const documentType = req.body[`documentType_${file.filename}`] || 'Other';
+        uploadedDocuments.push({
+          type: documentType,
+          fileName: file.originalname,
+          filePath: `/uploads/events/${file.filename}`,
+          fileSize: file.size,
+          status: 'pending'
+        });
+      });
+    }
+
+    // Create new registration
+    const newRegistration = new EventRegistration({
+      event: eventId,
+      attendee: req.user.id,
+      firstName,
+      lastName,
+      email,
+      phone,
+      profession,
+      company,
+      experience,
+      education,
+      motivation,
+      expectations,
+      aiExperience,
+      skills: skills ? skills.split(',').map(skill => skill.trim()) : [],
+      portfolio,
+      github,
+      linkedin,
+      uploadedDocuments,
+      emergencyContact: {
+        name: emergencyContactName,
+        relationship: emergencyContactRelationship,
+        phone: emergencyContactPhone
+      },
+      dietaryRestrictions,
+      accessibilityNeeds,
+      specialRequests,
+      status: event.requiresApproval ? 'pending' : 'approved'
+    });
+
+    await newRegistration.save();
+
+    // Update event attendee count if approved
+    if (!event.requiresApproval) {
+      event.currentAttendees += 1;
+      await event.save();
+    }
+
+    // Populate registration details for response
+    await newRegistration.populate([
+      { path: 'event', select: 'title startDate location' },
+      { path: 'attendee', select: 'username email' }
+    ]);
+
+    res.status(201).json({
+      msg: 'Registration submitted successfully',
+      registration: newRegistration
+    });
+
+  } catch (err) {
+    console.error('Register for event error:', err);
+    res.status(500).json({ msg: 'Server error registering for event' });
+  }
+});
+
+// ========================
+// GET USER'S REGISTRATIONS (User Only)
+// ========================
+router.get('/my-registrations', authMiddleware, roleMiddleware('user'), async (req, res) => {
+  try {
+    const { status, page = 1, limit = 10 } = req.query;
+
+    // Build filter
+    const filter = { attendee: req.user.id };
+    if (status) filter.status = status;
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const registrations = await EventRegistration.find(filter)
+      .populate({
+        path: 'event',
+        populate: { path: 'organizer', select: 'companyName companyLogo companyDescription' }
+      })
+      .sort({ registrationDate: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const totalRegistrations = await EventRegistration.countDocuments(filter);
+    const totalPages = Math.ceil(totalRegistrations / parseInt(limit));
+
+    res.json({
+      registrations,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages,
+        totalRegistrations,
+        hasNextPage: parseInt(page) < totalPages,
+        hasPrevPage: parseInt(page) > 1
+      }
+    });
+
+  } catch (err) {
+    console.error('Get user registrations error:', err);
+    res.status(500).json({ msg: 'Server error getting registrations' });
+  }
+});
+
+// ========================
+// GET EVENT'S REGISTRATIONS (Company Only - Own Events)
+// ========================
+router.get('/events/:eventId/registrations', authMiddleware, roleMiddleware('company'), async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const { status, page = 1, limit = 20 } = req.query;
+
+    // Check if event belongs to the company
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ msg: 'Event not found' });
+    }
+
+    if (event.organizer.toString() !== req.user.id) {
+      return res.status(403).json({ msg: 'Not authorized to view registrations for this event' });
+    }
+
+    // Build filter
+    const filter = { event: eventId };
+    if (status) filter.status = status;
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const registrations = await EventRegistration.find(filter)
+      .populate('attendee', 'username email profilePicture')
+      .sort({ registrationDate: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const totalRegistrations = await EventRegistration.countDocuments(filter);
+    const totalPages = Math.ceil(totalRegistrations / parseInt(limit));
+
+    res.json({
+      registrations,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages,
+        totalRegistrations,
+        hasNextPage: parseInt(page) < totalPages,
+        hasPrevPage: parseInt(page) > 1
+      }
+    });
+
+  } catch (err) {
+    console.error('Get event registrations error:', err);
+    res.status(500).json({ msg: 'Server error getting event registrations' });
+  }
+});
+
+// ========================
+// GET SINGLE REGISTRATION
+// ========================
+router.get('/registrations/:id', authMiddleware, async (req, res) => {
+  try {
+    const registration = await EventRegistration.findById(req.params.id)
+      .populate({
+        path: 'event',
+        populate: { path: 'organizer', select: 'companyName companyLogo' }
+      })
+      .populate('attendee', 'username email profilePicture');
+
+    if (!registration) {
+      return res.status(404).json({ msg: 'Registration not found' });
+    }
+
+    // Check if user is either the attendee or owns the event
+    const isAttendee = registration.attendee._id.toString() === req.user.id;
+    const isEventOwner = registration.event.organizer._id.toString() === req.user.id;
+
+    if (!isAttendee && !isEventOwner) {
+      return res.status(403).json({ msg: 'Not authorized to view this registration' });
+    }
+
+    res.json({ registration });
+
+  } catch (err) {
+    console.error('Get registration error:', err);
+    res.status(500).json({ msg: 'Server error getting registration' });
+  }
+});
+
+// ========================
+// UPDATE REGISTRATION STATUS (Company Only - Own Event)
+// ========================
+router.put('/registrations/:id/status', authMiddleware, roleMiddleware('company'), async (req, res) => {
+  try {
+    const { status, organizerNotes, internalRating } = req.body;
+
+    const registration = await EventRegistration.findById(req.params.id)
+      .populate('event');
+
+    if (!registration) {
+      return res.status(404).json({ msg: 'Registration not found' });
+    }
+
+    // Check if company owns this event
+    if (registration.event.organizer.toString() !== req.user.id) {
+      return res.status(403).json({ msg: 'Not authorized to update this registration' });
+    }
+
+    // Update status
+    const oldStatus = registration.status;
+    if (status) registration.status = status;
+    if (organizerNotes !== undefined) registration.organizerNotes = organizerNotes;
+    if (internalRating !== undefined) registration.internalRating = internalRating;
+
+    // Handle attendee count updates
+    if (oldStatus !== status) {
+      const event = registration.event;
+      if (status === 'approved' && oldStatus !== 'approved') {
+        event.currentAttendees += 1;
+      } else if (oldStatus === 'approved' && status !== 'approved') {
+        event.currentAttendees = Math.max(0, event.currentAttendees - 1);
+      }
+      await event.save();
+    }
+
+    await registration.save();
+
+    // Populate for response
+    await registration.populate([
+      { path: 'event', populate: { path: 'organizer', select: 'companyName companyLogo' } },
+      { path: 'attendee', select: 'username email profilePicture' }
+    ]);
+
+    res.json({
+      msg: 'Registration status updated successfully',
+      registration
+    });
+
+  } catch (err) {
+    console.error('Update registration status error:', err);
+    res.status(500).json({ msg: 'Server error updating registration status' });
+  }
+});
+
+// ========================
+// CANCEL REGISTRATION (User Only - Own Registration)
+// ========================
+router.put('/registrations/:id/cancel', authMiddleware, roleMiddleware('user'), async (req, res) => {
+  try {
+    const registration = await EventRegistration.findById(req.params.id)
+      .populate('event');
+
+    if (!registration) {
+      return res.status(404).json({ msg: 'Registration not found' });
+    }
+
+    // Check if user owns this registration
+    if (registration.attendee.toString() !== req.user.id) {
+      return res.status(403).json({ msg: 'Not authorized to cancel this registration' });
+    }
+
+    // Check if registration can be cancelled
+    if (['rejected', 'cancelled', 'attended'].includes(registration.status)) {
+      return res.status(400).json({ msg: 'This registration cannot be cancelled' });
+    }
+
+    // Update status
+    registration.status = 'cancelled';
+    await registration.save();
+
+    // Update event attendee count if it was approved
+    if (registration.status === 'approved') {
+      const event = registration.event;
+      event.currentAttendees = Math.max(0, event.currentAttendees - 1);
+      await event.save();
+    }
+
+    res.json({
+      msg: 'Registration cancelled successfully',
+      registration
+    });
+
+  } catch (err) {
+    console.error('Cancel registration error:', err);
+    res.status(500).json({ msg: 'Server error cancelling registration' });
+  }
+});
+
+// ========================
+// SUBMIT FEEDBACK (User Only - Own Registration)
+// ========================
+router.put('/registrations/:id/feedback', authMiddleware, roleMiddleware('user'), async (req, res) => {
+  try {
+    const { rating, comments, wouldRecommend } = req.body;
+
+    const registration = await EventRegistration.findById(req.params.id)
+      .populate('event');
+
+    if (!registration) {
+      return res.status(404).json({ msg: 'Registration not found' });
+    }
+
+    // Check if user owns this registration
+    if (registration.attendee.toString() !== req.user.id) {
+      return res.status(403).json({ msg: 'Not authorized to submit feedback for this registration' });
+    }
+
+    // Check if event has ended
+    if (new Date() < new Date(registration.event.endDate)) {
+      return res.status(400).json({ msg: 'Feedback can only be submitted after the event ends' });
+    }
+
+    // Update feedback
+    if (rating !== undefined) registration.feedback.rating = rating;
+    if (comments !== undefined) registration.feedback.comments = comments;
+    if (wouldRecommend !== undefined) registration.feedback.wouldRecommend = wouldRecommend;
+
+    await registration.save();
+
+    res.json({
+      msg: 'Feedback submitted successfully',
+      registration
+    });
+
+  } catch (err) {
+    console.error('Submit feedback error:', err);
+    res.status(500).json({ msg: 'Server error submitting feedback' });
+  }
+});
+
+// ========================
+// GET REGISTRATION STATISTICS (Company Only)
+// ========================
+router.get('/company/stats', authMiddleware, roleMiddleware('company'), async (req, res) => {
+  try {
+    // Get all events for this company
+    const companyEvents = await Event.find({ organizer: req.user.id }).distinct('_id');
+    
+    // Get statistics by status
+    const statusStats = await EventRegistration.aggregate([
+      { $match: { event: { $in: companyEvents } } },
+      { $group: { _id: '$status', count: { $sum: 1 } } }
+    ]);
+
+    // Get total registrations
+    const totalRegistrations = await EventRegistration.countDocuments({
+      event: { $in: companyEvents }
+    });
+
+    // Get recent registrations (last 7 days)
+    const recentRegistrations = await EventRegistration.countDocuments({
+      event: { $in: companyEvents },
+      registrationDate: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
+    });
+
+    // Format status statistics
+    const statusCounts = {};
+    statusStats.forEach(stat => {
+      statusCounts[stat._id] = stat.count;
+    });
+
+    res.json({
+      totalRegistrations,
+      recentRegistrations,
+      statusCounts: {
+        pending: statusCounts.pending || 0,
+        approved: statusCounts.approved || 0,
+        rejected: statusCounts.rejected || 0,
+        waitlisted: statusCounts.waitlisted || 0,
+        cancelled: statusCounts.cancelled || 0,
+        attended: statusCounts.attended || 0
+      }
+    });
+
+  } catch (err) {
+    console.error('Get registration stats error:', err);
+    res.status(500).json({ msg: 'Server error getting registration statistics' });
+  }
+});
+
+module.exports = router;
+

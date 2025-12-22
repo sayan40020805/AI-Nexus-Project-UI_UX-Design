@@ -20,12 +20,19 @@ const AiShowcaseForm = ({ onSubmit }) => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setFormData((prev) => ({
-        ...prev,
-        videoUpload: file,
-      }));
+    if (!file) return;
+
+    const maxShowcaseSize = 200 * 1024 * 1024; // 200MB
+    if (file.size > maxShowcaseSize) {
+      alert('Showcase videos must be 200MB or smaller');
+      e.target.value = null;
+      return;
     }
+
+    setFormData((prev) => ({
+      ...prev,
+      videoUpload: file,
+    }));
   };
 
   const handleSubmit = (e) => {
@@ -36,7 +43,7 @@ const AiShowcaseForm = ({ onSubmit }) => {
       (useUrl ? formData.videoUrl : formData.videoUpload)
     ) {
       onSubmit({
-        type: 'ai_showcase',
+        postType: 'ai_showcase',
         ...formData,
         videoSource: useUrl ? 'url' : 'upload',
       });

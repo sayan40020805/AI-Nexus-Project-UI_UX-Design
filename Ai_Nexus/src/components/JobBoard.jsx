@@ -1,215 +1,258 @@
+import { useState, useEffect } from 'react';
+import { MapPin, Briefcase, Building, Plus, Clock } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import jobService from '../services/jobService';
+import { JobVacancyForm } from './JobVacancyForm';
+import { JobApplicationModal } from './JobApplicationModal';
+import '../styles/JobBoard_SIMPLE.css';
 
-import { useState } from 'react';
-import { MapPin, Briefcase, DollarSign, Clock, Search, Filter, Bookmark, Building } from 'lucide-react';
-import '../styles/JobBoard.css';
+export function JobBoard() {
+  const { user } = useAuth();
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [showJobForm, setShowJobForm] = useState(false);
+  const [showApplicationModal, setShowApplicationModal] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
 
-const jobsData = [
-  {
-    id: 1,
-    title: 'Senior Machine Learning Engineer',
-    company: 'Google DeepMind',
-    location: 'London, UK',
-    type: 'Full-time',
-    salary: '$150k - $250k',
-    techStack: ['Python', 'TensorFlow', 'PyTorch', 'Kubernetes'],
-    description: 'Join our team working on cutting-edge AI research and applications.',
-    posted: '2 days ago',
-    applicants: 47,
-    logo: '🔷',
-  },
-  {
-    id: 2,
-    title: 'AI Research Scientist',
-    company: 'OpenAI',
-    location: 'San Francisco, CA',
-    type: 'Full-time',
-    salary: '$180k - $300k',
-    techStack: ['Python', 'JAX', 'Distributed Systems', 'NLP'],
-    description: 'Advance the field of AI safety and alignment through groundbreaking research.',
-    posted: '1 day ago',
-    applicants: 124,
-    logo: '🤖',
-  },
-  {
-    id: 3,
-    title: 'Computer Vision Engineer',
-    company: 'Tesla',
-    location: 'Palo Alto, CA',
-    type: 'Full-time',
-    salary: '$140k - $220k',
-    techStack: ['C++', 'Python', 'CUDA', 'Computer Vision'],
-    description: 'Develop autonomous driving technology using state-of-the-art computer vision.',
-    posted: '3 days ago',
-    applicants: 89,
-    logo: '🚗',
-  },
-  {
-    id: 4,
-    title: 'NLP Engineer',
-    company: 'Anthropic',
-    location: 'Remote',
-    type: 'Full-time',
-    salary: '$160k - $240k',
-    techStack: ['Python', 'Transformers', 'PyTorch', 'LLMs'],
-    description: 'Build next-generation language models with a focus on safety and reliability.',
-    posted: '5 days ago',
-    applicants: 102,
-    logo: '🧠',
-  },
-  {
-    id: 5,
-    title: 'AI Product Manager',
-    company: 'Microsoft',
-    location: 'Seattle, WA',
-    type: 'Full-time',
-    salary: '$130k - $200k',
-    techStack: ['Product Strategy', 'AI/ML', 'Agile', 'Analytics'],
-    description: 'Lead AI product initiatives and drive strategic vision for enterprise solutions.',
-    posted: '1 week ago',
-    applicants: 65,
-    logo: '💼',
-  },
-  {
-    id: 6,
-    title: 'ML Infrastructure Engineer',
-    company: 'Meta',
-    location: 'Menlo Park, CA',
-    type: 'Full-time',
-    salary: '$155k - $235k',
-    techStack: ['Python', 'Kubernetes', 'MLOps', 'AWS'],
-    description: 'Build scalable infrastructure for training and deploying ML models at scale.',
-    posted: '4 days ago',
-    applicants: 56,
-    logo: '🔧',
-  },
-];
+  // Load jobs
+  useEffect(() => {
+    loadJobs();
+  }, []);
 
-export function JobBoard({ preview = false }) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('All');
-  const [savedJobs, setSavedJobs] = useState(new Set());
-
-  const displayedJobs = preview ? jobsData.slice(0, 3) : jobsData;
-
-  const toggleSaveJob = (id) => {
-    setSavedJobs((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      return newSet;
-    });
+  const loadJobs = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      // Simple API call to get all active jobs
+      const response = await jobService.getJobs({ status: 'active' });
+      setJobs(response.jobs || []);
+    } catch (err) {
+      console.error('Load jobs error:', err);
+      setError('Failed to load jobs');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const filteredJobs = displayedJobs.filter(
-    (job) =>
-      (filterType === 'All' || job.type === filterType) &&
-      (searchTerm === '' ||
-        job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.techStack.some((tech) => tech.toLowerCase().includes(searchTerm.toLowerCase())))
-  );
+  const handleCreateJob = () => {
+    setSelectedJob(null);
+    setShowJobForm(true);
+  };
 
+  const handleEditJob = (job) => {
+    setSelectedJob(job);
+    setShowJobForm(true);
+  };
+
+  const handleDeleteJob = async (jobId) => {
+    if (window.confirm('Are you sure you want to delete this job?')) {
+      try {
+        await jobService.deleteJob(jobId);
+        loadJobs();
+      } catch (err) {
+        setError(err.message);
+      }
+    }
+  };
+
+  const handleApplyJob = (job) => {
+    setSelectedJob(job);
+    setShowApplicationModal(true);
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) return '1 day ago';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
+    return `${Math.ceil(diffDays / 30)} months ago`;
+  };
+
+  // Check user roles
+  const isCompany = user?.role === 'company';
+  const isUser = user?.role === 'user';
 
   return (
     <div className="job-board-container">
-      {!preview && (
-        <div className="job-board-controls">
-          <div className="job-board-search-section">
-            <div className="job-board-search-wrapper">
-                <Search className="job-board-search-icon" />
-                <input
-                  type="text"
-                  placeholder="Search jobs, companies, or skills..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="job-board-search-input"
-                />
-            </div>
-            <div className="job-board-filter-wrapper">
-                <Filter className="job-board-filter-icon" />
-                <select
-                  value={filterType}
-                  onChange={(e) => setFilterType(e.target.value)}
-                  className="job-board-filter-select"
-                >
-                  <option value="All">All Types</option>
-                  <option value="Full-time">Full-time</option>
-                  <option value="Part-time">Part-time</option>
-                  <option value="Contract">Contract</option>
-                  <option value="Remote">Remote</option>
-                </select>
-            </div>
-          </div>
-          <div className="job-board-ats-section">
-            <h4 className="job-board-ats-title">ATS Simulation Available</h4>
-            <p className="job-board-ats-description">
-              Practice with our Applicant Tracking System simulator to optimize your resume and increase your chances.
-            </p>
-          </div>
+      {/* Header */}
+      <div className="job-header-section">
+        <h2 className="page-title">Job Vacancies</h2>
+        {isCompany && (
+          <button onClick={handleCreateJob} className="create-job-btn">
+            <Plus className="w-5 h-5 mr-2" />
+            Post Job
+          </button>
+        )}
+      </div>
+
+      {/* Error State */}
+      {error && (
+        <div className="error-container">
+          <p className="error-text">{error}</p>
+          <button onClick={loadJobs} className="retry-button">Try Again</button>
         </div>
       )}
 
+      {/* Loading State */}
+      {loading && (
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Loading jobs...</p>
+        </div>
+      )}
 
-      <div className="job-board-list">
-        {filteredJobs.map((job) => (
-          <div key={job.id} className="job-card">
-            <div className="job-card-header">
-              <div className="job-company-info">
-                <div className="job-company-logo">{job.logo}</div>
-                <div className="job-details">
-                  <h3 className="job-title">{job.title}</h3>
-                  <div className="job-company">
-                    <Building className="w-4 h-4" />
-                    <span>{job.company}</span>
+      {/* Empty State */}
+      {!loading && jobs.length === 0 && !error && (
+        <div className="empty-container">
+          <Building className="empty-icon" />
+          <h3 className="empty-title">No jobs available</h3>
+          <p className="empty-text">
+            {isCompany ? 'Be the first to post a job vacancy!' : 'Check back later for new opportunities.'}
+          </p>
+          {isCompany && (
+            <button onClick={handleCreateJob} className="create-job-btn">
+              <Plus className="w-5 h-5 mr-2" />
+              Post First Job
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Job List */}
+      {!loading && jobs.map((job) => (
+        <div key={job._id} className="job-item">
+          <div className="job-main">
+            <div className="company-section">
+              <div className="company-logo">
+                {job.company?.companyLogo ? (
+                  <img 
+                    src={job.company.companyLogo} 
+                    alt={job.company.companyName}
+                    className="logo-img"
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                  />
+                ) : (
+                  <div className="logo-placeholder">
+                    <Building className="w-6 h-6" />
                   </div>
-                  <p className="job-description job-board-clamp-2">{job.description}</p>
-                </div>
+                )}
               </div>
-              <button onClick={() => toggleSaveJob(job.id)} className={`job-bookmark-btn ${savedJobs.has(job.id) ? 'active' : ''}`}>
-                <Bookmark className="w-6 h-6" />
-              </button>
+              <div className="job-basic-info">
+                <h3 className="job-title">{job.title}</h3>
+                <div className="company-name">
+                  <Building className="w-4 h-4" />
+                  <span>{job.company?.companyName}</span>
+                </div>
+                <p className="job-desc">{job.description}</p>
+              </div>
             </div>
+            
+            {/* Company Actions */}
+            {isCompany && job.company?._id === user.id && (
+              <div className="company-actions">
+                <button
+                  onClick={() => handleEditJob(job)}
+                  className="action-button edit"
+                  title="Edit Job"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDeleteJob(job._id)}
+                  className="action-button delete"
+                  title="Delete Job"
+                >
+                  Delete
+                </button>
+              </div>
+            )}
+          </div>
 
-            <div className="job-details-grid">
-              <div className="job-detail"><MapPin className="w-4 h-4" /><span>{job.location}</span></div>
-              <div className="job-detail"><Briefcase className="w-4 h-4" /><span>{job.type}</span></div>
-              <div className="job-detail"><DollarSign className="w-4 h-4" /><span>{job.salary}</span></div>
-              <div className="job-detail"><Clock className="w-4 h-4" /><span>{job.posted}</span></div>
+          <div className="job-meta">
+            <div className="meta-item">
+              <MapPin className="meta-icon" />
+              <span>{job.location}</span>
             </div>
+            <div className="meta-item">
+              <Briefcase className="meta-icon" />
+              <span>{job.jobType}</span>
+            </div>
+            <div className="meta-item">
+              <Clock className="meta-icon" />
+              <span>{formatDate(job.createdAt)}</span>
+            </div>
+          </div>
 
-            <div className="job-tech-stack">
-              {job.techStack.map((tech) => (
-                <span key={tech} className="job-tech-tag">
+          {job.techStack && job.techStack.length > 0 && (
+            <div className="tech-tags">
+              {job.techStack.map((tech, index) => (
+                <span key={index} className="tech-tag">
                   {tech}
                 </span>
               ))}
             </div>
+          )}
 
-            <div className="job-card-footer">
-              <span className="job-applicants">{job.applicants} applicants</span>
-              <button className="job-apply-btn">
-                Apply Now
-              </button>
+          <div className="job-footer">
+            <span className="applicant-info">
+              {job.applicantCount || job.applicants?.length || 0} applicants
+            </span>
+            
+            <div className="action-section">
+              {isUser ? (
+                <button 
+                  onClick={() => handleApplyJob(job)}
+                  className="apply-button"
+                >
+                  Apply Now
+                </button>
+              ) : isCompany && job.company?._id === user.id ? (
+                <span className="company-stats">
+                  {job.applicantCount || 0} total applications
+                </span>
+              ) : (
+                <span className="login-hint">
+                  Sign in to apply
+                </span>
+              )}
             </div>
           </div>
-        ))}
-      </div>
-
-
-      {!preview && (
-        <div className="job-board-cta">
-          <h3 className="job-board-cta-title">Prepare for Your Interview</h3>
-          <p className="job-board-cta-description">
-            Access our comprehensive interview preparation resources, including practice questions, mock interviews, and expert tips.
-          </p>
-          <button className="job-board-cta-btn">
-            Start Preparing
-          </button>
         </div>
+      ))}
+
+      {/* Modals */}
+      {showJobForm && (
+        <JobVacancyForm
+          job={selectedJob}
+          onClose={() => setShowJobForm(false)}
+          onSuccess={() => {
+            loadJobs();
+            setShowJobForm(false);
+          }}
+        />
+      )}
+
+      {showApplicationModal && selectedJob && (
+        <JobApplicationModal
+          job={selectedJob}
+          onClose={() => {
+            setShowApplicationModal(false);
+            setSelectedJob(null);
+          }}
+          onSuccess={() => {
+            loadJobs();
+            setShowApplicationModal(false);
+            setSelectedJob(null);
+          }}
+        />
       )}
     </div>
   );
 }
+

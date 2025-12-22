@@ -10,7 +10,17 @@ import { useAuth } from '../context/AuthContext';
 
 
 export function Hero({ onExploreModels, onJoinCommunity }) {
-  const { posts, liveStreams, loading, error, likePost, commentOnPost, sharePost } = useContext(FeedContext);
+  // Defensive consumption of FeedContext - provide safe defaults so component won't crash
+  const feedCtx = useContext(FeedContext) || {};
+  const {
+    posts = [],
+    liveStreams = [],
+    loading = false,
+    error = null,
+    likePost = async () => {},
+    commentOnPost = async () => {},
+    sharePost = async () => {}
+  } = feedCtx;
   const { user, token } = useAuth();
 
   const handlePostLike = async (postId) => {
@@ -66,11 +76,11 @@ export function Hero({ onExploreModels, onJoinCommunity }) {
               ) : (
                 posts.map((post) => (
                   <PostCard
-                    key={post.id}
+                    key={post.id || post._id}
                     post={post}
-                    onLike={() => handlePostLike(post.id)}
-                    onComment={() => handlePostComment(post.id)}
-                    onShare={() => handlePostShare(post.id)}
+                    onLike={() => handlePostLike(post.id || post._id)}
+                    onComment={() => handlePostComment(post.id || post._id)}
+                    onShare={() => handlePostShare(post.id || post._id)}
                   />
                 ))
               )}
@@ -102,9 +112,9 @@ export function Hero({ onExploreModels, onJoinCommunity }) {
                 ) : (
                   liveStreams.map((live) => (
                     <LiveVideoCard
-                      key={live.id}
+                      key={live.id || live._id}
                       liveStream={live}
-                      onWatch={() => handleWatchLive(live.id)}
+                      onWatch={() => handleWatchLive(live.id || live._id)}
                     />
                   ))
                 )}

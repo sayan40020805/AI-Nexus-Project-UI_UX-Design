@@ -65,8 +65,13 @@ app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Serve static files from uploads directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve static files from uploads directory (allow cross-origin resource loading)
+app.use('/uploads', (req, res, next) => {
+  // Allow embedding/uploads to be loaded from frontend origins
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || '*');
+  next();
+}, express.static(path.join(__dirname, 'uploads')));
 
 
 
@@ -232,6 +237,10 @@ const feedRouter = require('./routes/feed');
 const messagesRouter = require('./routes/messages');
 const liveRouter = require('./routes/live');
 const settingsRouter = require('./routes/settings');
+const jobsRouter = require('./routes/jobs');
+const jobApplicationsRouter = require('./routes/jobApplications');
+const eventsRouter = require('./routes/events');
+const eventRegistrationsRouter = require('./routes/eventRegistrations');
 
 app.use('/api/auth', authRouter);
 app.use('/api/company', companyRouter);
@@ -244,6 +253,10 @@ app.use('/api/messages', messagesRouter);
 app.use('/api/live', liveRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/projects', require('./routes/projectRoutes'));
+app.use('/api/jobs', jobsRouter);
+app.use('/api', jobApplicationsRouter);
+app.use('/api/events', eventsRouter);
+app.use('/api/events', eventRegistrationsRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

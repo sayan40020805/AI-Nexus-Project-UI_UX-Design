@@ -1,12 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { FeedContext } from '../../context/FeedContext';
 import PostTypeSelector from './PostTypeSelector';
 import AiNewsForm from './forms/AiNewsForm';
 import AiShortsForm from './forms/AiShortsForm';
 import AiModelsForm from './forms/AiModelsForm';
 import AiShowcaseForm from './forms/AiShowcaseForm';
+import NormalPostForm from './forms/NormalPostForm';
 import PostTypeAnimation from './PostTypeAnimation';
 import './PostCreation.css';
 
@@ -15,6 +17,8 @@ const PostForm = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user, token } = useAuth();
+  const feedCtx = useContext(FeedContext) || {};
+  const { addPost, refreshFeed } = feedCtx;
   const navigate = useNavigate();
 
   // Post type mapping for navigation
@@ -41,7 +45,7 @@ const PostForm = () => {
 
     // Role-based restrictions
     const restrictedTypesForUsers = ['ai_news', 'career', 'event'];
-    if (user.role === 'user' && restrictedTypesForUsers.includes(data.type)) {
+    if (user.role === 'user' && restrictedTypesForUsers.includes(data.postType)) {
       alert('Only company accounts can create this type of post');
       return;
     }
@@ -52,22 +56,34 @@ const PostForm = () => {
     try {
       const formData = new FormData();
       
-      // Add post data
+      // Add post data and files (append File objects correctly)
       Object.keys(data).forEach(key => {
-        if (key !== 'media') {
-          formData.append(key, data[key]);
+        const val = data[key];
+
+        // If value is a File (browser File API), append it directly
+        if (val instanceof File) {
+          formData.append(key, val);
+        } else if (Array.isArray(val) && val.length && val[0] instanceof File) {
+          // Array of files
+          val.forEach((file) => formData.append(key, file));
+        } else {
+          // Fallback: append primitive values
+          formData.append(key, val);
         }
       });
 
-      // Add media files if present
-      if (data.media) {
-        if (Array.isArray(data.media)) {
-          data.media.forEach((file, index) => {
-            formData.append(`media_${index}`, file);
-          });
-        } else {
-          formData.append('media', data.media);
-        }
+      // Also support an explicit `media` array if provided by some forms
+      if (data.media && Array.isArray(data.media)) {
+        data.media.forEach((file) => {
+          if (file instanceof File) formData.append('media', file);
+        });
+      }
+
+      // Support `media.images` object shape (used by NormalPostForm)
+      if (data.media && data.media.images && Array.isArray(data.media.images)) {
+        data.media.images.forEach((file) => {
+          if (file instanceof File) formData.append('media', file);
+        });
       }
 
       const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/posts`, {
@@ -80,7 +96,28 @@ const PostForm = () => {
 
       if (response.ok) {
         const result = await response.json();
-        
+
+        // Normalize result.post so frontend components that expect `media.images` or `media.video` render correctly
+        let createdPost = result?.post || null;
+        if (createdPost) {
+          // If backend provided mediaList but not media.images/video, map them into media
+          if (!createdPost.media) createdPost.media = {};
+          if ((!createdPost.media.images || createdPost.media.images.length === 0) && Array.isArray(createdPost.mediaList)) {
+            const firstImage = createdPost.mediaList.find(m => m.type === 'image');
+            const firstVideo = createdPost.mediaList.find(m => m.type === 'video');
+            if (firstImage) createdPost.media.images = [firstImage.url];
+            if (firstVideo) createdPost.media.video = firstVideo.url;
+          }
+        }
+
+        // Add created post to feed (if FeedContext available)
+        if (createdPost && typeof addPost === 'function') {
+          addPost(createdPost);
+        } else if (typeof refreshFeed === 'function') {
+          // fallback: refresh feed
+          refreshFeed();
+        }
+
         // Show success message
         alert(`Post created successfully!\n\nType: ${data.type}`);
         
@@ -107,6 +144,8 @@ const PostForm = () => {
     const formProps = { onSubmit: handleFormSubmit };
 
     switch (selectedType) {
+      case 'normal':
+        return <NormalPostForm {...formProps} />;
       case 'ai_news':
         return <AiNewsForm {...formProps} />;
       case 'ai_shorts':

@@ -17,19 +17,52 @@ const AiShortsForm = ({ onSubmit }) => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
+    if (!file) return;
+
+    const maxShortSize = 50 * 1024 * 1024; // 50MB
+    if (file.size > maxShortSize) {
+      alert('Shorts must be 50MB or smaller');
+      e.target.value = null;
+      return;
+    }
+
+    // Validate duration (<= 60s) by loading metadata
+    const url = URL.createObjectURL(file);
+    const videoEl = document.createElement('video');
+    videoEl.preload = 'metadata';
+    videoEl.src = url;
+    videoEl.onloadedmetadata = () => {
+      URL.revokeObjectURL(url);
+      const duration = videoEl.duration;
+      if (!isFinite(duration)) {
+        alert('Could not determine video duration. Try a different file.');
+        e.target.value = null;
+        return;
+      }
+      if (duration > 60) {
+        alert('Shorts must be 60 seconds or shorter');
+        e.target.value = null;
+        return;
+      }
+      // Valid short
       setFormData((prev) => ({
         ...prev,
         video: file,
       }));
-    }
+    };
+
+    videoEl.onerror = () => {
+      URL.revokeObjectURL(url);
+      alert('Invalid video file. Please select a valid video.');
+      e.target.value = null;
+    };
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (formData.caption && formData.video) {
       onSubmit({
-        type: 'ai_shorts',
+        postType: 'ai_shorts',
         ...formData,
         tagsArray: formData.tags.split(',').map((tag) => tag.trim()),
       });

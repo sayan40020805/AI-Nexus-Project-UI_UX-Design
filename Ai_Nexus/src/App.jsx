@@ -3,8 +3,8 @@ import { Header } from './components/Header';
 import { ModernSidebar } from './components/ModernSidebar';
 import { Hero } from './components/Hero';
 import AIShowcasePage from './pages/AIShowcase/AIShowcase';
-import { NewsFeed } from './components/NewsFeed';
-import { ModelDirectory } from './components/ModelDirectory';
+import AINews from './pages/AINews/AINews';
+import AIModels from './pages/AIModels/AIModels';
 import { JobBoard } from './components/JobBoard';
 import Events from './components/Events';
 import PostForm from './components/PostCreation/PostForm';
@@ -94,7 +94,7 @@ function App() {
               element={
                 <FeedLayout>
                   <MainLayout>
-                    <NewsFeed />
+                    <AINews />
                   </MainLayout>
                 </FeedLayout>
               }
@@ -114,7 +114,7 @@ function App() {
               element={
                 <FeedLayout>
                   <MainLayout>
-                    <ModelDirectory />
+                    <AIModels />
                   </MainLayout>
                 </FeedLayout>
               }
@@ -263,9 +263,11 @@ function App() {
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <PageLayout>
-                    <Dashboard />
-                  </PageLayout>
+                  <FeedLayout>
+                    <PageLayout>
+                      <Dashboard />
+                    </PageLayout>
+                  </FeedLayout>
                 </ProtectedRoute>
               }
             />

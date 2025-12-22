@@ -1,0 +1,249 @@
+
+const mongoose = require('mongoose');
+
+const EventRegistrationSchema = new mongoose.Schema({
+  // References
+  event: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Event',
+    required: [true, 'Event reference is required']
+  },
+  attendee: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'Attendee reference is required']
+  },
+  
+  // Registration details
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected', 'waitlisted', 'cancelled', 'attended'],
+    default: 'pending'
+  },
+  registrationDate: {
+    type: Date,
+    default: Date.now
+  },
+  lastUpdated: {
+    type: Date,
+    default: Date.now
+  },
+  
+  // Personal information
+  firstName: {
+    type: String,
+    required: [true, 'First name is required'],
+    trim: true,
+    maxlength: [50, 'First name cannot exceed 50 characters']
+  },
+  lastName: {
+    type: String,
+    required: [true, 'Last name is required'],
+    trim: true,
+    maxlength: [50, 'Last name cannot exceed 50 characters']
+  },
+  email: {
+    type: String,
+    required: [true, 'Email is required'],
+    trim: true,
+    match: [
+      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+      'Please provide a valid email'
+    ]
+  },
+  phone: {
+    type: String,
+    trim: true,
+    maxlength: [20, 'Phone number cannot exceed 20 characters']
+  },
+  
+  // Professional information
+  profession: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Profession cannot exceed 100 characters']
+  },
+  company: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Company cannot exceed 100 characters']
+  },
+  experience: {
+    type: String,
+    enum: ['Student', '0-1 years', '1-3 years', '3-5 years', '5-10 years', '10+ years'],
+    trim: true
+  },
+  education: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Education cannot exceed 100 characters']
+  },
+  
+  // Event-specific information
+  motivation: {
+    type: String,
+    maxlength: [1000, 'Motivation cannot exceed 1000 characters'],
+    required: [true, 'Motivation for attending is required']
+  },
+  expectations: {
+    type: String,
+    maxlength: [500, 'Expectations cannot exceed 500 characters']
+  },
+  
+  // AI/ML background
+  aiExperience: {
+    type: String,
+    enum: ['No experience', 'Beginner', 'Intermediate', 'Advanced', 'Expert'],
+    default: 'No experience'
+  },
+  skills: [{
+    type: String,
+    trim: true,
+    maxlength: [30, 'Skill cannot exceed 30 characters']
+  }],
+  portfolio: {
+    type: String,
+    trim: true
+  },
+  github: {
+    type: String,
+    trim: true
+  },
+  linkedin: {
+    type: String,
+    trim: true
+  },
+  
+  // Required documents
+  uploadedDocuments: [{
+    type: {
+      type: String,
+      enum: ['Resume', 'Portfolio', 'ID Card', 'Student ID', 'Professional Certificate', 'Project Proposal', 'GitHub Link', 'LinkedIn Profile', 'Other'],
+      required: true
+    },
+    fileName: {
+      type: String,
+      required: true
+    },
+    filePath: {
+      type: String,
+      required: true
+    },
+    uploadDate: {
+      type: Date,
+      default: Date.now
+    },
+    fileSize: {
+      type: Number,
+      required: true
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending'
+    }
+  }],
+  
+  // Emergency contact
+  emergencyContact: {
+    name: {
+      type: String,
+      trim: true,
+      maxlength: [100, 'Emergency contact name cannot exceed 100 characters']
+    },
+    relationship: {
+      type: String,
+      trim: true,
+      maxlength: [50, 'Relationship cannot exceed 50 characters']
+    },
+    phone: {
+      type: String,
+      trim: true,
+      maxlength: [20, 'Emergency contact phone cannot exceed 20 characters']
+    }
+  },
+  
+  // Dietary restrictions and accessibility
+  dietaryRestrictions: {
+    type: String,
+    maxlength: [200, 'Dietary restrictions cannot exceed 200 characters']
+  },
+  accessibilityNeeds: {
+    type: String,
+    maxlength: [200, 'Accessibility needs cannot exceed 200 characters']
+  },
+  
+  // Payment information (if applicable)
+  paymentStatus: {
+    type: String,
+    enum: ['pending', 'completed', 'failed', 'refunded'],
+    default: 'pending'
+  },
+  paymentAmount: {
+    type: Number,
+    min: [0, 'Payment amount cannot be negative'],
+    default: 0
+  },
+  paymentMethod: {
+    type: String,
+    trim: true
+  },
+  transactionId: {
+    type: String,
+    trim: true
+  },
+  
+  // Organizer notes and rating
+  organizerNotes: {
+    type: String,
+    maxlength: [1000, 'Organizer notes cannot exceed 1000 characters'],
+    default: ''
+  },
+  internalRating: {
+    type: Number,
+    min: 1,
+    max: 5,
+    default: null
+  },
+  
+  // Feedback after event
+  feedback: {
+    rating: {
+      type: Number,
+      min: 1,
+      max: 5,
+      default: null
+    },
+    comments: {
+      type: String,
+      maxlength: [1000, 'Feedback comments cannot exceed 1000 characters']
+    },
+    wouldRecommend: {
+      type: Boolean,
+      default: null
+    }
+  },
+  
+  // Special requests
+  specialRequests: {
+    type: String,
+    maxlength: [500, 'Special requests cannot exceed 500 characters']
+  }
+});
+
+// Update the lastUpdated field before saving
+EventRegistrationSchema.pre('save', function(next) {
+  this.lastUpdated = Date.now();
+  next();
+});
+
+// Compound indexes for better performance
+EventRegistrationSchema.index({ event: 1, attendee: 1 }, { unique: true }); // Prevent duplicate registrations
+EventRegistrationSchema.index({ event: 1, status: 1 });
+EventRegistrationSchema.index({ attendee: 1, status: 1 });
+EventRegistrationSchema.index({ registrationDate: -1 });
+EventRegistrationSchema.index({ lastUpdated: -1 });
+EventRegistrationSchema.index({ email: 1 });
+
+module.exports = mongoose.model('EventRegistration', EventRegistrationSchema);
+

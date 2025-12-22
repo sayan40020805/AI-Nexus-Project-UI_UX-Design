@@ -96,7 +96,7 @@ const AiModelsForm = ({ onSubmit }) => {
     e.preventDefault();
     if (formData.modelName && formData.description) {
       onSubmit({
-        type: 'ai_models',
+        postType: 'ai_models',
         ...formData,
         tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
         media: formData.images.length > 0 ? { images: formData.images } : {},

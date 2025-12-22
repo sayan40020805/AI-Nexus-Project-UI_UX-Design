@@ -15,12 +15,25 @@ if (!fs.existsSync(uploadsDir)) {
 // =========================
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
+    // Default subdir
     let subdir = 'general';
 
+    // Profile and company assets
     if (file.fieldname === 'profile-pic' || file.fieldname === 'profilePicture') {
       subdir = 'profiles';
     } else if (file.fieldname === 'company-logo' || file.fieldname === 'companyLogo') {
       subdir = 'companies';
+    } else {
+      // Route post media into posts/images, posts/videos, or posts/audio based on mimetype
+      if (file.mimetype && file.mimetype.startsWith('image/')) {
+        subdir = 'posts/images';
+      } else if (file.mimetype && file.mimetype.startsWith('video/')) {
+        subdir = 'posts/videos';
+      } else if (file.mimetype && file.mimetype.startsWith('audio/')) {
+        subdir = 'posts/audio';
+      } else {
+        subdir = 'posts/general';
+      }
     }
 
     const fullPath = path.join(uploadsDir, subdir);

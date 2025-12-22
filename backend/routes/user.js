@@ -40,7 +40,14 @@ router.use(roleMiddleware('user'));
 router.get('/profile', async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
-    res.json({ user });
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+
+    // Prefix stored media paths with base URL if present
+    const userObj = user.toObject();
+    if (userObj.profilePicture) userObj.profilePicture = `${baseUrl}${userObj.profilePicture}`;
+    if (userObj.companyLogo) userObj.companyLogo = `${baseUrl}${userObj.companyLogo}`;
+
+    res.json({ user: userObj });
   } catch (err) {
     console.error('Get user profile error:', err);
     res.status(500).json({ msg: 'Server error getting user profile' });
@@ -96,9 +103,27 @@ router.get('/posts', async (req, res) => {
       .skip((page - 1) * limit);
     
     const total = await Post.countDocuments({ author: req.user.id });
+
+    // Prefix media paths with base URL and provide mediaList
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const postsWithMedia = posts.map(p => {
+      const obj = p.toObject();
+      obj.mediaList = [];
+      if (obj.media) {
+        if (Array.isArray(obj.media.images) && obj.media.images.length) {
+          obj.media.images = obj.media.images.map(img => `${baseUrl}${img}`);
+          obj.media.images.forEach(img => obj.mediaList.push({ type: 'image', url: img }));
+        }
+        if (obj.media.video) {
+          obj.media.video = `${baseUrl}${obj.media.video}`;
+          obj.mediaList.push({ type: 'video', url: obj.media.video });
+        }
+      }
+      return obj;
+    });
     
     res.json({
-      posts,
+      posts: postsWithMedia,
       pagination: {
         current: page,
         pages: Math.ceil(total / limit),

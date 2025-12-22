@@ -14,6 +14,13 @@ export function PostCard({ post, onLike, onComment, onShare }) {
   const [liked, setLiked] = React.useState(post.isLiked || false);
   const [likeCount, setLikeCount] = React.useState(post.likes?.length || 0);
 
+  const normalizeUrl = (url) => {
+    if (!url) return url;
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    const base = import.meta.env.VITE_API_URL || window.location.origin;
+    return `${base}${url.startsWith('/') ? '' : '/'}${url}`.replace(/([^:]\/\/)\//, '$1');
+  };
+
   const handleLike = () => {
     const newLiked = !liked;
     setLiked(newLiked);
@@ -29,13 +36,13 @@ export function PostCard({ post, onLike, onComment, onShare }) {
         <div className="post-card-author-info">
           <div className="post-card-avatar">
             {post.author?.profilePicture ? (
-              <img src={post.author.profilePicture} alt={post.author.name} />
+              <img src={post.author.profilePicture} alt={post.author?.username || post.author?.companyName} />
             ) : (
               post.authorAvatar || '👤'
             )}
           </div>
           <div className="post-card-meta">
-            <h4 className="post-card-name">{post.author?.name || 'Unknown User'}</h4>
+            <h4 className="post-card-name">{post.author?.username || post.author?.companyName || 'Unknown User'}</h4>
             <p className="post-card-time">{timeSince(new Date(post.createdAt).getTime())} ago</p>
           </div>
         </div>
@@ -50,16 +57,27 @@ export function PostCard({ post, onLike, onComment, onShare }) {
         <p className="post-card-text">{post.content}</p>
       </div>
 
-      {/* Post Image/Video */}
-      {post.media && post.media.length > 0 && (
-        <div className="post-card-image-container">
-          {post.media[0].type === 'image' ? (
-            <img src={post.media[0].url} alt="Post content" className="post-card-image" />
-          ) : post.media[0].type === 'video' ? (
-            <video src={post.media[0].url} controls className="post-card-video" />
-          ) : null}
-        </div>
-      )}
+      {/* Post Image/Video (support both backend shapes: media array or media object) */}
+      {(() => {
+        const mediaList = Array.isArray(post.media)
+          ? post.media
+          : (post.mediaList || (post.media && Array.isArray(post.media.images)
+            ? post.media.images.map(url => ({ type: 'image', url }))
+            : (post.media && post.media.video ? [{ type: 'video', url: post.media.video }] : [])));
+
+        if (!mediaList || mediaList.length === 0) return null;
+
+        const first = mediaList[0];
+        return (
+          <div className="post-card-image-container">
+            {first.type === 'image' ? (
+              <img src={normalizeUrl(first.url)} alt="Post content" className="post-card-image" />
+            ) : first.type === 'video' ? (
+              <video src={normalizeUrl(first.url)} controls className="post-card-video" />
+            ) : null}
+          </div>
+        );
+      })()}
 
       {/* Post Stats */}
       <div className="post-card-stats">

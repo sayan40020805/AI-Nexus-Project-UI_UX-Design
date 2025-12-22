@@ -1,0 +1,258 @@
+
+const mongoose = require('mongoose');
+
+const EventSchema = new mongoose.Schema({
+  // Basic event information
+  title: {
+    type: String,
+    required: [true, 'Event title is required'],
+    trim: true,
+    maxlength: [100, 'Event title cannot exceed 100 characters']
+  },
+  description: {
+    type: String,
+    required: [true, 'Event description is required'],
+    maxlength: [2000, 'Event description cannot exceed 2000 characters']
+  },
+  
+  // Event details
+  eventType: {
+    type: String,
+    enum: ['AI Hackathon', 'AI Quiz', 'Workshop', 'Conference', 'Webinar', 'Symposium', 'Competition', 'Meetup', 'Other'],
+    required: [true, 'Event type is required'],
+    default: 'AI Hackathon'
+  },
+  category: {
+    type: String,
+    enum: ['AI/ML', 'Deep Learning', 'NLP', 'Computer Vision', 'Robotics', 'Healthcare AI', 'Climate AI', 'General AI', 'Other'],
+    required: [true, 'Event category is required'],
+    default: 'AI/ML'
+  },
+  format: {
+    type: String,
+    enum: ['Virtual', 'In-person', 'Hybrid'],
+    required: [true, 'Event format is required'],
+    default: 'Virtual'
+  },
+  
+  // Date and time
+  startDate: {
+    type: Date,
+    required: [true, 'Start date is required']
+  },
+  endDate: {
+    type: Date,
+    required: [true, 'End date is required']
+  },
+  startTime: {
+    type: String,
+    required: [true, 'Start time is required'],
+    trim: true
+  },
+  endTime: {
+    type: String,
+    required: [true, 'End time is required'],
+    trim: true
+  },
+  
+  // Location information
+  location: {
+    type: String,
+    required: [true, 'Event location is required'],
+    trim: true,
+    maxlength: [200, 'Location cannot exceed 200 characters']
+  },
+  address: {
+    type: String,
+    trim: true,
+    maxlength: [500, 'Address cannot exceed 500 characters']
+  },
+  virtualLink: {
+    type: String,
+    trim: true
+  },
+  
+  // Company information (referenced to User model)
+  organizer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'Organizer reference is required']
+  },
+  
+  // Event details
+  maxAttendees: {
+    type: Number,
+    min: [1, 'Maximum attendees must be at least 1'],
+    default: 100
+  },
+  currentAttendees: {
+    type: Number,
+    default: 0
+  },
+  registrationDeadline: {
+    type: Date,
+    required: [true, 'Registration deadline is required']
+  },
+  
+  // Pricing
+  isFree: {
+    type: Boolean,
+    default: true
+  },
+  ticketPrice: {
+    type: Number,
+    min: [0, 'Price cannot be negative'],
+    default: 0
+  },
+  
+  // Requirements and documentation
+  requirements: {
+    type: String,
+    maxlength: [1000, 'Requirements cannot exceed 1000 characters']
+  },
+  requiredDocuments: [{
+    type: String,
+    enum: ['Resume', 'Portfolio', 'ID Card', 'Student ID', 'Professional Certificate', 'Project Proposal', 'GitHub Link', 'LinkedIn Profile', 'Other']
+  }],
+  
+  // Event content
+  speakers: [{
+    name: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    title: {
+      type: String,
+      trim: true
+    },
+    company: {
+      type: String,
+      trim: true
+    },
+    bio: {
+      type: String,
+      maxlength: [500, 'Speaker bio cannot exceed 500 characters']
+    },
+    photo: {
+      type: String,
+      trim: true
+    }
+  }],
+  
+  agenda: [{
+    time: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    title: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    description: {
+      type: String,
+      maxlength: [500, 'Agenda item description cannot exceed 500 characters']
+    },
+    speaker: {
+      type: String,
+      trim: true
+    }
+  }],
+  
+  // Tags and skills
+  tags: [{
+    type: String,
+    trim: true,
+    maxlength: [30, 'Tag cannot exceed 30 characters']
+  }],
+  skillsRequired: [{
+    type: String,
+    trim: true,
+    maxlength: [50, 'Skill cannot exceed 50 characters']
+  }],
+  
+  // Event status
+  status: {
+    type: String,
+    enum: ['draft', 'published', 'cancelled', 'completed'],
+    default: 'draft'
+  },
+  
+  // Media
+  bannerImage: {
+    type: String,
+    trim: true
+  },
+  galleryImages: [{
+    type: String,
+    trim: true
+  }],
+  
+  // Contact information
+  contactEmail: {
+    type: String,
+    trim: true
+  },
+  contactPhone: {
+    type: String,
+    trim: true
+  },
+  
+  // Additional settings
+  isPublic: {
+    type: Boolean,
+    default: true
+  },
+  allowWaitlist: {
+    type: Boolean,
+    default: false
+  },
+  requiresApproval: {
+    type: Boolean,
+    default: false
+  },
+  
+  // AI-specific fields
+  aiCategory: {
+    type: String,
+    enum: ['Generative AI', 'Machine Learning', 'Computer Vision', 'Natural Language Processing', 'Reinforcement Learning', 'AI Safety', 'AI Ethics', 'Robotics', 'Healthcare AI', 'Climate AI', 'Financial AI', 'Other'],
+    default: 'Machine Learning'
+  },
+  difficultyLevel: {
+    type: String,
+    enum: ['Beginner', 'Intermediate', 'Advanced', 'Expert'],
+    default: 'Intermediate'
+  },
+  
+  // Timestamps
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+// Update the updatedAt field before saving
+EventSchema.pre('save', function(next) {
+  this.updatedAt = Date.now();
+  next();
+});
+
+// Indexes for better query performance
+EventSchema.index({ organizer: 1, status: 1 });
+EventSchema.index({ eventType: 1 });
+EventSchema.index({ category: 1 });
+EventSchema.index({ startDate: 1 });
+EventSchema.index({ registrationDeadline: 1 });
+EventSchema.index({ location: 1 });
+EventSchema.index({ tags: 1 });
+EventSchema.index({ aiCategory: 1 });
+EventSchema.index({ title: 'text', description: 'text', tags: 'text' });
+
+module.exports = mongoose.model('Event', EventSchema);
+

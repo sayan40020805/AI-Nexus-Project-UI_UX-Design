@@ -28,7 +28,9 @@ const PostCard = ({
   compact = false 
 }) => {
   const { user, token } = useAuth();
-  const { likePost, commentOnPost, sharePost } = React.useContext(FeedContext);
+  // Defensive: FeedContext may be absent in some layouts (e.g., edge cases). Use safe defaults to avoid runtime crashes.
+  const feedCtx = React.useContext(FeedContext) || {};
+  const { likePost = async () => {}, commentOnPost = async () => {}, sharePost = async () => {} } = feedCtx; 
   
   // Component state
   const [isLiked, setIsLiked] = useState(false);
@@ -241,31 +243,44 @@ const PostCard = ({
       {/* Post Header */}
       <div className="post-header">
         <div className="post-author">
-          <img 
-            src={post.author?.profilePicture || post.author?.companyLogo || '/default-avatar.svg'}
-            alt={post.author?.username || post.author?.companyName}
-            className="post-author-avatar"
-            onError={(e) => {
-              e.target.src = '/default-avatar.svg';
-            }}
-          />
-          <div className="post-author-info">
-            <div className="post-author-name">
-              {post.author?.username || post.author?.companyName}
-              {post.author?.role === 'company' && (
-                <span className="verified-badge">✓</span>
-              )}
-            </div>
-            <div className="post-meta">
-              <span className="post-timestamp">{formatTimestamp(post.createdAt)}</span>
-              <span className="post-privacy">
-                • {post.isPublic ? 'Public' : 'Followers'}
-              </span>
-              {post.postType && (
-                <span className="post-type">• {post.postType}</span>
-              )}
-            </div>
-          </div>
+          {(() => {
+            // Resolve author display fields safely (author may be an object or a simple string)
+            const authorObj = post.author;
+            const authorName = (authorObj && typeof authorObj === 'object')
+              ? (authorObj.username || authorObj.companyName || authorObj.name)
+              : (typeof authorObj === 'string' ? authorObj : null);
+            const authorImg = authorObj && typeof authorObj === 'object'
+              ? (authorObj.profilePicture || authorObj.companyLogo)
+              : null;
+
+            return (
+              <>
+                <img
+                  src={authorImg || post.authorAvatar || '/default-avatar.svg'}
+                  alt={authorName || 'User'}
+                  className="post-author-avatar"
+                  onError={(e) => { e.target.src = '/default-avatar.svg'; }}
+                />
+                <div className="post-author-info">
+                  <div className="post-author-name">
+                    {authorName || 'Unknown User'}
+                    {authorObj?.role === 'company' && (
+                      <span className="verified-badge">✓</span>
+                    )}
+                  </div>
+                  <div className="post-meta">
+                    <span className="post-timestamp">{formatTimestamp(post.createdAt)}</span>
+                    <span className="post-privacy">
+                      • {post.isPublic ? 'Public' : 'Followers'}
+                    </span>
+                    {post.postType && (
+                      <span className="post-type">• {post.postType}</span>
+                    )}
+                  </div>
+                </div>
+              </>
+            );
+          })()}
         </div>
         
         {/* Post Menu */}

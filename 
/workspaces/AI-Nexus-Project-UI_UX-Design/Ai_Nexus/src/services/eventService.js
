@@ -1,0 +1,360 @@
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+
+class EventService {
+  // Get all events with filtering
+  async getEvents(params = {}) {
+    const queryParams = new URLSearchParams();
+    
+    Object.keys(params).forEach(key => {
+      if (params[key] !== undefined && params[key] !== '') {
+        queryParams.append(key, params[key]);
+      }
+    });
+
+    const response = await fetch(`${API_URL}/api/events?${queryParams}`);
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.msg || 'Failed to fetch events');
+    }
+    
+    return response.json();
+  }
+
+  // Get single event by ID
+  async getEvent(id) {
+    const response = await fetch(`${API_URL}/api/events/${id}`);
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.msg || 'Failed to fetch event');
+    }
+    
+    return response.json();
+  }
+
+  // Create new event (Company only)
+  async createEvent(eventData) {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Authentication required');
+
+    const response = await fetch(`${API_URL}/api/events`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(eventData)
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.msg || 'Failed to create event');
+    }
+
+    return response.json();
+  }
+
+  // Update event (Company only, own events)
+  async updateEvent(id, eventData) {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Authentication required');
+
+    const response = await fetch(`${API_URL}/api/events/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(eventData)
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.msg || 'Failed to update event');
+    }
+
+    return response.json();
+  }
+
+  // Delete event (Company only, own events)
+  async deleteEvent(id) {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Authentication required');
+
+    const response = await fetch(`${API_URL}/api/events/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.msg || 'Failed to delete event');
+    }
+
+    return response.json();
+  }
+
+  // Get company's events (Company only)
+  async getCompanyEvents() {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Authentication required');
+
+    const response = await fetch(`${API_URL}/api/events/company/my-events`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.msg || 'Failed to fetch company events');
+    }
+
+    return response.json();
+  }
+
+  // Get event statistics (Company only)
+  async getCompanyStats() {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Authentication required');
+
+    const response = await fetch(`${API_URL}/api/events/company/stats`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.msg || 'Failed to fetch event statistics');
+    }
+
+    return response.json();
+  }
+
+  // Register for event (User only)
+  async registerForEvent(eventId, registrationData, documents = []) {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Authentication required');
+
+    const formData = new FormData();
+    
+    // Add text fields
+    Object.keys(registrationData).forEach(key => {
+      if (registrationData[key] !== undefined && registrationData[key] !== '') {
+        formData.append(key, registrationData[key]);
+      }
+    });
+
+    // Add documents
+    documents.forEach((doc, index) => {
+      if (doc.file) {
+        formData.append('documents', doc.file);
+        formData.append(`documentType_${doc.file.name}`, doc.type);
+      }
+    });
+
+    const response = await fetch(`${API_URL}/api/events/events/${eventId}/register`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.msg || 'Failed to register for event');
+    }
+
+    return response.json();
+  }
+
+  // Get user's registrations (User only)
+  async getMyRegistrations(params = {}) {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Authentication required');
+
+    const queryParams = new URLSearchParams();
+    Object.keys(params).forEach(key => {
+      if (params[key] !== undefined && params[key] !== '') {
+        queryParams.append(key, params[key]);
+      }
+    });
+
+    const response = await fetch(`${API_URL}/api/events/my-registrations?${queryParams}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.msg || 'Failed to fetch registrations');
+    }
+
+    return response.json();
+  }
+
+  // Get event registrations (Company only, own events)
+  async getEventRegistrations(eventId, params = {}) {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Authentication required');
+
+    const queryParams = new URLSearchParams();
+    Object.keys(params).forEach(key => {
+      if (params[key] !== undefined && params[key] !== '') {
+        queryParams.append(key, params[key]);
+      }
+    });
+
+    const response = await fetch(`${API_URL}/api/events/events/${eventId}/registrations?${queryParams}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.msg || 'Failed to fetch event registrations');
+    }
+
+    return response.json();
+  }
+
+  // Update registration status (Company only)
+  async updateRegistrationStatus(registrationId, statusData) {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Authentication required');
+
+    const response = await fetch(`${API_URL}/api/events/registrations/${registrationId}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(statusData)
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.msg || 'Failed to update registration status');
+    }
+
+    return response.json();
+  }
+
+  // Cancel registration (User only)
+  async cancelRegistration(registrationId) {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Authentication required');
+
+    const response = await fetch(`${API_URL}/api/events/registrations/${registrationId}/cancel`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.msg || 'Failed to cancel registration');
+    }
+
+    return response.json();
+  }
+
+  // Submit feedback (User only)
+  async submitFeedback(registrationId, feedbackData) {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('Authentication required');
+
+    const response = await fetch(`${API_URL}/api/events/registrations/${registrationId}/feedback`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(feedbackData)
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.msg || 'Failed to submit feedback');
+    }
+
+    return response.json();
+  }
+
+  // Get upcoming events (Public)
+  async getUpcomingEvents() {
+    const response = await fetch(`${API_URL}/api/events/public/upcoming`);
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.msg || 'Failed to fetch upcoming events');
+    }
+    
+    return response.json();
+  }
+
+  // Search events (Public)
+  async searchEvents(params) {
+    const queryParams = new URLSearchParams();
+    
+    Object.keys(params).forEach(key => {
+      if (params[key] !== undefined && params[key] !== '') {
+        queryParams.append(key, params[key]);
+      }
+    });
+
+    const response = await fetch(`${API_URL}/api/events/public/search?${queryParams}`);
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.msg || 'Failed to search events');
+    }
+    
+    return response.json();
+  }
+
+  // Helper method to format date
+  formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
+  // Helper method to format time
+  formatTime(timeString) {
+    return timeString;
+  }
+
+  // Helper method to check if event is upcoming
+  isUpcoming(event) {
+    return new Date(event.startDate) > new Date();
+  }
+
+  // Helper method to check if event is live
+  isLive(event) {
+    const now = new Date();
+    const start = new Date(event.startDate);
+    const end = new Date(event.endDate);
+    return now >= start && now <= end;
+  }
+
+  // Helper method to check if registration is open
+  isRegistrationOpen(event) {
+    return new Date() <= new Date(event.registrationDeadline);
+  }
+}
+
+export default new EventService();
+

@@ -23,6 +23,12 @@ const PostTypeAnimation = ({ selectedType }) => {
 
     const getAnimationConfig = (type) => {
       const configs = {
+        normal: {
+          color: '#6B73FF',
+          shape: 'pyramid',
+          speed: 1.2,
+          emoji: '📝',
+        },
         ai_news: {
           color: '#FF6B6B',
           shape: 'newspaper',
@@ -47,7 +53,6 @@ const PostTypeAnimation = ({ selectedType }) => {
           speed: 0.8,
           emoji: '🎥',
         },
-        // 'normal' animation removed from Create Post flow
       };
       return configs[type];
     };
@@ -275,6 +280,7 @@ const PostTypeAnimation = ({ selectedType }) => {
         <>
           <canvas ref={canvasRef} className="animation-canvas" />
           <div className="animation-label">
+            {selectedType === 'normal' && '📝 Normal Post'}
             {selectedType === 'ai_news' && '📰 AI News'}
             {selectedType === 'ai_shorts' && '🎬 AI Shorts'}
             {selectedType === 'ai_models' && '🤖 AI Models'}

@@ -3,6 +3,13 @@ import './PostCreation.css';
 
 const POST_TYPES = [
   {
+    id: 'normal',
+    label: 'Post',
+    description: 'Share photos and thoughts',
+    icon: '📝',
+    color: '#6366F1',
+  },
+  {
     id: 'ai_news',
     label: 'AI News',
     description: 'Share latest AI news and updates',

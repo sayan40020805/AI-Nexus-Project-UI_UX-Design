@@ -63,7 +63,7 @@ const UserDashboard = () => {
             authorPic: user?.profilePicture || '/default-avatar.svg',
             content: post.content,
             timestamp: new Date(post.createdAt).toLocaleDateString(),
-            image: post.media?.images?.[0] || '',
+            image: (post.media && post.media.images && post.media.images[0]) || (Array.isArray(post.mediaList) && post.mediaList.find(m => m.type === 'image')?.url) || '',
             likes: post.likes?.length || 0,
             comments: post.comments?.length || 0,
           }));
@@ -301,17 +301,17 @@ const UserDashboard = () => {
           <div className="post-feed">
             {posts.map((post) => (
               <PostCard
-                key={post._id}
+                key={post.id || post._id}
                 post={post}
                 onPostUpdate={(updatedPost) => {
-                  setPosts(prev => prev.map(p => p._id === updatedPost._id ? updatedPost : p));
+                  setPosts(prev => prev.map(p => (p.id || p._id) === (updatedPost.id || updatedPost._id) ? updatedPost : p));
                 }}
                 onPostDelete={(deletedPostId) => {
-                  setPosts(prev => prev.filter(p => p._id !== deletedPostId));
+                  setPosts(prev => prev.filter(p => (p.id || p._id) !== deletedPostId));
                 }}
                 showComments={false}
               />
-            ))}
+            ))} 
           </div>
         </div>
       </div>

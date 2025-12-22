@@ -20,20 +20,10 @@ router.get('/', authMiddleware, async (req, res) => {
     // Extract just the IDs
     const followingIds = following.map(f => f.following);
     
-    // If user follows no one, return empty feed
-    if (followingIds.length === 0) {
-      return res.json({
-        posts: [],
-        pagination: {
-          current: 1,
-          pages: 0,
-          total: 0
-        },
-        message: 'Start following users to see posts in your feed'
-      });
-    }
-    
-    // Build filter to get posts from followed users only
+    // Ensure the feed includes the current user's own posts even if they follow no one
+    if (!followingIds.includes(req.user.id)) followingIds.push(req.user.id);
+
+    // Build filter to get posts from followed users (and self)
     const filter = {
       author: { $in: followingIds },
       isPublic: true
@@ -52,20 +42,37 @@ router.get('/', authMiddleware, async (req, res) => {
     // Get total count for pagination
     const total = await Post.countDocuments(filter);
     
-    // Transform posts to include like/comment counts and user interaction status
-    const enrichedPosts = posts.map(post => ({
-      ...post,
-      likesCount: post.likes ? post.likes.length : 0,
-      commentsCount: post.comments ? post.comments.length : 0,
-      sharesCount: post.shares ? post.shares.length : 0,
-      isLiked: post.likes ? post.likes.some(like => 
-        like.user.toString() === req.user.id
-      ) : false,
-      isShared: post.shares ? post.shares.some(share => 
-        share.user.toString() === req.user.id
-      ) : false
-    }));
-    
+    // Transform posts to include like/comment counts, user interaction status, and full media URLs
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const enrichedPosts = posts.map(post => {
+      const p = {
+        ...post,
+        likesCount: post.likes ? post.likes.length : 0,
+        commentsCount: post.comments ? post.comments.length : 0,
+        sharesCount: post.shares ? post.shares.length : 0,
+        isLiked: post.likes ? post.likes.some(like => 
+          like.user.toString() === req.user.id
+        ) : false,
+        isShared: post.shares ? post.shares.some(share => 
+          share.user.toString() === req.user.id
+        ) : false
+      };
+
+      // Add mediaList with full URLs
+      p.mediaList = [];
+      if (p.media) {
+        if (Array.isArray(p.media.images) && p.media.images.length) {
+          p.media.images = p.media.images.map(img => `${baseUrl}${img}`);
+          p.media.images.forEach(img => p.mediaList.push({ type: 'image', url: img }));
+        }
+        if (p.media.video) {
+          p.media.video = `${baseUrl}${p.media.video}`;
+          p.mediaList.push({ type: 'video', url: p.media.video });
+        }
+      }
+
+      return p;
+    });
 
     res.json({
       posts: enrichedPosts,
@@ -106,16 +113,33 @@ router.get('/trending', authMiddleware, async (req, res) => {
     
     const total = await Post.countDocuments({ isPublic: true });
     
-    // Enrich posts with engagement metrics
-    const enrichedPosts = posts.map(post => ({
-      ...post,
-      engagementScore: (post.likes ? post.likes.length : 0) + 
-                      (post.comments ? post.comments.length : 0) + 
-                      (post.shares ? post.shares.length : 0),
-      isLiked: post.likes ? post.likes.some(like => 
-        like.user.toString() === req.user.id
-      ) : false
-    }));
+    // Enrich posts with engagement metrics and include full media URLs
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const enrichedPosts = posts.map(post => {
+      const p = {
+        ...post,
+        engagementScore: (post.likes ? post.likes.length : 0) + 
+                        (post.comments ? post.comments.length : 0) + 
+                        (post.shares ? post.shares.length : 0),
+        isLiked: post.likes ? post.likes.some(like => 
+          like.user.toString() === req.user.id
+        ) : false
+      };
+
+      p.mediaList = [];
+      if (p.media) {
+        if (Array.isArray(p.media.images) && p.media.images.length) {
+          p.media.images = p.media.images.map(img => `${baseUrl}${img}`);
+          p.media.images.forEach(img => p.mediaList.push({ type: 'image', url: img }));
+        }
+        if (p.media.video) {
+          p.media.video = `${baseUrl}${p.media.video}`;
+          p.mediaList.push({ type: 'video', url: p.media.video });
+        }
+      }
+
+      return p;
+    });
     
     res.json({
       posts: enrichedPosts,
@@ -157,15 +181,32 @@ router.get('/companies', authMiddleware, async (req, res) => {
       'author.role': 'company'
     });
     
-    const enrichedPosts = posts.map(post => ({
-      ...post,
-      likesCount: post.likes ? post.likes.length : 0,
-      commentsCount: post.comments ? post.comments.length : 0,
-      sharesCount: post.shares ? post.shares.length : 0,
-      isLiked: post.likes ? post.likes.some(like => 
-        like.user.toString() === req.user.id
-      ) : false
-    }));
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const enrichedPosts = posts.map(post => {
+      const p = {
+        ...post,
+        likesCount: post.likes ? post.likes.length : 0,
+        commentsCount: post.comments ? post.comments.length : 0,
+        sharesCount: post.shares ? post.shares.length : 0,
+        isLiked: post.likes ? post.likes.some(like => 
+          like.user.toString() === req.user.id
+        ) : false
+      };
+
+      p.mediaList = [];
+      if (p.media) {
+        if (Array.isArray(p.media.images) && p.media.images.length) {
+          p.media.images = p.media.images.map(img => `${baseUrl}${img}`);
+          p.media.images.forEach(img => p.mediaList.push({ type: 'image', url: img }));
+        }
+        if (p.media.video) {
+          p.media.video = `${baseUrl}${p.media.video}`;
+          p.mediaList.push({ type: 'video', url: p.media.video });
+        }
+      }
+
+      return p;
+    });
     
     res.json({
       posts: enrichedPosts,
@@ -272,16 +313,33 @@ router.get('/user/:userId', authMiddleware, async (req, res) => {
       isPublic: true
     });
     
-    const enrichedPosts = posts.map(post => ({
-      ...post,
-      likesCount: post.likes ? post.likes.length : 0,
-      commentsCount: post.comments ? post.comments.length : 0,
-      sharesCount: post.shares ? post.shares.length : 0,
-      isLiked: post.likes ? post.likes.some(like => 
-        like.user.toString() === req.user.id
-      ) : false,
-      isOwner: post.author._id.toString() === req.user.id
-    }));
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const enrichedPosts = posts.map(post => {
+      const p = {
+        ...post,
+        likesCount: post.likes ? post.likes.length : 0,
+        commentsCount: post.comments ? post.comments.length : 0,
+        sharesCount: post.shares ? post.shares.length : 0,
+        isLiked: post.likes ? post.likes.some(like => 
+          like.user.toString() === req.user.id
+        ) : false,
+        isOwner: post.author._id.toString() === req.user.id
+      };
+
+      p.mediaList = [];
+      if (p.media) {
+        if (Array.isArray(p.media.images) && p.media.images.length) {
+          p.media.images = p.media.images.map(img => `${baseUrl}${img}`);
+          p.media.images.forEach(img => p.mediaList.push({ type: 'image', url: img }));
+        }
+        if (p.media.video) {
+          p.media.video = `${baseUrl}${p.media.video}`;
+          p.mediaList.push({ type: 'video', url: p.media.video });
+        }
+      }
+
+      return p;
+    });
     
     res.json({
       posts: enrichedPosts,

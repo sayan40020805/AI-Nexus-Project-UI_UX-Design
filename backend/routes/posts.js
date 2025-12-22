@@ -2,8 +2,39 @@ const express = require('express');
 const Post = require('../models/Post');
 const { authMiddleware } = require('../middleware/auth');
 const User = require('../models/User');
+const { upload } = require('../middleware/upload');
 
 const router = express.Router();
+
+// Helper: transform post media into an array with full URLs
+const transformPostMedia = (post, baseUrl) => {
+  const obj = post.toObject ? post.toObject() : JSON.parse(JSON.stringify(post));
+  const mediaList = [];
+
+  if (obj.media) {
+    if (Array.isArray(obj.media.images) && obj.media.images.length) {
+      // Prefix images that are stored locally with base URL and add to mediaList
+      obj.media.images = obj.media.images.map(img => {
+        if (typeof img === 'string' && (img.startsWith('/uploads') || img.startsWith('uploads/'))) {
+          return `${baseUrl}${img}`;
+        }
+        return img; // assume already a full URL
+      });
+      obj.media.images.forEach(img => {
+        mediaList.push({ type: 'image', url: img });
+      });
+    }
+    if (obj.media.video) {
+      if (typeof obj.media.video === 'string' && (obj.media.video.startsWith('/uploads') || obj.media.video.startsWith('uploads/'))) {
+        obj.media.video = `${baseUrl}${obj.media.video}`;
+      }
+      mediaList.push({ type: 'video', url: obj.media.video });
+    }
+  }
+
+  obj.mediaList = mediaList; // non-breaking addition
+  return obj;
+};
 
 // ========================
 // GET POSTS (with filtering)
@@ -30,9 +61,13 @@ router.get('/', async (req, res) => {
     
     // Get total count for pagination
     const total = await Post.countDocuments(filter);
+
+    // Include mediaList with full URLs for each post
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const postsWithMedia = posts.map(p => transformPostMedia(p, baseUrl));
     
     res.json({
-      posts,
+      posts: postsWithMedia,
       pagination: {
         current: page,
         pages: Math.ceil(total / limit),
@@ -46,14 +81,13 @@ router.get('/', async (req, res) => {
 });
 
 // ========================
-// CREATE NEW POST
+// CREATE NEW POST (accepts files)
 // ========================
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, upload.any(), async (req, res) => {
   try {
     const { 
       content, 
       postType, 
-      media,
       // Normal post fields
       feeling,
       location,
@@ -81,14 +115,15 @@ router.post('/', authMiddleware, async (req, res) => {
     const postTypeMap = {
       'normal': 'normal',           // Normal posts show on home page
       'ai_news': 'ai_news',
-      'ai_short': 'ai_short',       // AI Shorts  
+      'ai_short': 'ai_short',       // AI Shorts
+      'ai_shorts': 'ai_short',      // plural form normalization
       'ai_models': 'ai_models',     // Models
       'ai_showcase': 'ai_showcase'  // Showcase
     };
     
     const backendPostType = postTypeMap[postType] || postType;
     
-    console.log('Creating post:', { content, postType, backendPostType, media });
+    console.log('Creating post:', { content, postType, backendPostType, files: req.files && req.files.length });
     
     // Validate post type and role restrictions
     const userRole = req.user.role;
@@ -100,12 +135,55 @@ router.post('/', authMiddleware, async (req, res) => {
       });
     }
 
+    // Process uploaded files into media structure
+    const images = [];
+    let video = '';
+
+    // Support externally hosted video URLs (e.g., YouTube) from forms that allow URL input
+    if (req.body.videoSource === 'url' && req.body.videoUrl) {
+      // Use the provided URL directly (no base URL prefix applied)
+      video = req.body.videoUrl;
+    }
+
+    if (req.files && req.files.length) {
+      const maxShortSize = 50 * 1024 * 1024; // 50 MB for shorts
+      const maxShowcaseSize = 200 * 1024 * 1024; // 200 MB for showcase videos
+
+      for (let i = 0; i < req.files.length; i++) {
+        const file = req.files[i];
+
+        if (file.mimetype.startsWith('image/')) {
+          // images are stored in uploads/posts/images
+          images.push(`/uploads/posts/images/${file.filename}`);
+        } else if (file.mimetype.startsWith('video/')) {
+          // Validate file size by post type
+          if (backendPostType === 'ai_short' && file.size > maxShortSize) {
+            return res.status(400).json({ msg: 'Shorts must be <= 50MB' });
+          }
+          if (backendPostType === 'ai_showcase' && file.size > maxShowcaseSize) {
+            return res.status(400).json({ msg: 'Showcase videos must be <= 200MB' });
+          }
+
+          video = `/uploads/posts/videos/${file.filename}`;
+        } else if (file.mimetype.startsWith('audio/')) {
+          // store audio under posts/audio
+          video = `/uploads/posts/audio/${file.filename}`;
+        } else {
+          // fallback to general uploads
+          images.push(`/uploads/posts/general/${file.filename}`);
+        }
+      }
+    }
+
     // Create new post with all fields
     const newPost = new Post({
       content,
       title,
       postType: backendPostType,
-      media: media || {},
+      media: {
+        images,
+        video: video || ''
+      },
       author: req.user.id,
       
       // Normal post fields
@@ -117,8 +195,8 @@ router.post('/', authMiddleware, async (req, res) => {
       // AI Models fields
       modelName,
       modelType,
-      capabilities: Array.isArray(capabilities) ? capabilities : [],
-      useCases: Array.isArray(useCases) ? useCases : [],
+      capabilities: Array.isArray(capabilities) ? capabilities : (capabilities ? capabilities.split(',').map(c => c.trim()).filter(c => c) : []),
+      useCases: Array.isArray(useCases) ? useCases : (useCases ? useCases.split(',').map(u => u.trim()).filter(u => u) : []),
       pricing,
       performance,
       limitations,
@@ -135,8 +213,13 @@ router.post('/', authMiddleware, async (req, res) => {
     
     // Populate author information
     await newPost.populate('author', 'username companyName profilePicture companyLogo role');
+
+    // Transform media URLs to include base URL for client
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const result = transformPostMedia(newPost, baseUrl);
     
-    res.status(201).json(newPost);
+    // Return in { post } envelope for backward compatibility with existing client code
+    res.status(201).json({ post: result });
   } catch (err) {
     console.error('Create post error:', err);
     res.status(500).json({ msg: 'Server error creating post' });
@@ -156,8 +239,11 @@ router.get('/:id', async (req, res) => {
     if (!post) {
       return res.status(404).json({ msg: 'Post not found' });
     }
+
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const postWithMedia = transformPostMedia(post, baseUrl);
     
-    res.json(post);
+    res.json(postWithMedia);
   } catch (err) {
     console.error('Get post error:', err);
     res.status(500).json({ msg: 'Server error getting post' });
@@ -187,8 +273,12 @@ router.put('/:id', authMiddleware, async (req, res) => {
     
     await post.save();
     await post.populate('author', 'username companyName profilePicture companyLogo role');
+
+    // Transform media URLs for client
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const transformed = transformPostMedia(post, baseUrl);
     
-    res.json(post);
+    res.json(transformed);
   } catch (err) {
     console.error('Update post error:', err);
     res.status(500).json({ msg: 'Server error updating post' });

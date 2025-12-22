@@ -67,8 +67,17 @@ const PostContent = ({ post, compact = false }) => {
   // Check if content should be truncated
   const shouldTruncateContent = content && content.length > 300 && !showFullContent;
 
+  // Normalize media URL - if not absolute, prefix with API base URL
+  const normalizeMediaUrl = (url) => {
+    if (!url) return url;
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    const base = import.meta.env.VITE_API_URL || window.location.origin;
+    return `${base}${url.startsWith('/') ? '' : '/'}${url}`.replace(/([^:]\/\/)\//, '$1');
+  };
+
   // Handle image error
-  const handleImageError = () => {
+  const handleImageError = (e) => {
+    console.warn('Image failed to load:', e?.target?.src);
     setImageError(true);
   };
 
@@ -130,7 +139,7 @@ const PostContent = ({ post, compact = false }) => {
                 >
                   {!imageError ? (
                     <img
-                      src={image}
+                      src={normalizeMediaUrl(image)}
                       alt={`Post image ${index + 1}`}
                       onError={handleImageError}
                       loading="lazy"
@@ -151,10 +160,10 @@ const PostContent = ({ post, compact = false }) => {
             <div className="post-video">
               <video
                 controls
-                poster={media.thumbnail}
+                poster={media.thumbnail && normalizeMediaUrl(media.thumbnail)}
                 preload="metadata"
               >
-                <source src={media.video} type="video/mp4" />
+                <source src={normalizeMediaUrl(media.video)} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </div>
@@ -225,7 +234,7 @@ const PostContent = ({ post, compact = false }) => {
         <div className="image-lightbox" onClick={() => setShowImageLightbox(false)}>
           <div className="lightbox-content">
             <img 
-              src={media?.images?.[0]} 
+              src={normalizeMediaUrl(media?.images?.[0])} 
               alt="Full size" 
             />
             <button 

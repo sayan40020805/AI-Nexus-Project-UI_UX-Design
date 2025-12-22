@@ -20,7 +20,7 @@ export function FeedProvider({ children }) {
       setError(null);
       
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/feed/home`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/feed`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -104,7 +104,7 @@ export function FeedProvider({ children }) {
     
     try {
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/posts/${postId}/comments`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/posts/${postId}/comment`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

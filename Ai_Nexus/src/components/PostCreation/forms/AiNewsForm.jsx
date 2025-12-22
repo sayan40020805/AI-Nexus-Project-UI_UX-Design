@@ -30,7 +30,7 @@ const AiNewsForm = ({ onSubmit }) => {
     e.preventDefault();
     if (formData.title && formData.summary) {
       onSubmit({
-        type: 'ai_news',
+        postType: 'ai_news',
         ...formData,
       });
     }
