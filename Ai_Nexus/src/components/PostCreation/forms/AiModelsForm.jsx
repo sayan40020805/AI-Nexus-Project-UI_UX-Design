@@ -95,12 +95,31 @@ const AiModelsForm = ({ onSubmit }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (formData.modelName && formData.description) {
-      onSubmit({
+      // CRITICAL FIX: Add required content field for backend
+      const submitData = {
         postType: 'ai_models',
-        ...formData,
+        content: `${formData.modelName}\n\n${formData.description}`, // Required field
+        modelName: formData.modelName,
+        modelType: formData.modelType,
+        description: formData.description,
+        capabilities: formData.capabilities,
+        useCases: formData.useCases,
+        pricing: formData.pricing,
+        performance: formData.performance,
+        limitations: formData.limitations,
+        githubUrl: formData.githubUrl,
+        demoUrl: formData.demoUrl,
+        paperUrl: formData.paperUrl,
+        category: formData.category,
+        releaseDate: formData.releaseDate,
+        company: formData.company,
+        license: formData.license,
         tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
         media: formData.images.length > 0 ? { images: formData.images } : {},
-      });
+      };
+
+      console.log('Submitting model post data:', submitData);
+      onSubmit(submitData);
     }
   };
 

@@ -144,12 +144,16 @@ export function JobBoard() {
                 )}
               </div>
               <div className="job-basic-info">
-                <h3 className="job-title">{job.title}</h3>
+                <h3 className="job-title">{job.jobTitle}</h3>
                 <div className="company-name">
                   <Building className="w-4 h-4" />
-                  <span>{job.company?.companyName}</span>
+                  <span>{job.companyName || job.company?.companyName}</span>
                 </div>
-                <p className="job-desc">{job.description}</p>
+                <p className="job-desc">{job.jobDescription}</p>
+                <div className="skills-section">
+                  <strong>Skills Required:</strong>
+                  <p>{job.skillsRequired}</p>
+                </div>
               </div>
             </div>
             
@@ -185,19 +189,15 @@ export function JobBoard() {
             </div>
             <div className="meta-item">
               <Clock className="meta-icon" />
-              <span>{formatDate(job.createdAt)}</span>
+              <span>Apply by: {new Date(job.applyDeadline).toLocaleDateString()}</span>
+            </div>
+            <div className="meta-item">
+              <Clock className="meta-icon" />
+              <span>Posted: {formatDate(job.createdAt)}</span>
             </div>
           </div>
 
-          {job.techStack && job.techStack.length > 0 && (
-            <div className="tech-tags">
-              {job.techStack.map((tech, index) => (
-                <span key={index} className="tech-tag">
-                  {tech}
-                </span>
-              ))}
-            </div>
-          )}
+
 
           <div className="job-footer">
             <span className="applicant-info">

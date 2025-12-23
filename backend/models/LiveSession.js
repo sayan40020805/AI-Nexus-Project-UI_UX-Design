@@ -77,6 +77,67 @@ const LiveSessionSchema = new mongoose.Schema({
     enum: ['low', 'medium', 'high', 'hd'],
     default: 'medium'
   },
+
+  // ZEGOCLOUD Integration Fields
+  zegoRoomId: {
+    type: String,
+    unique: true,
+    sparse: true // Allows null values but ensures uniqueness when present
+  },
+  
+  zegoConfig: {
+    appId: {
+      type: Number,
+      default: function() {
+        return process.env.ZEGO_APP_ID ? parseInt(process.env.ZEGO_APP_ID) : null;
+      }
+    },
+    environment: {
+      type: String,
+      enum: ['development', 'production'],
+      default: process.env.NODE_ENV === 'production' ? 'production' : 'development'
+    },
+    maxUserCount: {
+      type: Number,
+      default: 1000
+    },
+    enableCamera: {
+      type: Boolean,
+      default: true
+    },
+    enableMicrophone: {
+      type: Boolean,
+      default: true
+    },
+    enableScreenShare: {
+      type: Boolean,
+      default: false
+    },
+    enableChat: {
+      type: Boolean,
+      default: true
+    }
+  },
+
+  // Streaming statistics
+  streamingStats: {
+    totalConnections: {
+      type: Number,
+      default: 0
+    },
+    peakViewers: {
+      type: Number,
+      default: 0
+    },
+    averageViewTime: {
+      type: Number, // in seconds
+      default: 0
+    },
+    bandwidthUsed: {
+      type: Number, // in MB
+      default: 0
+    }
+  },
   
   // Chat messages during live session
   chatMessages: [{

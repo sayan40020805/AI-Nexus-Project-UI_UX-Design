@@ -14,14 +14,19 @@ const AIModels = () => {
 
   // Fetch AI Models posts
   const fetchAiModelsPosts = async () => {
-    if (!token) return;
+    if (!token) {
+      console.log('No token available, skipping fetch');
+      return;
+    }
     
     try {
       setLoading(true);
       setError(null);
       
+      console.log('Fetching AI models with token:', token ? 'Token present' : 'No token');
+      
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/feed/by-type/model?page=1&limit=50`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/feed/by-type/ai_models?page=1&limit=50`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,

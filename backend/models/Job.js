@@ -2,21 +2,26 @@ const mongoose = require('mongoose');
 
 const JobSchema = new mongoose.Schema({
   // Basic job information
-  title: {
+  jobTitle: {
     type: String,
     required: [true, 'Job title is required'],
     trim: true,
     maxlength: [100, 'Job title cannot exceed 100 characters']
   },
-  description: {
+  companyName: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Company name cannot exceed 100 characters']
+  },
+  jobDescription: {
     type: String,
     required: [true, 'Job description is required'],
     maxlength: [2000, 'Job description cannot exceed 2000 characters']
   },
-  requirements: {
+  skillsRequired: {
     type: String,
-    required: [true, 'Job requirements are required'],
-    maxlength: [2000, 'Requirements cannot exceed 2000 characters']
+    required: [true, 'Skills required are required'],
+    maxlength: [2000, 'Skills required cannot exceed 2000 characters']
   },
   
   // Job details
@@ -28,27 +33,14 @@ const JobSchema = new mongoose.Schema({
   },
   jobType: {
     type: String,
-    enum: ['Full-time', 'Part-time', 'Contract', 'Remote', 'Internship'],
+    enum: ['Internship', 'Full-Time', 'Part-Time'],
     required: [true, 'Job type is required'],
-    default: 'Full-time'
+    default: 'Full-Time'
   },
-  experienceLevel: {
-    type: String,
-    enum: ['Entry-level', 'Mid-level', 'Senior-level', 'Executive'],
-    required: [true, 'Experience level is required'],
-    default: 'Mid-level'
+  applyDeadline: {
+    type: Date,
+    required: [true, 'Application deadline is required']
   },
-  salary: {
-    type: String,
-    required: [true, 'Salary information is required'],
-    trim: true,
-    maxlength: [50, 'Salary cannot exceed 50 characters']
-  },
-  techStack: [{
-    type: String,
-    trim: true,
-    maxlength: [30, 'Technology cannot exceed 30 characters']
-  }],
   
   // Company information (referenced to User model)
   company: {
@@ -74,16 +66,6 @@ const JobSchema = new mongoose.Schema({
     default: 'active'
   },
   
-  // Additional fields
-  isUrgent: {
-    type: Boolean,
-    default: false
-  },
-  applicationDeadline: {
-    type: Date,
-    default: null
-  },
-  
   // Timestamps
   createdAt: {
     type: Date,
@@ -101,11 +83,27 @@ JobSchema.pre('save', function(next) {
   next();
 });
 
+// Pre-save middleware to auto-populate companyName from user profile
+JobSchema.pre('save', async function(next) {
+  if (this.isModified('company') || this.isNew) {
+    try {
+      const User = mongoose.model('User');
+      const companyUser = await User.findById(this.company).select('companyName');
+      if (companyUser && companyUser.companyName) {
+        this.companyName = companyUser.companyName;
+      }
+    } catch (error) {
+      console.error('Error auto-populating company name:', error);
+    }
+  }
+  next();
+});
+
 // Index for better query performance
 JobSchema.index({ company: 1, status: 1 });
 JobSchema.index({ jobType: 1 });
 JobSchema.index({ location: 1 });
 JobSchema.index({ createdAt: -1 });
-JobSchema.index({ title: 'text', description: 'text', requirements: 'text', techStack: 'text' });
+JobSchema.index({ jobTitle: 'text', jobDescription: 'text', skillsRequired: 'text' });
 
 module.exports = mongoose.model('Job', JobSchema);

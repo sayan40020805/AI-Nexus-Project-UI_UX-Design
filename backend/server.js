@@ -21,17 +21,19 @@ connectDB();
 // Security middleware
 app.use(helmet());
 
-// Rate limiting
+// Rate limiting - More relaxed for development
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
+  max: 1000, // Increased from 100 to 1000 requests per windowMs for development
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false
 });
 
-// More restrictive limiter for auth endpoints
+// More restrictive limiter for auth endpoints (but still reasonable)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // limit each IP to 10 auth requests per windowMs (more restrictive)
+  max: 50, // Increased from 10 to 50 auth requests per windowMs
   message: 'Too many authentication attempts, please try again later.',
   standardHeaders: true,
   legacyHeaders: false
@@ -41,7 +43,7 @@ app.use('/api/', limiter);
 app.use('/api/auth', authLimiter);
 
 
-// CORS configuration
+// CORS configuration - Fixed for console error resolution
 app.use(cors({
   origin: [
     process.env.FRONTEND_URL || 'http://localhost:5173',
@@ -56,6 +58,18 @@ app.use(cors({
     'http://127.0.0.1:5175'
   ],
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+    'Cache-Control',
+    'Pragma'
+  ],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 86400 // 24 hours
 }));
 
 // Logging
@@ -92,7 +106,9 @@ const io = socketIo(server, {
       'http://127.0.0.1:3000',
       'http://127.0.0.1:5175'
     ],
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization']
   }
 });
 
@@ -236,11 +252,11 @@ const followRouter = require('./routes/follow');
 const feedRouter = require('./routes/feed');
 const messagesRouter = require('./routes/messages');
 const liveRouter = require('./routes/live');
+const zegoRouter = require('./routes/zego');
 const settingsRouter = require('./routes/settings');
 const jobsRouter = require('./routes/jobs');
 const jobApplicationsRouter = require('./routes/jobApplications');
 const eventsRouter = require('./routes/events');
-const eventRegistrationsRouter = require('./routes/eventRegistrations');
 
 app.use('/api/auth', authRouter);
 app.use('/api/company', companyRouter);
@@ -251,12 +267,12 @@ app.use('/api/follow', followRouter);
 app.use('/api/feed', feedRouter);
 app.use('/api/messages', messagesRouter);
 app.use('/api/live', liveRouter);
+app.use('/api/zego', zegoRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/projects', require('./routes/projectRoutes'));
 app.use('/api/jobs', jobsRouter);
 app.use('/api', jobApplicationsRouter);
 app.use('/api/events', eventsRouter);
-app.use('/api/events', eventRegistrationsRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

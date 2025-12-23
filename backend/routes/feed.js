@@ -228,16 +228,65 @@ router.get('/companies', authMiddleware, async (req, res) => {
 // ========================
 router.get('/by-type/:postType', authMiddleware, async (req, res) => {
   try {
-    const { postType } = req.params;
-    const { page = 1, limit = 20 } = req.query;
+    console.log('📋 Feed by-type - Request started');
+    console.log('📋 Feed by-type - Request URL:', req.originalUrl);
+    console.log('📋 Feed by-type - User authenticated:', !!req.user);
+    console.log('📋 Feed by-type - User ID:', req.user ? req.user.id : 'none');
     
-    // Validate post type
-    const validPostTypes = ['normal', 'shorts', 'news', 'model', 'career', 'event', 'showcase'];
+    const { postType: rawPostType } = req.params;
+    console.log('📋 Feed by-type - Raw post type:', rawPostType);
+    
+    const postType = rawPostType.trim();
+    console.log('📋 Feed by-type - Trimmed post type:', postType);
+    
+    const { page = 1, limit = 20 } = req.query;
+    console.log('📋 Feed by-type - Query params:', { page, limit });
+    console.log('📋 Feed by-type - Query params types:', { 
+      pageType: typeof page, 
+      limitType: typeof limit 
+    });
+    
+    // Validate post type - support both frontend and backend post types
+    const validPostTypes = [
+      'normal', 
+      'shorts', 
+      'ai_short',
+      'news', 
+      'ai_news',
+      'model', 
+      'ai_models',
+      'career', 
+      'event',
+      'ai_showcase',
+      'showcase'
+    ];
+    
+    console.log('📋 Feed by-type - Valid post types:', validPostTypes);
+    console.log('📋 Feed by-type - Is post type valid:', validPostTypes.includes(postType));
+    
     if (!validPostTypes.includes(postType)) {
-      return res.status(400).json({ msg: 'Invalid post type' });
+      console.log('📋 Feed by-type - Invalid post type error:', {
+        received: postType,
+        validTypes: validPostTypes,
+        postTypeLength: postType.length,
+        postTypeTrimmed: postType === rawPostType.trim()
+      });
+      return res.status(400).json({ 
+        msg: 'Invalid post type',
+        received: postType,
+        validTypes: validPostTypes,
+        debug: {
+          originalLength: rawPostType.length,
+          trimmedLength: postType.length,
+          isEqual: postType === rawPostType
+        }
+      });
     }
     
     const skip = (page - 1) * limit;
+    console.log('📋 Feed by-type - Calculated skip:', skip);
+    
+    console.log('📋 Feed by-type - Starting database query...');
     
     // Get posts filtered by type
     const posts = await Post.find({ 
@@ -250,10 +299,14 @@ router.get('/by-type/:postType', authMiddleware, async (req, res) => {
       .skip(skip)
       .lean();
     
+    console.log('📋 Feed by-type - Database query completed, posts found:', posts.length);
+    
     const total = await Post.countDocuments({ 
       postType,
       isPublic: true
     });
+    
+    console.log('📋 Feed by-type - Total count query completed, total posts:', total);
     
     const enrichedPosts = posts.map(post => ({
       ...post,
@@ -264,6 +317,8 @@ router.get('/by-type/:postType', authMiddleware, async (req, res) => {
         like.user.toString() === req.user.id
       ) : false
     }));
+    
+    console.log('📋 Feed by-type - Response prepared successfully');
     
     res.json({
       posts: enrichedPosts,
@@ -276,8 +331,21 @@ router.get('/by-type/:postType', authMiddleware, async (req, res) => {
     });
     
   } catch (err) {
-    console.error('Get posts by type error:', err);
-    res.status(500).json({ msg: 'Server error getting posts by type' });
+    console.error('📋 Feed by-type - Error details:', {
+      message: err.message,
+      name: err.name,
+      stack: err.stack,
+      postType: req.params ? req.params.postType : 'unknown',
+      query: req.query
+    });
+    res.status(500).json({ 
+      msg: 'Server error getting posts by type',
+      error: err.message,
+      debug: {
+        postType: req.params ? req.params.postType : 'unknown',
+        query: req.query
+      }
+    });
   }
 });
 

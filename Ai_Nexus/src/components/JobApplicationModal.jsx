@@ -1,19 +1,16 @@
 import { useState } from 'react';
-import { X, Upload, FileText } from 'lucide-react';
+import { X, Upload } from 'lucide-react';
 import jobService from '../services/jobService';
-import { useAuth } from '../context/AuthContext';
 
 export function JobApplicationModal({ job, onClose, onSuccess }) {
-  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-  
   const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
     coverLetter: '',
-    additionalInfo: '',
-    resume: null,
-    portfolio: null
+    resume: null
   });
 
   const handleInputChange = (e) => {
@@ -25,11 +22,24 @@ export function JobApplicationModal({ job, onClose, onSuccess }) {
   };
 
   const handleFileChange = (e) => {
-    const { name, files } = e.target;
-    if (files.length > 0) {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(file.type)) {
+        setError('Please upload a PDF or Word document');
+        return;
+      }
+      
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        setError('File size must be less than 5MB');
+        return;
+      }
+      
       setFormData(prev => ({
         ...prev,
-        [name]: files[0]
+        resume: file
       }));
     }
   };
@@ -38,79 +48,47 @@ export function JobApplicationModal({ job, onClose, onSuccess }) {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setSuccess(false);
 
     try {
-      // For now, we'll send file paths as strings (in a real app, you'd upload files to a server)
-      const applicationData = {
-        coverLetter: formData.coverLetter,
-        additionalInfo: formData.additionalInfo,
-        resume: formData.resume ? formData.resume.name : null,
-        portfolio: formData.portfolio ? formData.portfolio.name : null
-      };
+      const applicationData = new FormData();
+      applicationData.append('jobId', job._id);
+      applicationData.append('fullName', formData.fullName);
+      applicationData.append('email', formData.email);
+      applicationData.append('phone', formData.phone);
+      applicationData.append('coverLetter', formData.coverLetter);
+      if (formData.resume) {
+        applicationData.append('resume', formData.resume);
+      }
 
-      await jobService.applyForJob(job._id, applicationData);
-      
-      setSuccess(true);
-      setTimeout(() => {
-        onSuccess();
-        onClose();
-      }, 2000);
+      await jobService.applyForJob(applicationData);
+      onSuccess();
+      onClose();
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Failed to submit application');
     } finally {
       setLoading(false);
     }
   };
-
-  const formatFileSize = (bytes) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
-
-  if (success) {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg max-w-md w-full mx-4 p-6 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Application Submitted!</h3>
-          <p className="text-gray-600">Your application has been successfully submitted. The company will review it and get back to you soon.</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Apply for Position</h2>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Apply for Position
+              </h2>
+              <p className="text-gray-600 mt-1">
+                {job?.jobTitle} at {job?.companyName || job?.company?.companyName}
+              </p>
+            </div>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600"
             >
               <X className="w-6 h-6" />
             </button>
-          </div>
-
-          {/* Job Information */}
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
-            <p className="text-blue-600 font-medium">{job.company?.companyName}</p>
-            <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-600">
-              <span>{job.location}</span>
-              <span>{job.jobType}</span>
-              <span>{job.experienceLevel}</span>
-              <span>{job.salary}</span>
-            </div>
           </div>
 
           {error && (
@@ -120,106 +98,97 @@ export function JobApplicationModal({ job, onClose, onSuccess }) {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Cover Letter *
-              </label>
-              <textarea
-                name="coverLetter"
-                value={formData.coverLetter}
-                onChange={handleInputChange}
-                required
-                rows={6}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Write a compelling cover letter explaining why you're a great fit for this position..."
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Additional Information
-              </label>
-              <textarea
-                name="additionalInfo"
-                value={formData.additionalInfo}
-                onChange={handleInputChange}
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Any additional information you'd like to share (portfolio links, availability, salary expectations, etc.)"
-              />
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Resume
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter your full name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address *
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="your.email@example.com"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="+1 (555) 123-4567"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Resume/CV *
                 </label>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
                   <input
                     type="file"
-                    name="resume"
                     onChange={handleFileChange}
                     accept=".pdf,.doc,.docx"
                     className="hidden"
                     id="resume-upload"
+                    required={!job?.hasApplied}
                   />
-                  <label htmlFor="resume-upload" className="cursor-pointer">
-                    <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-600 mb-1">
-                      {formData.resume ? formData.resume.name : 'Upload your resume'}
-                    </p>
-                    {formData.resume && (
-                      <p className="text-xs text-gray-500">
-                        {formatFileSize(formData.resume.size)}
-                      </p>
-                    )}
-                    <p className="text-xs text-gray-500">
-                      PDF, DOC, DOCX (max 5MB)
-                    </p>
+                  <label
+                    htmlFor="resume-upload"
+                    className="cursor-pointer flex flex-col items-center"
+                  >
+                    <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                    <span className="text-sm text-gray-600">
+                      {formData.resume ? formData.resume.name : 'Click to upload or drag and drop'}
+                    </span>
+                    <span className="text-xs text-gray-400 mt-1">
+                      PDF, DOC, or DOCX (max. 5MB)
+                    </span>
                   </label>
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Portfolio (Optional)
-                </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
-                  <input
-                    type="file"
-                    name="portfolio"
-                    onChange={handleFileChange}
-                    accept=".pdf,.doc,.docx,.zip"
-                    className="hidden"
-                    id="portfolio-upload"
-                  />
-                  <label htmlFor="portfolio-upload" className="cursor-pointer">
-                    <FileText className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-600 mb-1">
-                      {formData.portfolio ? formData.portfolio.name : 'Upload portfolio'}
-                    </p>
-                    {formData.portfolio && (
-                      <p className="text-xs text-gray-500">
-                        {formatFileSize(formData.portfolio.size)}
-                      </p>
-                    )}
-                    <p className="text-xs text-gray-500">
-                      PDF, DOC, DOCX, ZIP (max 10MB)
-                    </p>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            {/* Applicant Information */}
-            <div className="bg-blue-50 rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 mb-2">Your Application Will Include:</h4>
-              <div className="text-sm text-gray-600 space-y-1">
-                <p>• Name: {user.username}</p>
-                <p>• Email: {user.email}</p>
-                {user.profilePicture && (
-                  <p>• Profile picture will be included</p>
+                {formData.resume && (
+                  <p className="text-sm text-green-600 mt-2">
+                    ✓ {formData.resume.name} selected
+                  </p>
                 )}
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Cover Letter *
+                </label>
+                <textarea
+                  name="coverLetter"
+                  value={formData.coverLetter}
+                  onChange={handleInputChange}
+                  required
+                  rows={6}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Explain why you're interested in this position and how your skills make you a great fit..."
+                />
               </div>
             </div>
 

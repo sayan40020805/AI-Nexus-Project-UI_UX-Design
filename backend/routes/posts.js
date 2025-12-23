@@ -124,12 +124,45 @@ router.post('/', authMiddleware, upload.any(), async (req, res) => {
     const backendPostType = postTypeMap[postType] || postType;
     
     console.log('Creating post:', { content, postType, backendPostType, files: req.files && req.files.length });
+    console.log('Request body fields:', Object.keys(req.body));
+    console.log('User info:', { id: req.user.id, role: req.user.role });
+    
+    // CRITICAL: Validate required fields based on post type
+    if (!content || content.trim().length === 0) {
+      console.error('Validation failed: content field is required');
+      return res.status(400).json({ 
+        msg: 'Content field is required for all posts',
+        field: 'content'
+      });
+    }
+    
+    // Validate required fields for ai_models posts
+    if (backendPostType === 'ai_models') {
+      const requiredModelFields = ['modelName'];
+      const missingFields = [];
+      
+      requiredModelFields.forEach(field => {
+        if (!req.body[field] || req.body[field].toString().trim().length === 0) {
+          missingFields.push(field);
+        }
+      });
+      
+      if (missingFields.length > 0) {
+        console.error('Validation failed for ai_models post:', { missingFields, received: Object.keys(req.body) });
+        return res.status(400).json({ 
+          msg: 'Required fields missing for model post',
+          missingFields,
+          requiredFields: ['modelName']
+        });
+      }
+    }
     
     // Validate post type and role restrictions
     const userRole = req.user.role;
     const restrictedTypes = ['ai_news', 'career', 'event'];
     
     if (restrictedTypes.includes(backendPostType) && userRole !== 'company') {
+      console.log('Role restriction triggered:', { backendPostType, userRole });
       return res.status(403).json({ 
         msg: 'Only companies can create news, career, and event posts' 
       });
@@ -222,7 +255,46 @@ router.post('/', authMiddleware, upload.any(), async (req, res) => {
     res.status(201).json({ post: result });
   } catch (err) {
     console.error('Create post error:', err);
-    res.status(500).json({ msg: 'Server error creating post' });
+    
+    // Enhanced error logging with more details
+    console.error('Error details:', {
+      message: err.message,
+      code: err.code,
+      name: err.name,
+      stack: err.stack,
+      requestBody: req.body ? Object.keys(req.body) : 'No body',
+      postType: req.body ? req.body.postType : 'No postType',
+      user: req.user ? { id: req.user.id, role: req.user.role } : 'No user'
+    });
+    
+    // Check for specific error types
+    if (err.name === 'ValidationError') {
+      console.error('Mongoose validation error:', err.errors);
+      const validationErrors = Object.keys(err.errors).map(key => ({
+        field: key,
+        message: err.errors[key].message
+      }));
+      
+      return res.status(400).json({
+        msg: 'Validation error creating post',
+        validationErrors,
+        originalError: err.message
+      });
+    }
+    
+    if (err.name === 'MongoError' && err.code === 11000) {
+      console.error('Duplicate key error:', err);
+      return res.status(409).json({
+        msg: 'Duplicate post or conflict error',
+        originalError: err.message
+      });
+    }
+    
+    res.status(500).json({ 
+      msg: 'Server error creating post',
+      errorType: err.name,
+      originalError: err.message
+    });
   }
 });
 

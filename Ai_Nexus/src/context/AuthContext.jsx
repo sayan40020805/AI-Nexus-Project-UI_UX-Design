@@ -29,24 +29,11 @@ export const AuthProvider = ({ children }) => {
           setToken(storedToken);
           setUser(parsedUser);
 
-          // Then verify token with server
-          const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/me`, {
-            headers: {
-              Authorization: `Bearer ${storedToken}`,
-            },
-          });
-
-          if (!res.ok) {
-            // Token is invalid, clear storage
-            logout();
-            return;
+          // Only verify token with server if user data is missing
+          if (!parsedUser || !parsedUser.id) {
+            await verifyTokenWithServer(storedToken);
           }
-
-          const data = await res.json();
-          
-          // Update user data from server (in case it changed)
-          setUser(data.user);
-          localStorage.setItem('user', JSON.stringify(data.user));
+          // Skip server verification for cached user data to prevent rate limiting
 
         } catch (err) {
           console.error('Auth initialization error:', err);
@@ -63,6 +50,38 @@ export const AuthProvider = ({ children }) => {
 
     initAuth();
   }, []);
+
+  // Helper function to verify token with server
+  const verifyTokenWithServer = async (token) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        if (res.status === 429) {
+          // Rate limited - don't clear auth, just log it
+          console.warn('Rate limited during auth verification, keeping local session');
+          return;
+        }
+        // Token is invalid, clear storage
+        logout();
+        return;
+      }
+
+      const data = await res.json();
+      
+      // Update user data from server
+      setUser(data.user);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+    } catch (err) {
+      console.warn('Auth verification failed, keeping local session:', err.message);
+      // Don't clear auth on network errors, just log warning
+    }
+  };
 
   // =========================
   // LOGIN

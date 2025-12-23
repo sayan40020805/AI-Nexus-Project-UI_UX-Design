@@ -1,0 +1,42 @@
+<parameter name="content">
+const axios = require('axios');
+
+async function testEventsAPI() {
+  try {
+    console.log('Testing Events API...');
+    
+    // Test 1: Basic events endpoint
+    console.log('\n1. Testing GET /api/events');
+    try {
+      const response = await axios.get('http://localhost:5001/api/events');
+      console.log('✅ Success:', response.data);
+    } catch (error) {
+      console.log('❌ Error:', error.response?.data || error.message);
+    }
+    
+    // Test 2: Events with status parameter
+    console.log('\n2. Testing GET /api/events?status=published');
+    try {
+      const response = await axios.get('http://localhost:5001/api/events?status=published');
+      console.log('✅ Success:', response.data);
+    } catch (error) {
+      console.log('❌ Error:', error.response?.data || error.message);
+    }
+    
+    // Test 3: Events categories endpoint
+    console.log('\n3. Testing GET /api/events/categories');
+    try {
+      const response = await axios.get('http://localhost:5001/api/events/categories');
+      console.log('✅ Success:', response.data);
+    } catch (error) {
+      console.log('❌ Error:', error.response?.data || error.message);
+    }
+    
+  } catch (error) {
+    console.error('Test failed:', error.message);
+  }
+}
+
+// Run the test
+testEventsAPI();
+</parameter>

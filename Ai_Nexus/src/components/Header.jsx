@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Sparkles, Sun, Moon, LogOut, User, Building } from 'lucide-react';
+import { Menu, X, Sparkles, Sun, Moon, LogOut, User, Building, Radio } from 'lucide-react';
 import { useThemeContext } from './theme-provider';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -29,11 +29,12 @@ export function Header() {
 
   const navItems = [
     { id: 'home', label: 'Home', path: '/' },
-    { id: 'news', label: 'AI News', path: '/news' },
+    // { id: 'news', label: 'AI News', path: '/news' },
     { id: 'showcase', label: 'Showcase', path: '/showcase' },
     { id: 'models', label: 'Models', path: '/models' },
     { id: 'career', label: 'Career', path: '/career' },
     { id: 'events', label: 'Events', path: '/events' },
+    { id: 'live', label: 'Live', path: '/live' },
   ];
 
   const handleNavClick = () => {
@@ -108,6 +109,18 @@ export function Header() {
             {user ? (
               // Authenticated user UI
               <>
+                {/* Start Live button - Company only */}
+                {user.role === 'company' && (
+                  <Link 
+                    to="/live?action=start" 
+                    className="header-auth-button header-live-button"
+                    title="Start Live Stream"
+                  >
+                    <Radio className="header-icon" size={16} />
+                    Go Live
+                  </Link>
+                )}
+                
                 <Link to={getDashboardLink()} className="header-auth-button">
                   {user.role === 'company' ? (
                     <>
@@ -177,6 +190,18 @@ export function Header() {
               {user ? (
                 // Authenticated user UI for mobile
                 <>
+                  {/* Start Live button - Company only */}
+                  {user.role === 'company' && (
+                    <Link 
+                      to="/live?action=start" 
+                      className="header-mobile-nav-item header-mobile-live"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Radio className="header-icon" size={16} />
+                      Go Live
+                    </Link>
+                  )}
+                  
                   <Link 
                     to={getDashboardLink()} 
                     className="header-mobile-nav-item" 

@@ -145,12 +145,12 @@ export const getJobStats = async () => {
 };
 
 // Apply for job (user only)
-export const applyForJob = async (jobId, applicationData) => {
+export const applyForJob = async (formData) => {
   try {
-    const response = await fetch(`${API_URL}/api/jobs/${jobId}/apply`, {
+    const response = await fetch(`${API_URL}/api/job-applications`, {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify(applicationData)
+      body: formData // FormData for file uploads
     });
     
     if (!response.ok) {

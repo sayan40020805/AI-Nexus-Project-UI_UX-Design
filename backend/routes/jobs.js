@@ -1,7 +1,7 @@
 const express = require('express');
 const Job = require('../models/Job');
 const JobApplication = require('../models/JobApplication');
-const { authMiddleware, roleMiddleware } = require('../middleware/auth');
+const { authMiddleware, roleMiddleware, allowCompanyOnly } = require('../middleware/auth');
 const router = express.Router();
 
 // ========================
@@ -101,39 +101,37 @@ router.get('/:id', async (req, res) => {
 // ========================
 // CREATE JOB (Company Only)
 // ========================
-router.post('/', authMiddleware, roleMiddleware('company'), async (req, res) => {
+router.post('/', authMiddleware, allowCompanyOnly, async (req, res) => {
   try {
     const {
-      title,
-      description,
-      requirements,
+      jobTitle,
+      jobDescription,
+      skillsRequired,
       location,
       jobType,
-      experienceLevel,
-      salary,
-      techStack,
-      isUrgent,
-      applicationDeadline
+      applyDeadline
     } = req.body;
 
     // Validate required fields
-    if (!title || !description || !requirements || !location || !jobType || !experienceLevel || !salary) {
+    if (!jobTitle || !jobDescription || !skillsRequired || !location || !jobType || !applyDeadline) {
       return res.status(400).json({ msg: 'All required fields must be provided' });
+    }
+
+    // Validate apply deadline is in the future
+    const deadline = new Date(applyDeadline);
+    if (deadline <= new Date()) {
+      return res.status(400).json({ msg: 'Application deadline must be in the future' });
     }
 
     // Create new job
     const newJob = new Job({
-      title,
-      description,
-      requirements,
+      jobTitle,
+      jobDescription,
+      skillsRequired,
       location,
       jobType,
-      experienceLevel,
-      salary,
-      techStack: techStack || [],
-      company: req.user.id,
-      isUrgent: isUrgent || false,
-      applicationDeadline: applicationDeadline ? new Date(applicationDeadline) : null
+      applyDeadline: deadline,
+      company: req.user.id
     });
 
     await newJob.save();
@@ -155,7 +153,7 @@ router.post('/', authMiddleware, roleMiddleware('company'), async (req, res) => 
 // ========================
 // UPDATE JOB (Company Only, Own Jobs)
 // ========================
-router.put('/:id', authMiddleware, roleMiddleware('company'), async (req, res) => {
+router.put('/:id', authMiddleware, allowCompanyOnly, async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);
 
@@ -169,32 +167,28 @@ router.put('/:id', authMiddleware, roleMiddleware('company'), async (req, res) =
     }
 
     const {
-      title,
-      description,
-      requirements,
+      jobTitle,
+      jobDescription,
+      skillsRequired,
       location,
       jobType,
-      experienceLevel,
-      salary,
-      techStack,
-      status,
-      isUrgent,
-      applicationDeadline
+      applyDeadline,
+      status
     } = req.body;
 
     // Update fields
-    if (title) job.title = title;
-    if (description) job.description = description;
-    if (requirements) job.requirements = requirements;
+    if (jobTitle) job.jobTitle = jobTitle;
+    if (jobDescription) job.jobDescription = jobDescription;
+    if (skillsRequired) job.skillsRequired = skillsRequired;
     if (location) job.location = location;
     if (jobType) job.jobType = jobType;
-    if (experienceLevel) job.experienceLevel = experienceLevel;
-    if (salary) job.salary = salary;
-    if (techStack) job.techStack = techStack;
     if (status) job.status = status;
-    if (isUrgent !== undefined) job.isUrgent = isUrgent;
-    if (applicationDeadline !== undefined) {
-      job.applicationDeadline = applicationDeadline ? new Date(applicationDeadline) : null;
+    if (applyDeadline !== undefined) {
+      const deadline = new Date(applyDeadline);
+      if (deadline <= new Date()) {
+        return res.status(400).json({ msg: 'Application deadline must be in the future' });
+      }
+      job.applyDeadline = deadline;
     }
 
     await job.save();
@@ -214,7 +208,7 @@ router.put('/:id', authMiddleware, roleMiddleware('company'), async (req, res) =
 // ========================
 // DELETE JOB (Company Only, Own Jobs)
 // ========================
-router.delete('/:id', authMiddleware, roleMiddleware('company'), async (req, res) => {
+router.delete('/:id', authMiddleware, allowCompanyOnly, async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);
 
@@ -244,7 +238,7 @@ router.delete('/:id', authMiddleware, roleMiddleware('company'), async (req, res
 // ========================
 // GET COMPANY'S JOBS (Company Only)
 // ========================
-router.get('/company/my-jobs', authMiddleware, roleMiddleware('company'), async (req, res) => {
+router.get('/company/my-jobs', authMiddleware, allowCompanyOnly, async (req, res) => {
   try {
     const jobs = await Job.find({ company: req.user.id })
       .populate('applicants', '_id')
@@ -261,7 +255,7 @@ router.get('/company/my-jobs', authMiddleware, roleMiddleware('company'), async 
 // ========================
 // GET JOB STATISTICS (Company Only)
 // ========================
-router.get('/company/stats', authMiddleware, roleMiddleware('company'), async (req, res) => {
+router.get('/company/stats', authMiddleware, allowCompanyOnly, async (req, res) => {
   try {
     const totalJobs = await Job.countDocuments({ company: req.user.id });
     const activeJobs = await Job.countDocuments({ company: req.user.id, status: 'active' });
@@ -289,6 +283,170 @@ router.get('/company/stats', authMiddleware, roleMiddleware('company'), async (r
   } catch (err) {
     console.error('Get job stats error:', err);
     res.status(500).json({ msg: 'Server error getting job statistics' });
+  }
+});
+
+// ========================
+// APPLY FOR JOB (User Only)
+// ========================
+router.post('/:id/apply', authMiddleware, roleMiddleware('user'), async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id).populate('company', 'companyName');
+    
+    if (!job) {
+      return res.status(404).json({ msg: 'Job not found' });
+    }
+
+    // Check if job is active and accepting applications
+    if (job.status !== 'active') {
+      return res.status(400).json({ msg: 'This job is no longer accepting applications' });
+    }
+
+    // Check if application deadline has passed
+    if (job.applyDeadline && new Date() > job.applyDeadline) {
+      return res.status(400).json({ msg: 'Application deadline has passed' });
+    }
+
+    // Check if user has already applied
+    const existingApplication = await JobApplication.findOne({
+      job: job._id,
+      applicant: req.user.id
+    });
+
+    if (existingApplication) {
+      return res.status(400).json({ msg: 'You have already applied for this job' });
+    }
+
+    // Create job application
+    const application = new JobApplication({
+      job: job._id,
+      applicant: req.user.id,
+      status: 'pending',
+      appliedAt: new Date()
+    });
+
+    await application.save();
+
+    // Update job applicant count
+    await Job.findByIdAndUpdate(job._id, {
+      $inc: { applicantCount: 1 },
+      $push: { applicants: application._id }
+    });
+
+    res.status(201).json({
+      msg: 'Application submitted successfully',
+      application: {
+        id: application._id,
+        jobTitle: job.jobTitle,
+        companyName: job.companyName,
+        status: application.status,
+        appliedAt: application.appliedAt
+      }
+    });
+
+  } catch (err) {
+    console.error('Apply for job error:', err);
+    res.status(500).json({ msg: 'Server error submitting application' });
+  }
+});
+
+// ========================
+// GET JOB APPLICANTS (Company Only, Own Jobs)
+// ========================
+router.get('/:id/applicants', authMiddleware, allowCompanyOnly, async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+
+    if (!job) {
+      return res.status(404).json({ msg: 'Job not found' });
+    }
+
+    // Check if user owns this job
+    if (job.company.toString() !== req.user.id) {
+      return res.status(403).json({ msg: 'Not authorized to view applicants for this job' });
+    }
+
+    // Get all applications for this job with applicant details
+    const applications = await JobApplication.find({ job: job._id })
+      .populate('applicant', 'username email profilePicture bio')
+      .sort({ appliedAt: -1 });
+
+    res.json({
+      job: {
+        id: job._id,
+        jobTitle: job.jobTitle,
+        companyName: job.companyName
+      },
+      applications
+    });
+
+  } catch (err) {
+    console.error('Get job applicants error:', err);
+    res.status(500).json({ msg: 'Server error getting job applicants' });
+  }
+});
+
+// ========================
+// GET USER'S APPLICATIONS (User Only)
+// ========================
+router.get('/my/applications', authMiddleware, roleMiddleware('user'), async (req, res) => {
+  try {
+    const applications = await JobApplication.find({ applicant: req.user.id })
+      .populate({
+        path: 'job',
+        populate: {
+          path: 'company',
+          select: 'companyName companyLogo companyDescription'
+        }
+      })
+      .sort({ appliedAt: -1 });
+
+    res.json({ applications });
+
+  } catch (err) {
+    console.error('Get user applications error:', err);
+    res.status(500).json({ msg: 'Server error getting applications' });
+  }
+});
+
+// ========================
+// UPDATE APPLICATION STATUS (Company Only, Own Jobs)
+// ========================
+router.put('/applications/:id/status', authMiddleware, allowCompanyOnly, async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    if (!['pending', 'reviewed', 'interview', 'rejected', 'hired'].includes(status)) {
+      return res.status(400).json({ msg: 'Invalid status' });
+    }
+
+    const application = await JobApplication.findById(req.params.id)
+      .populate('job', 'company');
+
+    if (!application) {
+      return res.status(404).json({ msg: 'Application not found' });
+    }
+
+    // Check if user owns the job this application is for
+    if (application.job.company.toString() !== req.user.id) {
+      return res.status(403).json({ msg: 'Not authorized to update this application' });
+    }
+
+    application.status = status;
+    if (status === 'reviewed' || status === 'interview' || status === 'hired') {
+      application.responseDate = new Date();
+    }
+
+    await application.save();
+
+    res.json({
+      msg: 'Application status updated successfully',
+      application
+    });
+
+  } catch (err) {
+    console.error('Update application status error:', err);
+    res.status(500).json({ msg: 'Server error updating application status' });
   }
 });
 
