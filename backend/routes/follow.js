@@ -1,6 +1,7 @@
 const express = require('express');
 const Follow = require('../models/Follow');
 const User = require('../models/User');
+const FollowService = require('../services/followService');
 const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();

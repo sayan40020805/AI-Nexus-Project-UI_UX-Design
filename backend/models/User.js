@@ -123,7 +123,21 @@ UserSchema.pre('save', function(next) {
 });
 
 
-// Index for better query performance
-UserSchema.index({ role: 1 });
+// Indexes for optimized search performance
+// Text indexes for search functionality
+UserSchema.index({ 
+  username: 'text', 
+  companyName: 'text',
+  bio: 'text',
+  companyDescription: 'text'
+});
+
+// Compound indexes for better query performance
+UserSchema.index({ role: 1, createdAt: -1 });
+UserSchema.index({ role: 1, username: 1 });
+UserSchema.index({ role: 1, companyName: 1 });
+
+// Index for follow relationships optimization
+UserSchema.index({ email: 1 }, { unique: true });
 
 module.exports = mongoose.model('User', UserSchema);

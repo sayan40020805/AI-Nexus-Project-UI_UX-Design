@@ -5,7 +5,7 @@ const EventRegistration = require('../models/EventRegistration');
 const { authMiddleware, allowCompanyOnly, allowUserOrCompany } = require('../middleware/auth');
 const { upload } = require('../middleware/upload');
 
-// GET /api/events - Get all public events
+// GET /api/events - Get all public events (PUBLIC ENDPOINT - NO AUTH REQUIRED)
 router.get('/', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;

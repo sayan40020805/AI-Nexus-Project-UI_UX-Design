@@ -20,6 +20,7 @@ import SearchResults from './pages/Search/SearchResults';
 import { Footer } from './components/Footer';
 import { AuthProvider } from './context/AuthContext';
 import { FeedProvider } from './context/FeedContext';
+import { FollowProvider } from './context/FollowContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
@@ -73,207 +74,209 @@ const FeedLayout = ({ children }) => {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <GlobalLayout>
-          <Routes>
-            {/* Home route with main layout */}
-            <Route 
-              path="/" 
-              element={
-                <FeedLayout>
-                  <MainLayout>
-                    <Hero />
-                  </MainLayout>
-                </FeedLayout>
-              } 
-            />
-            
-            {/* Main app routes with sidebar */}
-            <Route
-              path="/news"
-              element={
-                <FeedLayout>
-                  <MainLayout>
-                    <AINews />
-                  </MainLayout>
-                </FeedLayout>
-              }
-            />
-            <Route
-              path="/showcase"
-              element={
-                <FeedLayout>
-                  <MainLayout>
-                    <AIShowcasePage />
-                  </MainLayout>
-                </FeedLayout>
-              }
-            />
-            <Route
-              path="/models"
-              element={
-                <FeedLayout>
-                  <MainLayout>
-                    <AIModels />
-                  </MainLayout>
-                </FeedLayout>
-              }
-            />
-            <Route
-              path="/career"
-              element={
-                <FeedLayout>
-                  <MainLayout>
-                    <JobBoard />
-                  </MainLayout>
-                </FeedLayout>
-              }
-            />
-            <Route
-              path="/events"
-              element={
-                <FeedLayout>
-                  <MainLayout>
-                    <Events />
-                  </MainLayout>
-                </FeedLayout>
-              }
-            />
-            <Route
-              path="/create-post"
-              element={
-                <FeedLayout>
-                  <MainLayout>
-                    <PostForm />
-                  </MainLayout>
-                </FeedLayout>
-              }
-            />
-            <Route
-              path="/live"
-              element={
-                <FeedLayout>
-                  <MainLayout>
-                    <Live />
-                  </MainLayout>
-                </FeedLayout>
-              }
-            />
-            <Route
-              path="/quiz"
-              element={
-                <FeedLayout>
-                  <MainLayout>
-                    <Quiz />
-                  </MainLayout>
-                </FeedLayout>
-              }
-            />
-            <Route
-              path="/post"
-              element={
-                <FeedLayout>
-                  <MainLayout>
-                    <Post />
-                  </MainLayout>
-                </FeedLayout>
-              }
-            />
-            <Route
-              path="/ats"
-              element={
-                <FeedLayout>
-                  <MainLayout>
-                    <ATSScore />
-                  </MainLayout>
-                </FeedLayout>
-              }
-            />
-            <Route
-              path="/shorts"
-              element={
-                <FeedLayout>
-                  <MainLayout>
-                    <AiShorts />
-                  </MainLayout>
-                </FeedLayout>
-              }
-            />
-            <Route
-              path="/tools"
-              element={
-                <FeedLayout>
-                  <MainLayout>
-                    <ToolsPage />
-                  </MainLayout>
-                </FeedLayout>
-              }
-            />
-            <Route
-              path="/profile/:id"
-              element={
-                <FeedLayout>
-                  <MainLayout>
-                    <ProfilePage />
-                  </MainLayout>
-                </FeedLayout>
-              }
-            />
-            <Route
-              path="/company/:id"
-              element={
-                <FeedLayout>
-                  <MainLayout>
-                    <CompanyPage />
-                  </MainLayout>
-                </FeedLayout>
-              }
-            />
-            <Route
-              path="/search"
-              element={
-                <FeedLayout>
-                  <MainLayout>
-                    <SearchResults />
-                  </MainLayout>
-                </FeedLayout>
-              }
-            />
-            
-            {/* Auth routes */}
-            <Route
-              path="/login"
-              element={
-                <PageLayout>
-                  <Login />
-                </PageLayout>
-              }
-            />
-            <Route
-              path="/register"
-              element={
-                <PageLayout>
-                  <Register />
-                </PageLayout>
-              }
-            />
-            
-            {/* Protected routes */}
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
+      <FollowProvider>
+        <Router>
+          <GlobalLayout>
+            <Routes>
+              {/* Home route with main layout */}
+              <Route 
+                path="/" 
+                element={
                   <FeedLayout>
-                    <PageLayout>
-                      <Dashboard />
-                    </PageLayout>
+                    <MainLayout>
+                      <Hero />
+                    </MainLayout>
                   </FeedLayout>
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </GlobalLayout>
-      </Router>
+                } 
+              />
+              
+              {/* Main app routes with sidebar */}
+              <Route
+                path="/news"
+                element={
+                  <FeedLayout>
+                    <MainLayout>
+                      <AINews />
+                    </MainLayout>
+                  </FeedLayout>
+                }
+              />
+              <Route
+                path="/showcase"
+                element={
+                  <FeedLayout>
+                    <MainLayout>
+                      <AIShowcasePage />
+                    </MainLayout>
+                  </FeedLayout>
+                }
+              />
+              <Route
+                path="/models"
+                element={
+                  <FeedLayout>
+                    <MainLayout>
+                      <AIModels />
+                    </MainLayout>
+                  </FeedLayout>
+                }
+              />
+              <Route
+                path="/career"
+                element={
+                  <FeedLayout>
+                    <MainLayout>
+                      <JobBoard />
+                    </MainLayout>
+                  </FeedLayout>
+                }
+              />
+              <Route
+                path="/events"
+                element={
+                  <FeedLayout>
+                    <MainLayout>
+                      <Events />
+                    </MainLayout>
+                  </FeedLayout>
+                }
+              />
+              <Route
+                path="/create-post"
+                element={
+                  <FeedLayout>
+                    <MainLayout>
+                      <PostForm />
+                    </MainLayout>
+                  </FeedLayout>
+                }
+              />
+              <Route
+                path="/live"
+                element={
+                  <FeedLayout>
+                    <MainLayout>
+                      <Live />
+                    </MainLayout>
+                  </FeedLayout>
+                }
+              />
+              <Route
+                path="/quiz"
+                element={
+                  <FeedLayout>
+                    <MainLayout>
+                      <Quiz />
+                    </MainLayout>
+                  </FeedLayout>
+                }
+              />
+              <Route
+                path="/post"
+                element={
+                  <FeedLayout>
+                    <MainLayout>
+                      <Post />
+                    </MainLayout>
+                  </FeedLayout>
+                }
+              />
+              <Route
+                path="/ats"
+                element={
+                  <FeedLayout>
+                    <MainLayout>
+                      <ATSScore />
+                    </MainLayout>
+                  </FeedLayout>
+                }
+              />
+              <Route
+                path="/shorts"
+                element={
+                  <FeedLayout>
+                    <MainLayout>
+                      <AiShorts />
+                    </MainLayout>
+                  </FeedLayout>
+                }
+              />
+              <Route
+                path="/tools"
+                element={
+                  <FeedLayout>
+                    <MainLayout>
+                      <ToolsPage />
+                    </MainLayout>
+                  </FeedLayout>
+                }
+              />
+              <Route
+                path="/profile/:id"
+                element={
+                  <FeedLayout>
+                    <MainLayout>
+                      <ProfilePage />
+                    </MainLayout>
+                  </FeedLayout>
+                }
+              />
+              <Route
+                path="/company/:id"
+                element={
+                  <FeedLayout>
+                    <MainLayout>
+                      <CompanyPage />
+                    </MainLayout>
+                  </FeedLayout>
+                }
+              />
+              <Route
+                path="/search"
+                element={
+                  <FeedLayout>
+                    <MainLayout>
+                      <SearchResults />
+                    </MainLayout>
+                  </FeedLayout>
+                }
+              />
+              
+              {/* Auth routes */}
+              <Route
+                path="/login"
+                element={
+                  <PageLayout>
+                    <Login />
+                  </PageLayout>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <PageLayout>
+                    <Register />
+                  </PageLayout>
+                }
+              />
+              
+              {/* Protected routes */}
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <FeedLayout>
+                      <PageLayout>
+                        <Dashboard />
+                      </PageLayout>
+                    </FeedLayout>
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </GlobalLayout>
+        </Router>
+      </FollowProvider>
     </AuthProvider>
   );
 }

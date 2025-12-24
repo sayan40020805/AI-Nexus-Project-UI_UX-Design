@@ -22,6 +22,16 @@ router.post('/token', authMiddleware, async (req, res) => {
       return res.status(400).json({ msg: 'Session ID is required' });
     }
 
+    // Check if ZEGOCLOUD is configured
+    const config = zegoService.getConfig();
+    if (!config.enabled) {
+      return res.status(503).json({ 
+        msg: 'Live streaming is currently unavailable',
+        error: config.message,
+        zegoConfigured: false
+      });
+    }
+
     // Validate user has permission for this action
     if (!zegoService.hasPermission(req.user.role, role === 'host' ? 'host' : 'join')) {
       return res.status(403).json({ msg: 'Insufficient permissions for this action' });
@@ -43,9 +53,6 @@ router.post('/token', authMiddleware, async (req, res) => {
       role,         // role: 'host' or 'audience'
       86400         // 24 hours expiration
     );
-
-    // Get ZEGOCLOUD configuration for frontend
-    const config = zegoService.getConfig();
 
     console.log(`Token generated for user ${req.user.id}, session ${sessionId}, role ${role}`);
 
@@ -79,8 +86,10 @@ router.get('/config', authMiddleware, async (req, res) => {
     res.json({
       success: true,
       config: {
-        appId: config.appId,
-        environment: config.environment
+        enabled: config.enabled || false,
+        appId: config.appId || null,
+        environment: config.environment,
+        message: config.message
         // Never expose serverSecret
       }
     });
@@ -105,6 +114,16 @@ router.post('/start-stream', authMiddleware, async (req, res) => {
     
     if (!sessionId) {
       return res.status(400).json({ msg: 'Session ID is required' });
+    }
+
+    // Check if ZEGOCLOUD is configured
+    const config = zegoService.getConfig();
+    if (!config.enabled) {
+      return res.status(503).json({ 
+        msg: 'Live streaming is currently unavailable',
+        error: config.message,
+        zegoConfigured: false
+      });
     }
 
     // Find and validate the session
@@ -133,9 +152,6 @@ router.post('/start-stream', authMiddleware, async (req, res) => {
       session.actualStart = new Date();
       await session.save();
     }
-
-    // Get ZEGOCLOUD configuration
-    const config = zegoService.getConfig();
 
     // Broadcast to connected clients that stream started
     const io = req.app.get('io');
@@ -180,6 +196,16 @@ router.post('/join-stream', authMiddleware, async (req, res) => {
     
     if (!sessionId) {
       return res.status(400).json({ msg: 'Session ID is required' });
+    }
+
+    // Check if ZEGOCLOUD is configured
+    const config = zegoService.getConfig();
+    if (!config.enabled) {
+      return res.status(503).json({ 
+        msg: 'Live streaming is currently unavailable',
+        error: config.message,
+        zegoConfigured: false
+      });
     }
 
     // Find the session
@@ -227,8 +253,6 @@ router.post('/join-stream', authMiddleware, async (req, res) => {
         });
       }
     }
-
-    const config = zegoService.getConfig();
 
     console.log(`User ${req.user.id} joined stream ${sessionId}`);
 

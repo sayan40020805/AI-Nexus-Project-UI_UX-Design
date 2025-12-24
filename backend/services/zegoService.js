@@ -10,9 +10,13 @@ class ZEGOService {
   constructor() {
     this.appId = process.env.ZEGO_APP_ID;
     this.serverSecret = process.env.ZEGO_SERVER_SECRET;
+    this.enabled = !!(this.appId && this.serverSecret);
     
-    if (!this.appId || !this.serverSecret) {
-      throw new Error('ZEGOCLOUD credentials not found in environment variables');
+    if (!this.enabled) {
+      console.warn('ZEGOCLOUD credentials not found. Live streaming functionality will be disabled.');
+      console.warn('To enable live streaming, please add these environment variables:');
+      console.warn('ZEGO_APP_ID=1606771526');
+      console.warn('ZEGO_SERVER_SECRET=your_server_secret_from_zegocloud');
     }
   }
 
@@ -25,6 +29,10 @@ class ZEGOService {
    * @returns {string} ZEGOCLOUD token
    */
   generateToken(userId, roomId, role = 'audience', expireTime = 86400) {
+    if (!this.enabled) {
+      throw new Error('ZEGOCLOUD is not configured. Please add ZEGO_SERVER_SECRET to environment variables.');
+    }
+
     try {
       // Generate timestamp for token
       const timestamp = Math.floor(Date.now() / 1000);
@@ -120,7 +128,15 @@ class ZEGOService {
    * @returns {object} Configuration for frontend
    */
   getConfig() {
+    if (!this.enabled) {
+      return {
+        enabled: false,
+        message: 'ZEGOCLOUD not configured. Please add ZEGO_SERVER_SECRET to environment variables.'
+      };
+    }
+
     return {
+      enabled: true,
       appId: this.appId,
       // Never expose serverSecret to frontend
       environment: process.env.NODE_ENV || 'development'

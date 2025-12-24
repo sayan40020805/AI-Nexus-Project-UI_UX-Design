@@ -1,11 +1,12 @@
 const express = require('express');
 const User = require('../models/User');
+const FollowService = require('../services/followService');
 const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 
 // ========================
-// GLOBAL SEARCH (USERS & COMPANIES)
+// GLOBAL SEARCH (USERS & COMPANIES) - Enhanced with Follow Status
 // ========================
 router.get('/', authMiddleware, async (req, res) => {
   try {
@@ -38,9 +39,9 @@ router.get('/', authMiddleware, async (req, res) => {
     // Calculate skip for pagination
     const skip = (page - 1) * limit;
     
-    // Execute search
+    // Execute search with enhanced fields
     const results = await User.find(filter)
-      .select('username companyName profilePicture companyLogo role createdAt')
+      .select('username companyName profilePicture companyLogo role createdAt bio companyDescription')
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip(skip);
@@ -48,25 +49,41 @@ router.get('/', authMiddleware, async (req, res) => {
     // Get total count for pagination
     const total = await User.countDocuments(filter);
     
-    // Format results
+    // Get follow status for all results in batch
+    const userIds = results.map(user => user._id.toString());
+    const followStatusMap = await FollowService.checkMultipleFollowStatus(req.user.id, userIds);
+    
+    // Format results with follow status
     const formattedResults = results.map(user => {
+      const followStatus = followStatusMap[user._id.toString()] || { isFollowing: false, followId: null };
+      
       if (user.role === 'user') {
         return {
           id: user._id,
           type: 'user',
           name: user.username,
+          displayName: user.username, // Alternative name field
           profilePicture: user.profilePicture,
+          bio: user.bio,
           createdAt: user.createdAt,
-          // Add additional user fields if needed
+          isFollowing: followStatus.isFollowing,
+          followId: followStatus.followId,
+          // Add follower count
+          followerCount: 0, // Will be populated if needed
         };
       } else {
         return {
           id: user._id,
           type: 'company',
           name: user.companyName,
+          displayName: user.companyName, // Alternative name field
           profilePicture: user.companyLogo,
+          bio: user.companyDescription,
           createdAt: user.createdAt,
-          // Add additional company fields if needed
+          isFollowing: followStatus.isFollowing,
+          followId: followStatus.followId,
+          // Add follower count
+          followerCount: 0, // Will be populated if needed
         };
       }
     });
@@ -79,7 +96,8 @@ router.get('/', authMiddleware, async (req, res) => {
         total
       },
       query: query.trim(),
-      searchType: type || 'all'
+      searchType: type || 'all',
+      searchTimestamp: new Date().toISOString()
     });
     
   } catch (err) {

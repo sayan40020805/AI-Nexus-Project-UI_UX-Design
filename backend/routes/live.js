@@ -8,6 +8,46 @@ const router = express.Router();
 // ========================
 // GET ACTIVE LIVE SESSIONS
 // ========================
+router.get('/active', authMiddleware, async (req, res) => {
+  try {
+    // Get only live sessions
+    const sessions = await LiveSession.find({
+      status: 'live'
+    })
+      .populate('streamer', 'username companyName profilePicture companyLogo role')
+      .sort({ actualStart: -1 });
+    
+    res.json({ sessions });
+    
+  } catch (err) {
+    console.error('Get active live sessions error:', err);
+    res.status(500).json({ msg: 'Server error getting active live sessions' });
+  }
+});
+
+// ========================
+// GET UPCOMING LIVE SESSIONS
+// ========================
+router.get('/upcoming', authMiddleware, async (req, res) => {
+  try {
+    // Get only scheduled sessions
+    const sessions = await LiveSession.find({
+      status: 'scheduled'
+    })
+      .populate('streamer', 'username companyName profilePicture companyLogo role')
+      .sort({ scheduledStart: 1 });
+    
+    res.json({ sessions });
+    
+  } catch (err) {
+    console.error('Get upcoming live sessions error:', err);
+    res.status(500).json({ msg: 'Server error getting upcoming live sessions' });
+  }
+});
+
+// ========================
+// GET ALL LIVE SESSIONS (ORIGINAL)
+// ========================
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;

@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { ChevronRight, Sparkles, Search, User, X, HelpCircle, BarChart3, Video, Radio, FileText } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useFollow } from '../context/FollowContext';
+import { SearchDropdown } from './Search';
 import '../styles/ModernSidebar.css';
 
 export function ModernSidebar({ sidebarOpen, setSidebarOpen }) {
@@ -12,6 +14,7 @@ export function ModernSidebar({ sidebarOpen, setSidebarOpen }) {
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeoutRef = useRef(null);
   const { user, token } = useAuth();
+  const { initializeFollowStatus } = useFollow();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -31,7 +34,7 @@ export function ModernSidebar({ sidebarOpen, setSidebarOpen }) {
     return location.pathname;
   };
 
-  // Search functionality
+  // Enhanced search functionality with follow integration
   const performSearch = async (query) => {
     if (!query.trim() || !token) {
       setSearchResults([]);
@@ -50,12 +53,21 @@ export function ModernSidebar({ sidebarOpen, setSidebarOpen }) {
 
       if (response.ok) {
         const data = await response.json();
-        setSearchResults(data.results || []);
+        const results = data.results || [];
+        
+        // Initialize follow status for search results
+        initializeFollowStatus(results);
+        
+        setSearchResults(results);
         setShowSearchResults(true);
+      } else {
+        setSearchResults([]);
+        setShowSearchResults(false);
       }
     } catch (error) {
       console.error('Search error:', error);
       setSearchResults([]);
+      setShowSearchResults(false);
     } finally {
       setIsSearching(false);
     }
@@ -86,6 +98,12 @@ export function ModernSidebar({ sidebarOpen, setSidebarOpen }) {
     setShowSearchResults(false);
     setSearchQuery('');
     setOpen(false);
+  };
+
+  const handleSearchClose = () => {
+    setShowSearchResults(false);
+    setSearchQuery('');
+    setSearchResults([]);
   };
 
   const handleSearchBlur = () => {
@@ -167,40 +185,20 @@ export function ModernSidebar({ sidebarOpen, setSidebarOpen }) {
               value={searchQuery}
               onChange={handleSearchChange}
               onBlur={handleSearchBlur}
+              onFocus={() => searchQuery && setShowSearchResults(true)}
             />
             {isSearching && <div className="search-spinner">...</div>}
           </div>
           
-          {/* Search Results Dropdown */}
-          {showSearchResults && searchResults.length > 0 && (
-            <div className="search-results-dropdown">
-              {searchResults.map((result) => (
-                <div
-                  key={`${result.type}-${result.id}`}
-                  className="search-result-item"
-                  onClick={() => handleSearchResultClick(result)}
-                >
-                  <div className="search-result-avatar">
-                    <img 
-                      src={result.profilePicture || '/default-avatar.svg'} 
-                      alt={result.name}
-                      onError={(e) => { e.target.src = '/default-avatar.svg'; }}
-                    />
-                  </div>
-                  <div className="search-result-info">
-                    <div className="search-result-name">{result.name}</div>
-                    <div className="search-result-type">{result.type}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-          
-          {showSearchResults && searchQuery && searchResults.length === 0 && !isSearching && (
-            <div className="search-results-dropdown">
-              <div className="search-no-results">No results found</div>
-            </div>
-          )}
+          {/* Enhanced Search Results Dropdown */}
+          <SearchDropdown
+            isOpen={showSearchResults}
+            results={searchResults}
+            isLoading={isSearching}
+            query={searchQuery}
+            onResultClick={handleSearchResultClick}
+            onClose={handleSearchClose}
+          />
 
           <button className="quick-action-btn profile-btn" onClick={handleProfileClick}>
             <User className="h-4 w-4" />

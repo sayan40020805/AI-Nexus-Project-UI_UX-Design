@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useSearchParams } from 'react-router-dom';
 import { Radio, Users, Eye, MessageCircle, ThumbsUp, Share2, Settings, Mic, MicOff, Video, VideoOff, Phone, PhoneOff } from 'lucide-react';
 import '../../styles/Live.css';
 
@@ -117,6 +118,7 @@ const chatMessages = [
 
 
 export function Live() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [liveStreams, setLiveStreams] = useState([]);
   const [upcomingStreams, setUpcomingStreams] = useState([]);
   const [selectedStream, setSelectedStream] = useState(null);
@@ -127,6 +129,7 @@ export function Live() {
   const [chatMessages, setChatMessages] = useState([]);
   const [showChat, setShowChat] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [isCreatingSession, setIsCreatingSession] = useState(false);
   const [creatingSessionData, setCreatingSessionData] = useState({
     title: '',
@@ -137,10 +140,15 @@ export function Live() {
 
   // Fetch live streams
   const fetchLiveStreams = async () => {
-    if (!token) return;
+    if (!token) {
+      setError('Please log in to view live streams');
+      setLoading(false);
+      return;
+    }
     
     try {
       setLoading(true);
+      setError('');
       
       // Fetch live sessions
       const liveResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/live/active`, {
@@ -166,8 +174,8 @@ export function Live() {
           isLive: true,
           thumbnail: session.thumbnail || 'https://images.unsplash.com/photo-1625314887424-9f190599bd56?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxBSSUyMHJvYm90JTIwZnV0dXJpc3RpY3xlbnwxfHx8fDE3NjUyNjMwODZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
           tags: session.tags || [],
-          startTime: new Date(session.startTime).toLocaleTimeString(),
-          duration: calculateDuration(session.startTime),
+          startTime: session.actualStart ? new Date(session.actualStart).toLocaleTimeString() : 'Now',
+          duration: session.actualStart ? calculateDuration(session.actualStart) : '0m',
           _id: session._id,
           streamer: session.streamer
         }));
@@ -178,6 +186,9 @@ export function Live() {
         if (formattedLiveStreams.length > 0 && !selectedStream) {
           setSelectedStream(formattedLiveStreams[0]);
         }
+      } else {
+        console.warn('Failed to fetch live sessions:', liveResponse.status);
+        setLiveStreams([]);
       }
 
       // Fetch upcoming sessions
@@ -198,18 +209,21 @@ export function Live() {
           title: session.title,
           streamer: session.streamer?.companyName || session.streamer?.username || 'Unknown',
           streamerAvatar: session.streamer?.companyLogo || session.streamer?.profilePicture || '🎥',
-          scheduledTime: new Date(session.scheduledTime).toLocaleTimeString(),
+          scheduledTime: session.scheduledStart ? new Date(session.scheduledStart).toLocaleTimeString() : 'TBD',
           description: session.description || '',
           category: session.category || 'General',
           _id: session._id
         }));
         
         setUpcomingStreams(formattedUpcomingStreams);
+      } else {
+        console.warn('Failed to fetch upcoming sessions:', upcomingResponse.status);
+        setUpcomingStreams([]);
       }
       
     } catch (err) {
       console.error('Fetch live streams error:', err);
-      // Fallback to empty arrays if API fails
+      setError('Failed to load live streams. Please try again later.');
       setLiveStreams([]);
       setUpcomingStreams([]);
     } finally {
@@ -264,19 +278,19 @@ export function Live() {
         
         // Format the new session for display
         const formattedSession = {
-          id: newSession.session._id,
-          title: newSession.session.title,
+          id: newSession._id,
+          title: newSession.title,
           streamer: user.companyName || 'Company',
           streamerAvatar: user.companyLogo || '🎥',
           viewers: 0,
-          description: newSession.session.description || '',
-          category: newSession.session.category || 'General',
+          description: newSession.description || '',
+          category: newSession.category || 'General',
           isLive: true,
           thumbnail: 'https://images.unsplash.com/photo-1625314887424-9f190599bd56?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxBSSUyMHJvYm90JTIwZnV0dXJpc3RpY3xlbnwxfHx8fDE3NjUyNjMwODZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
           tags: [],
-          startTime: new Date(newSession.session.startTime).toLocaleTimeString(),
+          startTime: new Date(newSession.actualStart).toLocaleTimeString(),
           duration: '0m',
-          _id: newSession.session._id,
+          _id: newSession._id,
           streamer: user
         };
         
@@ -347,12 +361,98 @@ export function Live() {
     fetchLiveStreams();
   }, [token]);
 
+  // Handle action parameter (for auto-creating live sessions)
+  useEffect(() => {
+    const action = searchParams.get('action');
+    if (action === 'start' && user?.role === 'company' && !isCreatingSession) {
+      // Auto-prompt for session creation when coming from "Go Live" button
+      const timer = setTimeout(() => {
+        const title = prompt('Enter live session title:');
+        if (title && title.trim()) {
+          createLiveSession({ title: title.trim(), description: '' });
+        }
+      }, 1000); // Small delay to allow page to load
+      
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams, user, isCreatingSession]);
+
   // Auto-join first stream if user is viewer
   useEffect(() => {
     if (selectedStream && token && user?.role === 'user') {
       joinLiveSession(selectedStream._id);
     }
   }, [selectedStream, token, user]);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="live-container">
+        <div className="live-loading">
+          <div className="live-loading-spinner"></div>
+          <p>Loading live streams...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="live-container">
+        <div className="live-error">
+          <div className="live-error-icon">⚠️</div>
+          <h2>Unable to load live streams</h2>
+          <p>{error}</p>
+          <button 
+            className="live-error-retry"
+            onClick={fetchLiveStreams}
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show empty state if no streams
+  if (liveStreams.length === 0 && upcomingStreams.length === 0) {
+    return (
+      <div className="live-container">
+        <div className="live-header">
+          <div className="live-title">
+            <Radio className="w-6 h-6" />
+            <h1>Live Streams</h1>
+            <span className="live-status">
+              <span className="live-indicator"></span>
+              0 live now
+            </span>
+          </div>
+        </div>
+        <div className="live-empty">
+          <div className="live-empty-icon">📺</div>
+          <h2>No live streams available</h2>
+          <p>Be the first to start a live session!</p>
+          {user?.role === 'company' && (
+            <button 
+              className="live-empty-cta"
+              onClick={() => {
+                const title = prompt('Enter live session title:');
+                if (title && title.trim()) {
+                  setCreatingSessionData(prev => ({ ...prev, title: title.trim() }));
+                  createLiveSession();
+                }
+              }}
+              disabled={isCreatingSession}
+            >
+              <Radio className="w-4 h-4" />
+              {isCreatingSession ? 'Creating...' : 'Start First Live Stream'}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="live-container">
@@ -372,8 +472,9 @@ export function Live() {
               className="live-action-btn"
               onClick={() => {
                 const title = prompt('Enter live session title:');
-                if (title) {
-                  createLiveSession({ title, description: '' });
+                if (title && title.trim()) {
+                  setCreatingSessionData(prev => ({ ...prev, title: title.trim() }));
+                  createLiveSession();
                 }
               }}
               disabled={isCreatingSession}
