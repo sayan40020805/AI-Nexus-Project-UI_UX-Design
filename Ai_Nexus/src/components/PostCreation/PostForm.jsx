@@ -4,11 +4,10 @@ import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { FeedContext } from '../../context/FeedContext';
 import PostTypeSelector from './PostTypeSelector';
-import AiNewsForm from './forms/AiNewsForm';
-import AiShortsForm from './forms/AiShortsForm';
-import AiModelsForm from './forms/AiModelsForm';
-import AiShowcaseForm from './forms/AiShowcaseForm';
-import NormalPostForm from './forms/NormalPostForm';
+import PhotoPostForm from './forms/PhotoPostForm';
+import ShortsPostForm from './forms/ShortsPostForm';
+import VideoPostForm from './forms/VideoPostForm';
+import AIModelPostForm from './forms/AIModelPostForm';
 import PostTypeAnimation from './PostTypeAnimation';
 import './PostCreation.css';
 
@@ -24,10 +23,10 @@ const PostForm = () => {
   // Post type mapping for navigation
   const getPostTypeNavigation = (postType) => {
     const typeMap = {
-      'ai_news': '/news',
-      'ai_shorts': '/shorts',
-      'ai_models': '/models',
-      'ai_showcase': '/showcase'
+      'normal': '/', // Photo posts show on home page
+      'ai_short': '/shorts', // Shorts show on shorts page
+      'ai_showcase': '/', // Video showcase shows on home page  
+      'ai_models': '/models' // AI Models show on models page
     };
     return typeMap[postType] || '/';
   };
@@ -43,8 +42,9 @@ const PostForm = () => {
       return;
     }
 
-    // Role-based restrictions
-    const restrictedTypesForUsers = ['ai_news', 'career', 'event'];
+    // Role-based restrictions (currently no restrictions for new post types)
+    // All users can create photo, shorts, video, and ai_model posts
+    const restrictedTypesForUsers = [];
     if (user.role === 'user' && restrictedTypesForUsers.includes(data.postType)) {
       alert('Only company accounts can create this type of post');
       return;
@@ -84,6 +84,13 @@ const PostForm = () => {
         data.media.images.forEach((file) => {
           if (file instanceof File) formData.append('media', file);
         });
+      }
+
+      // Support `media.video` object shape (used by ShortsPostForm and VideoPostForm)
+      if (data.media && data.media.video) {
+        if (data.media.video instanceof File) {
+          formData.append('media', data.media.video);
+        }
       }
 
       const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/posts`, {
@@ -130,7 +137,21 @@ const PostForm = () => {
         setFormSubmitted(false);
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.msg || 'Failed to create post');
+        console.error('Post creation failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData
+        });
+        
+        // Enhanced error messages
+        let errorMessage = 'Failed to create post';
+        if (errorData.msg) {
+          errorMessage = errorData.msg;
+        } else if (errorData.validationErrors) {
+          errorMessage = `Validation error: ${errorData.validationErrors.map(e => e.field + ': ' + e.message).join(', ')}`;
+        }
+        
+        throw new Error(errorMessage);
       }
     } catch (error) {
       console.error('Post creation error:', error);
@@ -144,16 +165,14 @@ const PostForm = () => {
     const formProps = { onSubmit: handleFormSubmit };
 
     switch (selectedType) {
-      case 'normal':
-        return <NormalPostForm {...formProps} />;
-      case 'ai_news':
-        return <AiNewsForm {...formProps} />;
-      case 'ai_shorts':
-        return <AiShortsForm {...formProps} />;
-      case 'ai_models':
-        return <AiModelsForm {...formProps} />;
-      case 'ai_showcase':
-        return <AiShowcaseForm {...formProps} />;
+      case 'photo':
+        return <PhotoPostForm {...formProps} />;
+      case 'shorts':
+        return <ShortsPostForm {...formProps} />;
+      case 'video':
+        return <VideoPostForm {...formProps} />;
+      case 'ai_model':
+        return <AIModelPostForm {...formProps} />;
       default:
         return null;
     }
@@ -166,21 +185,15 @@ const PostForm = () => {
         <p>Share your thoughts and content with the community</p>
       </div>
 
-      <div className="post-form-layout">
-        <div className="post-form-left">
-          <PostTypeSelector selectedType={selectedType} onTypeChange={handleTypeChange} />
+      <PostTypeSelector selectedType={selectedType} onTypeChange={handleTypeChange} />
 
-          {selectedType && (
-            <div className={`form-wrapper ${formSubmitted ? 'submitting' : ''}`}>
-              {renderForm()}
-            </div>
-          )}
+      {selectedType && (
+        <div className="form-section">
+          {renderForm()}
         </div>
+      )}
 
-        <div className="post-form-right">
-          <PostTypeAnimation selectedType={selectedType} />
-        </div>
-      </div>
+      <PostTypeAnimation selectedType={selectedType} />
     </div>
   );
 };

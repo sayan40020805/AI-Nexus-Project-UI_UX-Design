@@ -54,12 +54,12 @@ const fetchWithRetry = async (url, options, maxRetries = 2) => {
   throw new Error('Max retries exceeded');
 };
 
-// Get all events with filtering
+// Get all events with filtering (PUBLIC ENDPOINT - NO AUTH)
 export const getEvents = async (params = {}) => {
   try {
     const queryParams = new URLSearchParams(params);
     const response = await fetchWithRetry(`${API_URL}/api/events?${queryParams}`, {
-      headers: getAuthHeaders()
+      headers: { 'Content-Type': 'application/json' } // No auth headers for public endpoint
     });
     
     if (!response.ok) {

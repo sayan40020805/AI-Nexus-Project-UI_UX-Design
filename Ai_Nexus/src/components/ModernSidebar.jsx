@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { ChevronRight, Sparkles, Search, User, X, HelpCircle, BarChart3, Video, Radio, FileText } from 'lucide-react';
+import { ChevronRight, Sparkles, Search, User, X, HelpCircle, BarChart3, Video, Radio, FileText, Home } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useFollow } from '../context/FollowContext';
@@ -134,7 +134,7 @@ export function ModernSidebar({ sidebarOpen, setSidebarOpen }) {
   }, [isControlled, setOpen]);
 
   const sidebarItems = [
-    { id: 'tools', label: 'AI Tools', icon: Sparkles, path: '/tools' },
+    { id: 'home', label: 'Home Feed', icon: Home, path: '/' },
     { id: 'quiz', label: 'Quiz', icon: HelpCircle, path: '/quiz' },
     { id: 'ats', label: 'ATS Score', icon: BarChart3, path: '/ats' },
     { id: 'shorts', label: 'AI Shorts', icon: Video, path: '/shorts' },

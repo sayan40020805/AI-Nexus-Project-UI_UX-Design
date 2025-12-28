@@ -6,32 +6,20 @@ const { authMiddleware } = require('../middleware/auth');
 const router = express.Router();
 
 // ========================
-// GET PERSONALIZED HOME FEED
+// GET PUBLIC HOME FEED (All Users See All Public Posts)
 // ========================
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
     
-    // Get list of users/companies that current user follows
-    const following = await Follow.find({ follower: req.user.id })
-      .select('following')
-      .lean();
-    
-    // Extract just the IDs
-    const followingIds = following.map(f => f.following);
-    
-    // Ensure the feed includes the current user's own posts even if they follow no one
-    if (!followingIds.includes(req.user.id)) followingIds.push(req.user.id);
-
-    // Build filter to get posts from followed users (and self)
+    // PUBLIC FEED: Show ALL public posts from ALL users (Facebook-like behavior)
     const filter = {
-      author: { $in: followingIds },
       isPublic: true
     };
     
     const skip = (page - 1) * limit;
     
-    // Get posts from followed users, sorted by creation date (latest first)
+    // Get all public posts, sorted by creation date (latest first)
     const posts = await Post.find(filter)
       .populate('author', 'username companyName profilePicture companyLogo role')
       .sort({ createdAt: -1 })
@@ -80,8 +68,7 @@ router.get('/', authMiddleware, async (req, res) => {
         current: parseInt(page),
         pages: Math.ceil(total / limit),
         total
-      },
-      followingCount: followingIds.length
+      }
     });
     
   } catch (err) {

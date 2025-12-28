@@ -29,6 +29,7 @@ export function Header() {
 
   const navItems = [
     { id: 'home', label: 'Home', path: '/' },
+    { id: 'shorts', label: 'Shorts', path: '/shorts' },
     // { id: 'news', label: 'AI News', path: '/news' },
     { id: 'showcase', label: 'Showcase', path: '/showcase' },
     { id: 'models', label: 'Models', path: '/models' },

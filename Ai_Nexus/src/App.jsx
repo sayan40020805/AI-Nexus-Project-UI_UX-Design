@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Header } from './components/Header';
 import { ModernSidebar } from './components/ModernSidebar';
 import { Hero } from './components/Hero';
+import Home from './pages/Home/Home';
 import AIShowcasePage from './pages/AIShowcase/AIShowcase';
 import AINews from './pages/AINews/AINews';
 import AIModels from './pages/AIModels/AIModels';
@@ -84,7 +85,7 @@ function App() {
                 element={
                   <FeedLayout>
                     <MainLayout>
-                      <Hero />
+                      <Home />
                     </MainLayout>
                   </FeedLayout>
                 } 

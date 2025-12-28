@@ -3,39 +3,32 @@ import './PostCreation.css';
 
 const POST_TYPES = [
   {
-    id: 'normal',
-    label: 'Post',
-    description: 'Share photos and thoughts',
-    icon: '📝',
+    id: 'photo',
+    label: 'Photo Post',
+    description: 'Share photos with captions and hashtags',
+    icon: '📸',
     color: '#6366F1',
   },
   {
-    id: 'ai_news',
-    label: 'AI News',
-    description: 'Share latest AI news and updates',
-    icon: '📰',
-    color: '#FF6B6B',
-  },
-  {
-    id: 'ai_shorts',
-    label: 'AI Shorts',
-    description: 'Create quick video content',
+    id: 'shorts',
+    label: 'Shorts Post',
+    description: 'Quick video content (max 60s)',
     icon: '🎬',
     color: '#4ECDC4',
   },
   {
-    id: 'ai_models',
-    label: 'AI Models',
+    id: 'video',
+    label: 'Video Post',
+    description: 'Regular video with title and description',
+    icon: '🎥',
+    color: '#FFD93D',
+  },
+  {
+    id: 'ai_model',
+    label: 'AI Model Post',
     description: 'Showcase AI models and tools',
     icon: '🤖',
     color: '#95E1D3',
-  },
-  {
-    id: 'ai_showcase',
-    label: 'AI Showcase',
-    description: 'Long-form video content',
-    icon: '🎥',
-    color: '#FFD93D',
   },
 ];
 
@@ -52,6 +45,7 @@ const PostTypeSelector = ({ selectedType, onTypeChange }) => {
             style={{
               '--card-color': type.color,
             }}
+            data-type={type.id}
           >
             <div className="card-icon">{type.icon}</div>
             <div className="card-label">{type.label}</div>

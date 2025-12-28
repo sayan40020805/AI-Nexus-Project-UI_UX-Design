@@ -414,6 +414,7 @@ const settingsRouter = require('./routes/settings');
 const jobsRouter = require('./routes/jobs');
 const jobApplicationsRouter = require('./routes/jobApplications');
 const eventsRouter = require('./routes/events');
+const chatRouter = require('./routes/chat');
 
 app.use('/api/auth', authRouter);
 app.use('/api/company', companyRouter);

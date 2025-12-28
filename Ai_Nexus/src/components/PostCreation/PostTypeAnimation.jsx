@@ -23,38 +23,32 @@ const PostTypeAnimation = ({ selectedType }) => {
 
     const getAnimationConfig = (type) => {
       const configs = {
-        normal: {
-          color: '#6B73FF',
+        photo: {
+          color: '#6366F1',
           shape: 'pyramid',
           speed: 1.2,
-          emoji: '📝',
+          emoji: '📸',
         },
-        ai_news: {
-          color: '#FF6B6B',
-          shape: 'newspaper',
-          speed: 0.5,
-          emoji: '📰',
-        },
-        ai_shorts: {
+        shorts: {
           color: '#4ECDC4',
           shape: 'film',
           speed: 1.5,
           emoji: '🎬',
         },
-        ai_models: {
-          color: '#95E1D3',
-          shape: 'cube',
-          speed: 1,
-          emoji: '🤖',
-        },
-        ai_showcase: {
+        video: {
           color: '#FFD93D',
           shape: 'sphere',
           speed: 0.8,
           emoji: '🎥',
         },
+        ai_model: {
+          color: '#95E1D3',
+          shape: 'cube',
+          speed: 1,
+          emoji: '🤖',
+        },
       };
-      return configs[type];
+      return configs[type] || configs.photo; // fallback to photo
     };
 
     const config = getAnimationConfig(selectedType);
@@ -280,11 +274,10 @@ const PostTypeAnimation = ({ selectedType }) => {
         <>
           <canvas ref={canvasRef} className="animation-canvas" />
           <div className="animation-label">
-            {selectedType === 'normal' && '📝 Normal Post'}
-            {selectedType === 'ai_news' && '📰 AI News'}
-            {selectedType === 'ai_shorts' && '🎬 AI Shorts'}
-            {selectedType === 'ai_models' && '🤖 AI Models'}
-            {selectedType === 'ai_showcase' && '🎥 AI Showcase'}
+            {selectedType === 'photo' && '📸 Photo Post'}
+            {selectedType === 'shorts' && '🎬 Shorts Post'}
+            {selectedType === 'video' && '🎥 Video Post'}
+            {selectedType === 'ai_model' && '🤖 AI Model Post'}
           </div>
         </>
       ) : (
