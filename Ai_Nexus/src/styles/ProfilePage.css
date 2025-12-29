@@ -1,0 +1,389 @@
+/* Profile Page Styles */
+.profile-page {
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+.profile-loading,
+.profile-error,
+.profile-not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  gap: 1rem;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e2e8f0;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.profile-header {
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.profile-cover {
+  height: 200px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+}
+
+.cover-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: white;
+  opacity: 0.7;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.cover-placeholder:hover {
+  opacity: 1;
+}
+
+.profile-info {
+  padding: 0 24px 24px;
+  position: relative;
+}
+
+.profile-avatar-section {
+  display: flex;
+  justify-content: center;
+  margin-top: -50px;
+  margin-bottom: 16px;
+}
+
+.profile-avatar {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 4px solid white;
+  overflow: hidden;
+  background: #e2e8f0;
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-edit-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.avatar-edit-btn:hover {
+  background: #2563eb;
+}
+
+.profile-details {
+  text-align: center;
+}
+
+.profile-name-section {
+  margin-bottom: 12px;
+}
+
+.profile-name {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0 0 4px 0;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.verified-badge {
+  color: #3b82f6;
+  font-weight: bold;
+}
+
+.profile-handle {
+  color: #6b7280;
+  margin: 0;
+  font-size: 16px;
+}
+
+.profile-bio {
+  margin-bottom: 16px;
+}
+
+.profile-bio p {
+  color: #4b5563;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.profile-meta {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.profile-stats {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: 20px;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.edit-profile-btn,
+.settings-btn,
+.message-btn,
+.follow-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.edit-profile-btn,
+.message-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.edit-profile-btn:hover,
+.message-btn:hover {
+  background: #2563eb;
+}
+
+.settings-btn,
+.follow-btn {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.settings-btn:hover,
+.follow-btn:hover {
+  background: #d1d5db;
+}
+
+.profile-content {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.profile-tabs {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.tab-btn.active {
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
+  background: white;
+}
+
+.profile-posts {
+  padding: 24px;
+}
+
+.posts-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profile-post-item {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.no-posts {
+  text-align: center;
+  padding: 48px 24px;
+  color: #6b7280;
+}
+
+.no-posts-icon {
+  margin-bottom: 16px;
+  color: #d1d5db;
+}
+
+.no-posts h3 {
+  margin: 0 0 8px 0;
+  color: #374151;
+  font-size: 18px;
+}
+
+.no-posts p {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+}
+
+.create-post-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background: #3b82f6;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.create-post-btn:hover {
+  background: #2563eb;
+}
+
+.retry-button,
+.back-button {
+  padding: 8px 16px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.retry-button:hover,
+.back-button:hover {
+  background: #2563eb;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profile-cover {
+    height: 150px;
+  }
+  
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+    margin-top: -40px;
+  }
+  
+  .profile-name {
+    font-size: 24px;
+  }
+  
+  .profile-meta {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .profile-stats {
+    gap: 16px;
+  }
+  
+  .profile-actions {
+    flex-direction: column;
+  }
+  
+  .profile-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .tab-btn {
+    flex: none;
+    min-width: 120px;
+  }
+}

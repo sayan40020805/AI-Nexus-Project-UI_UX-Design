@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { ChevronRight, Sparkles, Search, User, X, HelpCircle, BarChart3, Video, Radio, FileText, Home } from 'lucide-react';
+import { ChevronRight, Sparkles, Search, User, X, HelpCircle, BarChart3, Video, FileText, Home } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useFollow } from '../context/FollowContext';
@@ -139,7 +139,6 @@ export function ModernSidebar({ sidebarOpen, setSidebarOpen }) {
     { id: 'ats', label: 'ATS Score', icon: BarChart3, path: '/ats' },
     { id: 'shorts', label: 'AI Shorts', icon: Video, path: '/shorts' },
     { id: 'create-post', label: 'Create Post', icon: FileText, path: '/create-post' },
-    { id: 'live', label: 'Live', icon: Radio, path: '/live' },
   ];
 
   const handleProfileClick = () => {

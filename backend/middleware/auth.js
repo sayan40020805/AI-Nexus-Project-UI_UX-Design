@@ -34,7 +34,15 @@ const authMiddleware = async (req, res, next) => {
     console.log('🔐 Auth Middleware - Token verified successfully, user ID:', decoded.user.id);
     
     // Get user from database (exclude password)
-    const user = await User.findById(decoded.user.id).select('-password');
+    const userId = decoded.user?.id || decoded.id || decoded.userId;
+    console.log('🔐 Auth Middleware - Extracted user ID:', userId);
+    
+    if (!userId) {
+      console.log('🔐 Auth Middleware - No user ID in token, returning 401');
+      return res.status(401).json({ msg: 'Invalid token structure' });
+    }
+    
+    const user = await User.findById(userId).select('-password');
     console.log('🔐 Auth Middleware - User found:', !!user);
     
     if (!user) {
@@ -44,8 +52,11 @@ const authMiddleware = async (req, res, next) => {
 
     console.log('🔐 Auth Middleware - User authenticated successfully:', user.username || user.companyName);
     
-    // Add user to request object
-    req.user = user;
+    // Add user to request object with consistent structure
+    req.user = {
+      ...user.toObject(),
+      id: user._id.toString() // Ensure id field is always available
+    };
     next();
   } catch (err) {
     console.error('🔐 Auth Middleware - Error details:', {

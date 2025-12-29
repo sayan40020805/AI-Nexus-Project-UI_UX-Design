@@ -48,6 +48,15 @@ const PostCard = ({
   // Initialize state from post data
   useEffect(() => {
     if (post) {
+      console.log('🔍 PostCard - Post data received:', {
+        postId: post._id,
+        has_id: !!post._id,
+        has_id_type: typeof post._id,
+        postKeys: Object.keys(post),
+        postContent: post.content?.substring(0, 50),
+        hasAuthor: !!post.author
+      });
+      
       setIsLiked(post.isLiked || false);
       setLikesCount(post.likes?.length || 0);
       setCommentsCount(post.comments?.length || 0);
@@ -57,8 +66,13 @@ const PostCard = ({
     }
   }, [post]);
 
-  // Check if current user is the author
-  const isAuthor = user && post?.author?._id === user._id;
+  // Helper function to get post ID (handles both _id and id fields)
+  const getPostId = () => {
+    return post?._id || post?.id;
+  };
+
+  // Check if current user is the author (handle both _id and id formats)
+  const isAuthor = user && post?.author && (post.author._id === user._id || post.author.id === user.id);
   const canEdit = isAuthor;
   const canDelete = isAuthor;
   const canModerate = user?.role === 'company' || user?.role === 'admin';
@@ -76,7 +90,7 @@ const PostCard = ({
       setIsLiked(newIsLiked);
       setLikesCount(prev => newIsLiked ? prev + 1 : prev - 1);
       
-      await likePost(post._id);
+      await likePost(getPostId());
     } catch (err) {
       // Revert optimistic update on error
       setIsLiked(!isLiked);
@@ -96,7 +110,7 @@ const PostCard = ({
       setIsLoading(true);
       setError(null);
       
-      const newComment = await commentOnPost(post._id, content.trim());
+      const newComment = await commentOnPost(getPostId(), content.trim());
       
       // Update local state
       setCommentsCount(prev => prev + 1);
@@ -132,7 +146,7 @@ const PostCard = ({
         setSharesCount(1);
       }
       
-      await sharePost(post._id);
+      await sharePost(getPostId());
     } catch (err) {
       setSharesCount(prev => prev > 0 ? prev - 1 : 0);
       setError('Failed to share post. Please try again.');
@@ -154,7 +168,7 @@ const PostCard = ({
       setIsSaved(!isSaved);
       
       // TODO: Implement save/bookmark API call
-      // await savePost(post._id);
+      // await savePost(getPostId());
       
     } catch (err) {
       // Revert optimistic update
@@ -174,6 +188,26 @@ const PostCard = ({
 
   // Handle delete
   const handleDelete = async () => {
+    // Defensive check: ensure post and post ID exist
+    if (!post) {
+      console.error('🗑️ Frontend - No post object provided');
+      setError('Post data is missing. Please refresh the page.');
+      return;
+    }
+    
+    const postId = getPostId();
+    
+    if (!postId) {
+      console.error('🗑️ Frontend - Post ID is missing:', { 
+        post, 
+        hasId: !!post.id, 
+        has_id: !!post._id,
+        postKeys: Object.keys(post) 
+      });
+      setError('Post ID is missing. Please refresh the page.');
+      return;
+    }
+    
     if (!token || !window.confirm('Are you sure you want to delete this post?')) {
       return;
     }
@@ -182,23 +216,66 @@ const PostCard = ({
       setIsLoading(true);
       setError(null);
       
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/posts/${post._id}`, {
+      console.log('🗑️ Frontend - Starting delete request for post:', postId);
+      console.log('🗑️ Frontend - Token present:', !!token);
+      console.log('🗑️ Frontend - Post object keys:', Object.keys(post));
+      console.log('🗑️ Frontend - Post author:', post.author);
+      
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/posts/${postId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
       
+      console.log('🗑️ Frontend - Response status:', response.status);
+      console.log('🗑️ Frontend - Response ok:', response.ok);
+      
+      const data = await response.json().catch(() => ({}));
+      console.log('🗑️ Frontend - Response data:', data);
+      
       if (response.ok) {
+        console.log('🗑️ Frontend - Delete successful');
         if (onPostDelete) {
-          onPostDelete(post._id);
+          onPostDelete(postId); // Use the validated postId instead of post._id
         }
       } else {
-        throw new Error('Failed to delete post');
+        console.error('🗑️ Frontend - Delete failed with status:', response.status);
+        console.error('🗑️ Frontend - Error data:', data);
+        
+        // Handle specific error types
+        if (response.status === 404) {
+          throw new Error('Post not found. It may have been already deleted.');
+        } else if (response.status === 403) {
+          throw new Error('You are not authorized to delete this post.');
+        } else if (response.status === 401) {
+          throw new Error('Your session has expired. Please log in again.');
+        } else if (data.msg) {
+          throw new Error(data.msg);
+        } else {
+          throw new Error(`Server error (${response.status}): Please try again later.`);
+        }
       }
     } catch (err) {
-      setError('Failed to delete post. Please try again.');
-      console.error('Delete error:', err);
+      console.error('🗑️ Frontend - Delete error:', err);
+      
+      // Provide user-friendly error messages
+      let errorMessage = 'Failed to delete post. Please try again.';
+      
+      if (err.message.includes('not found')) {
+        errorMessage = err.message;
+      } else if (err.message.includes('not authorized')) {
+        errorMessage = err.message;
+      } else if (err.message.includes('session')) {
+        errorMessage = err.message;
+      } else if (err.message.includes('Network')) {
+        errorMessage = 'Network error. Please check your connection and try again.';
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

@@ -1,0 +1,243 @@
+/* ThemeSwitcher.css - Light & Dark Mode Toggle Component */
+
+.theme-switcher {
+  position: relative;
+  display: inline-block;
+}
+
+.theme-switcher-container {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 0.25rem;
+  gap: 0.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+}
+
+.theme-switcher-container:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-accent);
+}
+
+.theme-switcher-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-switcher-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(125, 211, 252, 0.1), transparent);
+  transition: left 0.3s ease;
+}
+
+.theme-switcher-button:hover::before {
+  left: 100%;
+}
+
+.theme-switcher-button:hover {
+  color: var(--text-accent);
+  background-color: var(--bg-secondary);
+  transform: translateY(-1px);
+}
+
+.theme-switcher-button.active {
+  background: var(--button-primary-bg);
+  color: white;
+  box-shadow: var(--glow-subtle);
+}
+
+.theme-switcher-button.active:hover {
+  box-shadow: var(--glow-medium);
+  transform: translateY(-2px);
+}
+
+.theme-switcher-button svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.theme-switcher-label {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .theme-switcher-label {
+    display: inline;
+  }
+}
+
+/* Mobile Compact Version */
+@media (max-width: 639px) {
+  .theme-switcher-container {
+    padding: 0.125rem;
+    gap: 0.125rem;
+  }
+
+  .theme-switcher-button {
+    padding: 0.5rem;
+    min-width: 2.5rem;
+    justify-content: center;
+  }
+
+  .theme-switcher-button svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+}
+
+/* Dropdown version for mobile */
+.theme-switcher-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  padding: 0.5rem;
+  z-index: 50;
+  min-width: 150px;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: all var(--transition-normal);
+}
+
+.theme-switcher-dropdown.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+.theme-switcher-dropdown-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.theme-switcher-dropdown-button:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.theme-switcher-dropdown-button.active {
+  background: var(--button-primary-bg);
+  color: white;
+}
+
+.theme-switcher-dropdown-button svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+/* Compact icon-only version */
+.theme-switcher-compact {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-switcher-compact:hover {
+  background: var(--bg-secondary);
+  border-color: var(--border-accent);
+  box-shadow: var(--glow-subtle);
+}
+
+.theme-switcher-compact svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--text-accent);
+  transition: transform 0.3s ease;
+}
+
+.theme-switcher-compact:hover svg {
+  transform: rotate(15deg) scale(1.1);
+}
+
+/* Animation for theme change */
+@keyframes theme-change-glow {
+  0% {
+    box-shadow: 0 0 0 rgba(125, 211, 252, 0);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(125, 211, 252, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(125, 211, 252, 0);
+  }
+}
+
+.theme-changing {
+  animation: theme-change-glow 0.6s ease-in-out;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .theme-switcher-button,
+  .theme-switcher-compact {
+    transition: none;
+  }
+
+  .theme-switcher-button::before,
+  .theme-switcher-compact svg {
+    transition: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .theme-switcher-container {
+    border: 2px solid var(--text-primary);
+  }
+
+  .theme-switcher-button {
+    border: 1px solid var(--text-primary);
+  }
+
+  .theme-switcher-button.active {
+    border: 2px solid white;
+  }
+}

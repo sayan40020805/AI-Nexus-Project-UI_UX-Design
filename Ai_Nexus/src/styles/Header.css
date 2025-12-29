@@ -1,19 +1,18 @@
-/* Header.css - Clean & Functional Design */
+/* Header.css - Enhanced with Theme System */
 
 .header {
-  background: rgba(10, 10, 10, 0.8);
+  background: var(--navbar-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: var(--border-glow);
+  border-bottom: 1px solid var(--border-light);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 95px;
   z-index: 50;
-  box-shadow: 0 8px 32px rgba(125, 211, 252, 0.15), 
-              0 0 50px rgba(6, 182, 212, 0.1);
-  transition: all 0.3s ease-in-out;
+  box-shadow: var(--shadow-lg);
+  transition: all var(--transition-normal);
 }
 
 

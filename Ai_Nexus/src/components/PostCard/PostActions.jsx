@@ -78,7 +78,7 @@ const PostActions = ({
   // Handle copy link
   const handleCopyLink = async () => {
     try {
-      const postUrl = `${window.location.origin}/post/${'post._id'}`; // TODO: get actual post URL
+      const postUrl = `${window.location.origin}/posts`; // Generic posts URL since post ID not available
       await navigator.clipboard.writeText(postUrl);
       alert('Link copied to clipboard!');
       setShowShareMenu(false);

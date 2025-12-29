@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { FeedContext } from '../../context/FeedContext';
 import PostCard from '../../components/PostCard/PostCard';
-import PostCreation from '../../components/PostCreation/PostForm';
 import { Home as HomeIcon, RefreshCw, Users, Heart, MessageCircle } from 'lucide-react';
 import './Home.css';
 
@@ -90,11 +89,6 @@ const Home = () => {
 
       {/* Main Content */}
       <div className="home-content">
-        {/* Post Creation */}
-        <div className="post-creation-section">
-          <PostCreation />
-        </div>
-
         {/* Error State */}
         {error && (
           <div className="error-state">
@@ -118,29 +112,37 @@ const Home = () => {
           <div className="empty-feed">
             <HomeIcon size={48} className="empty-icon" />
             <h3>No posts yet</h3>
-            <p>Be the first to share something with the community!</p>
-            <PostCreation />
+            <p>Be the first to share something with the community! Visit the Create Post page to get started.</p>
           </div>
         )}
 
         {/* Posts Feed */}
         {posts.length > 0 && (
           <div className="posts-feed">
-            {posts.map((post) => (
-              <div key={post._id} className="feed-post-item">
-                <PostCard 
-                  post={post}
-                  onPostUpdate={(updatedPost) => {
-                    // Handle post updates if needed
-                    console.log('Post updated:', updatedPost);
-                  }}
-                  onPostDelete={(deletedPostId) => {
-                    // Handle post deletion if needed
-                    console.log('Post deleted:', deletedPostId);
-                  }}
-                />
-              </div>
-            ))}
+            {posts.map((post, index) => {
+              console.log(`🏠 Home - Rendering post ${index + 1}:`, {
+                postId: post._id,
+                has_id: !!post._id,
+                content: post.content?.substring(0, 50),
+                author: post.author?.username || post.author?.companyName
+              });
+              
+              return (
+                <div key={post._id || `temp-${index}`} className="feed-post-item">
+                  <PostCard 
+                    post={post}
+                    onPostUpdate={(updatedPost) => {
+                      // Handle post updates if needed
+                      console.log('Post updated:', updatedPost);
+                    }}
+                    onPostDelete={(deletedPostId) => {
+                      // Handle post deletion if needed
+                      console.log('Post deleted:', deletedPostId);
+                    }}
+                  />
+                </div>
+              );
+            })}
           </div>
         )}
 

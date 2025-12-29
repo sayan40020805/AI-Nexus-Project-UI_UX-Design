@@ -21,7 +21,7 @@ const AIShowcase = () => {
       setError(null);
       
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/feed/by-type/showcase?page=1&limit=50`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/feed/by-type/ai_showcase?page=1&limit=50`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,

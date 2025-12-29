@@ -16,8 +16,8 @@ router.get('/', authMiddleware, async (req, res) => {
       return res.status(400).json({ msg: 'Search query is required' });
     }
     
-    if (query.length < 2) {
-      return res.status(400).json({ msg: 'Search query must be at least 2 characters' });
+    if (query.length < 1) {
+      return res.status(400).json({ msg: 'Search query must be at least 1 character' });
     }
     
     // Create search regex for partial, case-insensitive matching
@@ -49,9 +49,17 @@ router.get('/', authMiddleware, async (req, res) => {
     // Get total count for pagination
     const total = await User.countDocuments(filter);
     
-    // Get follow status for all results in batch
-    const userIds = results.map(user => user._id.toString());
-    const followStatusMap = await FollowService.checkMultipleFollowStatus(req.user.id, userIds);
+    // Get follow status for all results in batch (with error handling)
+    let followStatusMap = {};
+    try {
+      const userIds = results.map(user => user._id.toString());
+      if (userIds.length > 0) {
+        followStatusMap = await FollowService.checkMultipleFollowStatus(req.user.id, userIds);
+      }
+    } catch (followError) {
+      console.warn('Follow status check failed:', followError.message);
+      // Continue without follow status - this shouldn't break the search
+    }
     
     // Format results with follow status
     const formattedResults = results.map(user => {

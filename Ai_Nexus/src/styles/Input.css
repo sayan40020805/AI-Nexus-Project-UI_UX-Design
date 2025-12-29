@@ -1,37 +1,34 @@
-/* Input Component Styles */
+/* Input Component Styles - Enhanced with Theme System */
 
 .input {
   display: flex;
   height: 2.25rem;
   width: 100%;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background-color: var(--input-background);
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
   padding: 0 0.75rem;
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.5;
-  color: var(--foreground);
-  transition: all 0.2s ease-in-out;
+  color: var(--text-primary);
+  transition: all var(--transition-normal);
   outline: none;
+  font-family: inherit;
 }
 
 .input::placeholder {
-  color: var(--muted-foreground);
+  color: var(--text-muted);
 }
 
 .input:focus-visible {
-  border-color: var(--ring);
-  box-shadow: 0 0 0 3px var(--ring) / 0.5;
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.1), var(--glow-medium);
 }
 
 .input[aria-invalid="true"] {
-  box-shadow: 0 0 0 3px var(--destructive) / 0.2;
-  border-color: var(--destructive);
-}
-
-.dark .input[aria-invalid="true"] {
-  box-shadow: 0 0 0 3px var(--destructive) / 0.4;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+  border-color: var(--error);
 }
 
 .input:disabled {
@@ -39,11 +36,144 @@
   opacity: 0.5;
 }
 
-.dark .input {
-  background-color: var(--input);
-  border-color: var(--input);
+/* Input Sizes */
+.input-sm {
+  height: 2rem;
+  padding: 0 0.5rem;
+  font-size: 0.75rem;
 }
 
-.dark .input:focus-visible {
-  border-color: var(--ring);
+.input-lg {
+  height: 2.5rem;
+  padding: 0 1rem;
+  font-size: 1rem;
+}
+
+/* Textarea Styles */
+.textarea {
+  display: flex;
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+  transition: all var(--transition-normal);
+  outline: none;
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+}
+
+.textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.textarea:focus-visible {
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.1), var(--glow-medium);
+}
+
+.textarea[aria-invalid="true"] {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+  border-color: var(--error);
+}
+
+.textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Select Styles */
+.select {
+  display: flex;
+  height: 2.25rem;
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+  transition: all var(--transition-normal);
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.select::placeholder {
+  color: var(--text-muted);
+}
+
+.select:focus-visible {
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.1), var(--glow-medium);
+}
+
+.select[aria-invalid="true"] {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+  border-color: var(--error);
+}
+
+.select:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Search Input */
+.search-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input .input {
+  padding-left: 2.5rem;
+}
+
+.search-input .search-icon {
+  position: absolute;
+  left: 0.75rem;
+  width: 1rem;
+  height: 1rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* Input Groups */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.input-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.input-help {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.input-error {
+  font-size: 0.75rem;
+  color: var(--error);
+}
+
+/* Input States */
+.input-glow {
+  box-shadow: var(--glow-subtle);
+}
+
+.input-glow:focus {
+  box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.1), var(--glow-medium);
 }

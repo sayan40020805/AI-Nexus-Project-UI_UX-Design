@@ -46,16 +46,20 @@ router.get('/', authMiddleware, async (req, res) => {
         ) : false
       };
 
-      // Add mediaList with full URLs
-      p.mediaList = [];
+      // Ensure media URLs are properly formatted
       if (p.media) {
         if (Array.isArray(p.media.images) && p.media.images.length) {
-          p.media.images = p.media.images.map(img => `${baseUrl}${img}`);
-          p.media.images.forEach(img => p.mediaList.push({ type: 'image', url: img }));
+          p.media.images = p.media.images.map(img => 
+            img.startsWith('http') ? img : `${baseUrl}${img}`
+          );
         }
         if (p.media.video) {
-          p.media.video = `${baseUrl}${p.media.video}`;
-          p.mediaList.push({ type: 'video', url: p.media.video });
+          p.media.video = p.media.video.startsWith('http') ? 
+            p.media.video : `${baseUrl}${p.media.video}`;
+        }
+        if (p.media.document) {
+          p.media.document = p.media.document.startsWith('http') ? 
+            p.media.document : `${baseUrl}${p.media.document}`;
         }
       }
 
@@ -113,15 +117,20 @@ router.get('/trending', authMiddleware, async (req, res) => {
         ) : false
       };
 
-      p.mediaList = [];
+      // Ensure media URLs are properly formatted
       if (p.media) {
         if (Array.isArray(p.media.images) && p.media.images.length) {
-          p.media.images = p.media.images.map(img => `${baseUrl}${img}`);
-          p.media.images.forEach(img => p.mediaList.push({ type: 'image', url: img }));
+          p.media.images = p.media.images.map(img => 
+            img.startsWith('http') ? img : `${baseUrl}${img}`
+          );
         }
         if (p.media.video) {
-          p.media.video = `${baseUrl}${p.media.video}`;
-          p.mediaList.push({ type: 'video', url: p.media.video });
+          p.media.video = p.media.video.startsWith('http') ? 
+            p.media.video : `${baseUrl}${p.media.video}`;
+        }
+        if (p.media.document) {
+          p.media.document = p.media.document.startsWith('http') ? 
+            p.media.document : `${baseUrl}${p.media.document}`;
         }
       }
 
@@ -180,15 +189,20 @@ router.get('/companies', authMiddleware, async (req, res) => {
         ) : false
       };
 
-      p.mediaList = [];
+      // Ensure media URLs are properly formatted
       if (p.media) {
         if (Array.isArray(p.media.images) && p.media.images.length) {
-          p.media.images = p.media.images.map(img => `${baseUrl}${img}`);
-          p.media.images.forEach(img => p.mediaList.push({ type: 'image', url: img }));
+          p.media.images = p.media.images.map(img => 
+            img.startsWith('http') ? img : `${baseUrl}${img}`
+          );
         }
         if (p.media.video) {
-          p.media.video = `${baseUrl}${p.media.video}`;
-          p.mediaList.push({ type: 'video', url: p.media.video });
+          p.media.video = p.media.video.startsWith('http') ? 
+            p.media.video : `${baseUrl}${p.media.video}`;
+        }
+        if (p.media.document) {
+          p.media.document = p.media.document.startsWith('http') ? 
+            p.media.document : `${baseUrl}${p.media.document}`;
         }
       }
 
@@ -234,6 +248,25 @@ router.get('/by-type/:postType', authMiddleware, async (req, res) => {
     });
     
     // Validate post type - support both frontend and backend post types
+    // Map frontend post types to backend post types
+    const postTypeMap = {
+      'showcase': 'ai_showcase',  // Frontend 'showcase' maps to backend 'ai_showcase'
+      'shorts': 'ai_short',       // Frontend 'shorts' maps to backend 'ai_short' 
+      'ai_short': 'ai_short',
+      'ai_showcase': 'ai_showcase',
+      'normal': 'normal',
+      'ai_news': 'ai_news',
+      'news': 'ai_news',
+      'ai_models': 'ai_models',
+      'model': 'ai_models',
+      'career': 'career',
+      'event': 'event'
+    };
+    
+    // Map the requested post type to backend type
+    const mappedPostType = postTypeMap[postType] || postType;
+    console.log('📋 Feed by-type - Mapped post type:', { original: postType, mapped: mappedPostType });
+    
     const validPostTypes = [
       'normal', 
       'shorts', 
@@ -270,14 +303,17 @@ router.get('/by-type/:postType', authMiddleware, async (req, res) => {
       });
     }
     
+    // Use the mapped post type for database queries
+    const finalPostType = mappedPostType;
+    
     const skip = (page - 1) * limit;
     console.log('📋 Feed by-type - Calculated skip:', skip);
     
     console.log('📋 Feed by-type - Starting database query...');
     
     // Get posts filtered by type
-    const posts = await Post.find({ 
-      postType,
+    const posts = await Post.find({
+      postType: finalPostType,
       isPublic: true
     })
       .populate('author', 'username companyName profilePicture companyLogo role')
@@ -288,8 +324,8 @@ router.get('/by-type/:postType', authMiddleware, async (req, res) => {
     
     console.log('📋 Feed by-type - Database query completed, posts found:', posts.length);
     
-    const total = await Post.countDocuments({ 
-      postType,
+    const total = await Post.countDocuments({
+      postType: finalPostType,
       isPublic: true
     });
     
@@ -381,15 +417,30 @@ router.get('/user/:userId', authMiddleware, async (req, res) => {
         isOwner: post.author._id.toString() === req.user.id
       };
 
-      p.mediaList = [];
+      // Ensure media URLs are properly formatted
       if (p.media) {
+        console.log('🔍 Backend - Post media found:', {
+          postId: p._id,
+          media: p.media,
+          hasImages: p.media.images?.length,
+          hasVideo: p.media.video
+        });
+        
         if (Array.isArray(p.media.images) && p.media.images.length) {
-          p.media.images = p.media.images.map(img => `${baseUrl}${img}`);
-          p.media.images.forEach(img => p.mediaList.push({ type: 'image', url: img }));
+          p.media.images = p.media.images.map(img => 
+            img.startsWith('http') ? img : `${baseUrl}${img}`
+          );
+          console.log('🔍 Backend - Images formatted:', p.media.images);
         }
         if (p.media.video) {
-          p.media.video = `${baseUrl}${p.media.video}`;
-          p.mediaList.push({ type: 'video', url: p.media.video });
+          p.media.video = p.media.video.startsWith('http') ? 
+            p.media.video : `${baseUrl}${p.media.video}`;
+          console.log('🔍 Backend - Video formatted:', p.media.video);
+        }
+        if (p.media.document) {
+          p.media.document = p.media.document.startsWith('http') ? 
+            p.media.document : `${baseUrl}${p.media.document}`;
+          console.log('🔍 Backend - Document formatted:', p.media.document);
         }
       }
 

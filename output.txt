@@ -1,8 +1,0 @@
-I have fixed the issue causing the 'You cannot render a <Router> inside another <Router>' error by removing the duplicate `Router` from `main.jsx`.
-
-The application should now run correctly. Please verify the following by running `npm run dev` in the `Ai_Nexus` directory:
-*   The application starts without the router error.
-*   The sidebar toggle button in the header works.
-*   The 'Login', 'Register', and 'Dashboard' pages are accessible and display correctly.
-*   The 'Dashboard' page has the new 'black with sky glow' theme and enhanced content.
-*   The 3D animation on the 'Register' page is visible.

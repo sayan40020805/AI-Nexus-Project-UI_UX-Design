@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const Post = require('../models/Post');
 const { authMiddleware } = require('../middleware/auth');
 const User = require('../models/User');
@@ -362,23 +363,116 @@ router.put('/:id', authMiddleware, async (req, res) => {
 // ========================
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
+    console.log('🗑️ DELETE POST - Request started');
+    console.log('🗑️ DELETE POST - Post ID:', req.params.id);
+    console.log('🗑️ DELETE POST - User ID:', req.user.id);
+    console.log('🗑️ DELETE POST - User role:', req.user.role);
+    
+    // Validate post ID format
+    const postId = req.params.id;
+    if (!postId || !mongoose.Types.ObjectId.isValid(postId)) {
+      console.log('🗑️ DELETE POST - Invalid post ID format:', postId);
+      return res.status(400).json({ 
+        msg: 'Invalid post ID format',
+        postId: postId 
+      });
+    }
+    
+    console.log('🗑️ DELETE POST - Post ID validation passed');
+    
+    // Find post with author populated for comparison
+    const post = await Post.findById(postId).populate('author', '_id role');
     
     if (!post) {
+      console.log('🗑️ DELETE POST - Post not found:', postId);
       return res.status(404).json({ msg: 'Post not found' });
     }
     
-    // Check if user is the author
-    if (post.author.toString() !== req.user.id) {
-      return res.status(403).json({ msg: 'Not authorized to delete this post' });
+    console.log('🗑️ DELETE POST - Post found:', { 
+      postId: post._id, 
+      authorId: post.author._id,
+      authorRole: post.author.role,
+      postType: post.postType 
+    });
+    
+    // Check if user is the author or has admin role
+    const isAuthor = post.author._id.toString() === req.user.id;
+    const isAdmin = req.user.role === 'admin';
+    const isCompanyModerator = req.user.role === 'company' && post.author.role !== 'company';
+    
+    if (!isAuthor && !isAdmin && !isCompanyModerator) {
+      console.log('🗑️ DELETE POST - Authorization failed:', {
+        isAuthor,
+        isAdmin,
+        isCompanyModerator,
+        userId: req.user.id,
+        postAuthorId: post.author._id
+      });
+      return res.status(403).json({ 
+        msg: 'Not authorized to delete this post',
+        requiredRole: 'author',
+        userRole: req.user.role,
+        isAuthor,
+        isAdmin
+      });
     }
     
-    await Post.findByIdAndDelete(req.params.id);
+    console.log('🗑️ DELETE POST - Authorization passed');
     
-    res.json({ msg: 'Post deleted successfully' });
+    // Delete the post
+    const deleteResult = await Post.findByIdAndDelete(postId);
+    
+    if (!deleteResult) {
+      console.log('🗑️ DELETE POST - Delete operation failed');
+      return res.status(500).json({ msg: 'Failed to delete post' });
+    }
+    
+    console.log('🗑️ DELETE POST - Post deleted successfully:', postId);
+    
+    // Return success response
+    res.json({ 
+      msg: 'Post deleted successfully',
+      deletedPostId: postId,
+      deletedAt: new Date().toISOString()
+    });
+    
   } catch (err) {
-    console.error('Delete post error:', err);
-    res.status(500).json({ msg: 'Server error deleting post' });
+    console.error('🗑️ DELETE POST - Error details:', {
+      message: err.message,
+      name: err.name,
+      code: err.code,
+      stack: err.stack,
+      postId: req.params.id,
+      userId: req.user?.id,
+      requestBody: req.body
+    });
+    
+    // Handle specific MongoDB errors
+    if (err.name === 'CastError') {
+      console.log('🗑️ DELETE POST - Invalid ObjectId format');
+      return res.status(400).json({ 
+        msg: 'Invalid post ID format',
+        error: 'CastError',
+        value: err.value
+      });
+    }
+    
+    if (err.name === 'MongoError' || err.name === 'MongoServerError') {
+      console.log('🗑️ DELETE POST - MongoDB error:', err.code);
+      return res.status(500).json({ 
+        msg: 'Database error deleting post',
+        error: err.name,
+        code: err.code
+      });
+    }
+    
+    // Generic server error
+    res.status(500).json({ 
+      msg: 'Server error deleting post',
+      errorType: err.name,
+      errorMessage: err.message,
+      timestamp: new Date().toISOString()
+    });
   }
 });
 

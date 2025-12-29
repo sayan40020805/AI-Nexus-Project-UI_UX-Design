@@ -28,7 +28,6 @@ import './PostContent.css';
  */
 const PostContent = ({ post, compact = false }) => {
   const [showFullContent, setShowFullContent] = useState(false);
-  const [imageError, setImageError] = useState(false);
   const [showImageLightbox, setShowImageLightbox] = useState(false);
 
   if (!post) return null;
@@ -67,18 +66,16 @@ const PostContent = ({ post, compact = false }) => {
   // Check if content should be truncated
   const shouldTruncateContent = content && content.length > 300 && !showFullContent;
 
-  // Normalize media URL - if not absolute, prefix with API base URL
+  // Normalize media URL - handle both relative and absolute URLs
   const normalizeMediaUrl = (url) => {
     if (!url) return url;
+    
+    // If it's already an absolute URL, return as is
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    const base = import.meta.env.VITE_API_URL || window.location.origin;
-    return `${base}${url.startsWith('/') ? '' : '/'}${url}`.replace(/([^:]\/\/)\//, '$1');
-  };
-
-  // Handle image error
-  const handleImageError = (e) => {
-    console.warn('Image failed to load:', e?.target?.src);
-    setImageError(true);
+    
+    // If it's a relative URL, prefix with API base URL
+    const base = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+    return `${base}${url.startsWith('/') ? '' : '/'}${url}`;
   };
 
   // Handle image click for lightbox
@@ -137,19 +134,15 @@ const PostContent = ({ post, compact = false }) => {
                   className={`post-image ${media.images.length === 1 ? 'single' : ''}`}
                   onClick={() => handleImageClick(image)}
                 >
-                  {!imageError ? (
-                    <img
-                      src={normalizeMediaUrl(image)}
-                      alt={`Post image ${index + 1}`}
-                      onError={handleImageError}
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="image-placeholder">
-                      <Image size={24} />
-                      <span>Image unavailable</span>
-                    </div>
-                  )}
+                  <img
+                    src={normalizeMediaUrl(image)}
+                    alt={`Post image ${index + 1}`}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      console.warn('Image failed to load:', image);
+                    }}
+                    loading="lazy"
+                  />
                 </div>
               ))}
             </div>

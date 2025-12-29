@@ -30,9 +30,38 @@ const upload = multer({
   }
 });
 
-// All routes require authentication and user role
+// Public routes (authentication required but no role restriction)
 router.use(authMiddleware);
+
+// User role restricted routes
 router.use(roleMiddleware('user'));
+
+// ========================
+// GET ANY USER'S PUBLIC PROFILE BY ID (no role restriction)
+// ========================
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Check if user exists
+    const user = await User.findById(id).select('-password');
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    
+    // Prefix stored media paths with base URL if present
+    const userObj = user.toObject();
+    if (userObj.profilePicture) userObj.profilePicture = `${baseUrl}${userObj.profilePicture}`;
+    if (userObj.companyLogo) userObj.companyLogo = `${baseUrl}${userObj.companyLogo}`;
+    
+    res.json(userObj);
+  } catch (err) {
+    console.error('Get user profile by ID error:', err);
+    res.status(500).json({ msg: 'Server error getting user profile' });
+  }
+});
 
 // ========================
 // GET USER PROFILE
