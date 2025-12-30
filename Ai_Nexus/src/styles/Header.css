@@ -1,18 +1,19 @@
 /* Header.css - Enhanced with Theme System */
 
 .header {
-  background: var(--navbar-bg);
+  background: var(--bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 95px;
+  height: var(--header-height);
   z-index: 50;
-  box-shadow: var(--shadow-lg);
-  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-glow);
+  transition: all var(--transition-std);
+  will-change: transform;
 }
 
 
@@ -61,23 +62,23 @@
 }
 
 .header-logo-bg {
-  background: linear-gradient(135deg, rgba(125, 211, 252, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%);
+  background: linear-gradient(135deg, rgba(56,189,248,0.18) 0%, rgba(56,189,248,0.12) 100%);
   padding: 0.6rem;
   border-radius: 50%;
-  border: 2px solid rgba(125, 211, 252, 0.4);
+  border: 2px solid rgba(56,189,248,0.22);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease-in-out;
-  box-shadow: 0 0 20px rgba(125, 211, 252, 0.2),
-              inset 0 0 20px rgba(125, 211, 252, 0.1);
+  transition: all var(--transition-std);
+  box-shadow: 0 0 20px rgba(56,189,248,0.12),
+              inset 0 0 20px rgba(56,189,248,0.06);
 }
 
 .header-logo:hover .header-logo-bg {
-  border-color: var(--primary);
-  background: linear-gradient(135deg, rgba(125, 211, 252, 0.3) 0%, rgba(6, 182, 212, 0.3) 100%);
-  box-shadow: 0 0 30px rgba(125, 211, 252, 0.4),
-              inset 0 0 30px rgba(125, 211, 252, 0.15);
+  border-color: var(--accent);
+  background: linear-gradient(135deg, rgba(56,189,248,0.24) 0%, rgba(56,189,248,0.14) 100%);
+  box-shadow: 0 0 30px rgba(56,189,248,0.16),
+              inset 0 0 30px rgba(56,189,248,0.08);
 }
 
 /* Dark mode logo background */
@@ -88,15 +89,15 @@
 .header-logo-icon {
   width: 1.5rem;
   height: 1.5rem;
-  color: var(--primary);
-  transition: all 0.3s ease;
+  color: var(--accent);
+  transition: all var(--transition-std);
 }
 
 .header-title {
   font-size: 1.5rem;
-  color: var(--primary);
+  color: var(--text);
   font-weight: 700;
-  transition: all 0.3s ease-in-out;
+  transition: all var(--transition-std);
   letter-spacing: -0.01em;
 }
 
@@ -147,7 +148,7 @@
 }
 
 .header-nav-item.inactive {
-  color: var(--text-muted);
+  color: var(--text-2);
 }
 
 .header-nav-item.inactive:hover {
@@ -276,15 +277,15 @@
 }
 
 .header-icon-button {
-  background: rgba(125, 211, 252, 0.05);
-  border: 1px solid rgba(125, 211, 252, 0.2);
+  background: rgba(56,189,248,0.04);
+  border: 1px solid rgba(56,189,248,0.12);
   cursor: pointer;
   padding: 0.6rem;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  transition: all 0.3s ease;
+  transition: all var(--transition-std);
   position: relative;
   overflow: hidden;
 }
@@ -320,8 +321,8 @@
 .header-icon {
   width: 1.5rem;
   height: 1.5rem;
-  color: var(--primary);
-  transition: all 0.3s ease;
+  color: var(--text-2);
+  transition: all var(--transition-std);
   position: relative;
   z-index: 1;
 }
@@ -346,69 +347,68 @@
 
 /* Light Mode Overrides */
 .light .header-nav-item {
-  color: #1f2937; /* Dark text in light mode */
+  color: var(--text-neutral); /* Neutral dark text in light mode */
 }
 
 .light .header-nav-item.active {
-  color: #0284c7; /* Darker sky blue for active state */
+  color: var(--primary-600); /* Accent for active state */
 }
 
 .light .header-nav-item.inactive {
-  color: #4b5563; /* Medium dark gray */
+  color: var(--text-muted-dark); /* Muted neutral */
 }
 
 .light .header-nav-item.inactive:hover {
-  color: #0284c7;
+  color: var(--primary-600);
 }
 
 .light .header-mobile-nav-item {
-  color: #1f2937; /* Dark text in light mode */
+  color: var(--text-neutral); /* Neutral dark text in light mode */
 }
 
 .light .header-mobile-nav-item.active {
-  color: #0284c7;
+  color: var(--primary-600);
 }
 
 .light .header-mobile-nav-item.inactive {
-  color: #4b5563;
+  color: var(--text-muted-dark);
 }
 
 .light .header-mobile-nav-item.inactive:hover {
-  color: #0284c7;
+  color: var(--primary-600);
 }
 
 .light .header-icon-button {
-  color: #1f2937; /* Dark text for icon buttons */
+  color: var(--text-neutral); /* Neutral dark text for icon buttons */
 }
 
 .light .header-icon-button:hover {
-  color: #0284c7; /* Blue on hover */
+  color: var(--primary-600); /* Accent on hover */
 }
 
 .light .header-icon {
-  color: #1f2937; /* Dark icon in light mode */
+  color: var(--text-neutral); /* Neutral icon in light mode */
 }
 
 .light .header-icon-button:hover .header-icon {
-  color: #0284c7;
+  color: var(--primary-600);
 }
 
 .light .header-auth-button {
-  color: #1f2937; /* Dark text for auth buttons */
+  color: var(--text-neutral); /* Neutral text for auth buttons */
 }
 
 .light .header-auth-button:hover {
-  color: #0284c7;
+  color: var(--primary-600);
 }
 
 /* Light Mode Header Background & Border */
 .light .header {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg-overlay);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(2, 132, 199, 0.5);
-  box-shadow: 0 8px 32px rgba(2, 132, 199, 0.1),
-              0 0 50px rgba(2, 132, 199, 0.08);
+  border-bottom: 1px solid var(--border-accent-strong);
+  box-shadow: var(--glow-subtle), 0 0 50px rgba(14, 165, 233, 0.08);
 }
 
 .light .header-title {

@@ -1,9 +1,10 @@
 /* ATS Score Page Styles */
 .ats-score-container {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: var(--page-top-spacing) auto 0; /* Account for fixed header */
   padding: 2rem;
 }
+
 
 .ats-score-header {
   display: flex;

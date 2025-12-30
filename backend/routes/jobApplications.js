@@ -158,8 +158,9 @@ router.get('/company/applications', authMiddleware, roleMiddleware('company'), a
 
 // ========================
 // GET SINGLE APPLICATION (Company Only - Own Job)
+// Endpoint moved to '/api/applications/:id' to avoid root-level route collisions
 // ========================
-router.get('/:id', authMiddleware, async (req, res) => {
+router.get('/applications/:id', authMiddleware, async (req, res) => {
   try {
     const application = await JobApplication.findById(req.params.id)
       .populate({
@@ -190,8 +191,9 @@ router.get('/:id', authMiddleware, async (req, res) => {
 
 // ========================
 // UPDATE APPLICATION STATUS (Company Only - Own Job)
+// Endpoint moved to '/api/applications/:id/status'
 // ========================
-router.put('/:id/status', authMiddleware, roleMiddleware('company'), async (req, res) => {
+router.put('/applications/:id/status', authMiddleware, roleMiddleware('company'), async (req, res) => {
   try {
     const { status, companyNotes, internalRating, interviewDate, interviewNotes, rejectionReason } = req.body;
 
@@ -237,7 +239,7 @@ router.put('/:id/status', authMiddleware, roleMiddleware('company'), async (req,
 // ========================
 // WITHDRAW APPLICATION (User Only - Own Application)
 // ========================
-router.put('/:id/withdraw', authMiddleware, roleMiddleware('user'), async (req, res) => {
+router.put('/applications/:id/withdraw', authMiddleware, roleMiddleware('user'), async (req, res) => {
   try {
     const application = await JobApplication.findById(req.params.id)
       .populate('job');

@@ -1,12 +1,12 @@
 
 .login-container {
   width: 100%;
-  min-height: calc(100vh - 70px);
+  min-height: calc(100vh - var(--page-top-spacing));
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  padding-top: 95px;
+  padding-top: var(--page-top-spacing);
   
   /* Modern gradient background matching home page */
   background: linear-gradient(135deg, var(--bg) 0%, var(--bg-secondary) 100%);
@@ -167,80 +167,80 @@
 
 .light .login-form {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.95) 100%);
-  border: 1px solid rgba(2, 132, 199, 0.15);
-  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.08);
+  border: 1px solid var(--border-accent);
+  box-shadow: var(--glow-subtle);
 }
 
 .light .login-form:hover {
-  border-color: rgba(2, 132, 199, 0.3);
-  box-shadow: 0 12px 32px rgba(2, 132, 199, 0.15);
+  border-color: var(--border-accent-strong);
+  box-shadow: var(--glow-medium);
 }
 
 .light .login-form h2 {
-  color: #0284c7;
+  color: var(--primary-600);
 }
 
 .light .role-selector {
-  background: rgba(2, 132, 199, 0.05);
-  border: 1px solid rgba(2, 132, 199, 0.2);
+  background: rgba(14, 165, 233, 0.05);
+  border: 1px solid var(--border-accent);
 }
 
 .light .role-selector button {
-  color: #4b5563;
+  color: var(--text-muted-dark);
 }
 
 .light .role-selector button:hover:not(.active) {
-  background: rgba(2, 132, 199, 0.08);
-  color: #0284c7;
+  background: rgba(14, 165, 233, 0.08);
+  color: var(--primary-600);
 }
 
 .light .role-selector button.active {
-  background: linear-gradient(135deg, #0284c7 0%, #0891b2 100%);
+  background: var(--button-hover-bg);
   color: white;
 }
 
 .light .input-group input,
 .light .input-group textarea {
   background: rgba(248, 249, 250, 0.9);
-  border: 1px solid rgba(2, 132, 199, 0.2);
-  color: #1f2937;
+  border: 1px solid var(--border-accent);
+  color: var(--text-neutral);
 }
 
 .light .input-group input:focus,
 .light .input-group textarea:focus {
-  border-color: #0284c7;
-  box-shadow: 0 0 30px rgba(2, 132, 199, 0.2), inset 0 0 15px rgba(2, 132, 199, 0.05);
+  border-color: var(--primary-600);
+  box-shadow: var(--glow-medium);
 }
 
 .light .input-group input::placeholder,
 .light .input-group textarea::placeholder {
-  color: #6b7b9a;
+  color: var(--text-muted-dark);
 }
 
 .light .input-group label {
-  color: #1f2937;
+  color: var(--text-neutral);
 }
 
 .light .login-button {
-  background: linear-gradient(135deg, #0284c7 0%, #0891b2 100%);
+  background: var(--button-hover-bg);
   color: white;
-  box-shadow: 0 4px 15px rgba(2, 132, 199, 0.2);
+  box-shadow: var(--glow-subtle);
 }
 
 .light .login-button:hover {
-  box-shadow: 0 6px 25px rgba(2, 132, 199, 0.3);
+  box-shadow: var(--glow-medium);
 }
 
 .light .register-link {
-  color: #4b5563;
+  color: var(--text-muted-dark);
 }
 
 .light .register-link a {
-  color: #0284c7;
+  color: var(--primary-600);
 }
 
 .light .register-link a:hover {
-  color: #0891b2;
+  color: var(--accent-cyan);
 }
 .animation-container {
   flex: 1;

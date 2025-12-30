@@ -59,15 +59,17 @@ const getUserData = (user) => {
   const baseUrl = process.env.BASE_URL || 'http://localhost:5001';
   
   return {
+    _id: user._id,
     id: user.id,
     email: user.email,
     role: user.role,
     username: user.username,
     companyName: user.companyName,
     companyDescription: user.companyDescription,
-    profilePicture: user.profilePicture ? `${baseUrl}${user.profilePicture}` : '',
-    companyLogo: user.companyLogo ? `${baseUrl}${user.companyLogo}` : '',
-    coverPhoto: user.coverPhoto ? `${baseUrl}${user.coverPhoto}` : '',
+    // Normalize media fields to either full URL or null for consistency
+    profilePicture: user.profilePicture ? `${baseUrl}${user.profilePicture}` : null,
+    companyLogo: user.companyLogo ? `${baseUrl}${user.companyLogo}` : null,
+    coverPhoto: user.coverPhoto ? `${baseUrl}${user.coverPhoto}` : null,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };

@@ -102,8 +102,10 @@ export const createEvent = async (eventData) => {
     });
     
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.msg || 'Failed to create event');
+      // Parse server error body if available and include message (supports both `message` and `msg` keys)
+      const errorBody = await response.json().catch(() => ({}));
+      const serverMessage = errorBody?.message || errorBody?.msg || errorBody?.error || null;
+      throw new Error(serverMessage || `HTTP ${response.status}: Failed to create event`);
     }
     
     return await response.json();
@@ -202,13 +204,22 @@ export const getUserEventRegistrations = async (params = {}) => {
     });
     
     if (!response.ok) {
-      throw new Error('Failed to fetch registrations');
+      // If unauthorized, return an empty registrations list so UI can continue gracefully
+      if (response.status === 401) {
+        console.warn('Unauthorized while fetching event registrations');
+        return { registrations: [] };
+      }
+
+      const errBody = await response.json().catch(() => ({}));
+      const msg = errBody?.message || errBody?.msg || `HTTP ${response.status}: Failed to fetch registrations`;
+      throw new Error(msg);
     }
     
     return await response.json();
   } catch (error) {
     console.error('Get user registrations error:', error);
-    throw error;
+    // If network or other error, return empty registrations to avoid breaking page
+    return { registrations: [] };
   }
 };
 

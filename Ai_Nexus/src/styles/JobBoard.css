@@ -35,19 +35,19 @@
 .job-board-filter-select {
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 3rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-light);
   border-radius: 0.5rem;
-  background-color: white;
+  background-color: var(--card-bg);
   font-size: 1rem;
-  color: #1f2937;
+  color: var(--text-neutral);
   transition: all 0.2s ease;
 }
 
 .job-board-search-input:focus,
 .job-board-filter-select:focus {
   outline: none;
-  border-color: #0ea5e9;
-  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+  border-color: var(--input-focus);
+  box-shadow: var(--glow-subtle);
 }
 
 .job-board-search-icon,
@@ -58,26 +58,26 @@
   transform: translateY(-50%);
   width: 1.25rem;
   height: 1.25rem;
-  color: #9ca3af;
+  color: var(--text-muted-dark);
 }
 
 .job-board-ats-section {
-  background-color: #e0f2fe;
-  border: 1px solid #7dd3fc;
+  background-color: var(--primary-100);
+  border: 1px solid var(--primary-200);
   border-radius: 0.5rem;
   padding: 1.5rem;
 }
 
 .job-board-ats-title {
   font-weight: 700;
-  color: #0c4a6e;
+  color: var(--primary-900);
   margin-bottom: 0.5rem;
   font-size: 1rem;
 }
 
 .job-board-ats-description {
   font-size: 0.875rem;
-  color: #0c4a6e;
+  color: var(--primary-900);
   line-height: 1.5;
 }
 
@@ -88,7 +88,7 @@
 }
 
 .job-board-create-btn {
-  background-color: #7c3aed;
+  background-color: var(--primary-400);
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
@@ -102,12 +102,12 @@
 }
 
 .job-board-create-btn:hover {
-  background-color: #6d28d9;
+  background-color: var(--primary-600);
 }
 
 /* Login Button */
 .job-board-login-btn {
-  background-color: #0ea5e9;
+  background-color: var(--primary-500);
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
@@ -119,7 +119,7 @@
 }
 
 .job-board-login-btn:hover {
-  background-color: #0284c7;
+  background-color: var(--primary-600);
 }
 
 /* Loading State */
@@ -129,19 +129,18 @@
   align-items: center;
   justify-content: center;
   padding: 3rem;
-  color: #6b7280;
+  color: var(--text-muted-dark);
 }
 
 .loading-spinner {
   width: 2rem;
   height: 2rem;
-  border: 2px solid #e5e7eb;
-  border-top: 2px solid #0ea5e9;
+  border: 2px solid var(--border-light);
+  border-top: 2px solid var(--primary-500);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
 }
-
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -291,7 +290,7 @@
 
 .job-description {
   font-size: 0.875rem;
-  color: #4b5563;
+  color: var(--text-muted-dark);
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;

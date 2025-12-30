@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { FeedContext } from '../../context/FeedContext';
 import PostCard from '../../components/PostCard/PostCard';
@@ -8,6 +8,7 @@ import './Dashboard.css';
 
 const CompanyDashboard = () => {
   const { user, token } = useAuth();
+  const feedCtx = useContext(FeedContext);
   const [companyPosts, setCompanyPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newPost, setNewPost] = useState('');
@@ -40,12 +41,13 @@ const CompanyDashboard = () => {
       try {
         setLoading(true);
         
-        // Fetch company profile data
+        // Fetch company profile data (avoid cached 304 responses)
         const profileResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/company/profile`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
-          }
+          },
+          cache: 'no-store'
         });
 
         if (profileResponse.ok) {
@@ -62,13 +64,25 @@ const CompanyDashboard = () => {
           });
         }
 
-        // Fetch company's posts
-        const postsResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/company/posts`, {
+        // Fetch company's posts (avoid cached 304 responses)
+        let postsResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/company/posts`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
-          }
+          },
+          cache: 'no-store'
         });
+
+        if (postsResponse && postsResponse.status === 304) {
+          console.log('📋 Company Dashboard - Received 304 for /api/company/posts, re-fetching with no-store');
+          postsResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/company/posts`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            cache: 'no-store'
+          });
+        }
 
         if (postsResponse.ok) {
           const postsResult = await postsResponse.json();
@@ -140,6 +154,28 @@ const CompanyDashboard = () => {
 
     fetchCompanyData();
   }, [user, token]);
+
+  // Listen for new posts added to the global feed and add them to company dashboard if authored by this company
+  useEffect(() => {
+    if (!feedCtx || !feedCtx.posts || !user) return;
+
+    const latest = feedCtx.posts[0];
+    if (!latest) return;
+
+    const latestAuthorId = latest.author?._id || latest.author;
+    const currentCompanyId = user._id || user.id || user;
+
+    try {
+      if (latestAuthorId && currentCompanyId && latestAuthorId.toString() === currentCompanyId.toString()) {
+        setCompanyPosts(prev => {
+          if (prev.some(p => p._id === latest._id)) return prev;
+          return [latest, ...prev];
+        });
+      }
+    } catch (err) {
+      console.warn('Feed integration check failed for company dashboard:', err.message);
+    }
+  }, [feedCtx?.posts, user]);
 
   const handlePostSubmit = async (event) => {
     event.preventDefault();

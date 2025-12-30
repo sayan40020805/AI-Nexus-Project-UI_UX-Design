@@ -36,37 +36,8 @@ router.use(authMiddleware);
 // Company role restricted routes
 router.use(roleMiddleware('company'));
 
-// ========================
-// GET ANY COMPANY'S PUBLIC PROFILE BY ID (no role restriction)
-// ========================
-router.get('/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    // Check if company exists
-    const user = await User.findById(id).select('-password');
-    if (!user) {
-      return res.status(404).json({ msg: 'Company not found' });
-    }
-    
-    // Ensure this is actually a company account
-    if (user.role !== 'company') {
-      return res.status(400).json({ msg: 'This profile is not a company account' });
-    }
-    
-    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
-    
-    // Prefix stored media paths with base URL if present
-    const userObj = user.toObject();
-    if (userObj.profilePicture) userObj.profilePicture = `${baseUrl}${userObj.profilePicture}`;
-    if (userObj.companyLogo) userObj.companyLogo = `${baseUrl}${userObj.companyLogo}`;
-    
-    res.json(userObj);
-  } catch (err) {
-    console.error('Get company profile by ID error:', err);
-    res.status(500).json({ msg: 'Server error getting company profile' });
-  }
-});
+// NOTE: Parameterized company ID route moved to bottom to avoid catching fixed paths like
+// '/profile', '/posts', '/analytics' as an :id and causing CastErrors.
 
 // ========================
 // GET COMPANY PROFILE
@@ -201,3 +172,36 @@ router.get('/analytics', async (req, res) => {
 });
 
 module.exports = router;
+
+// ========================
+// GET ANY COMPANY'S PUBLIC PROFILE BY ID (no role restriction)
+// NOTE: Placed at end to avoid matching fixed paths earlier
+// ========================
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Check if company exists
+    const user = await User.findById(id).select('-password');
+    if (!user) {
+      return res.status(404).json({ msg: 'Company not found' });
+    }
+    
+    // Ensure this is actually a company account
+    if (user.role !== 'company') {
+      return res.status(400).json({ msg: 'This profile is not a company account' });
+    }
+    
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    
+    // Prefix stored media paths with base URL if present
+    const userObj = user.toObject();
+    if (userObj.profilePicture) userObj.profilePicture = `${baseUrl}${userObj.profilePicture}`;
+    if (userObj.companyLogo) userObj.companyLogo = `${baseUrl}${userObj.companyLogo}`;
+    
+    res.json(userObj);
+  } catch (err) {
+    console.error('Get company profile by ID error:', err);
+    res.status(500).json({ msg: 'Server error getting company profile' });
+  }
+});

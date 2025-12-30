@@ -8,16 +8,16 @@
 }
 
 .model-directory-container * {
-  margin-top: 4%;
+  margin-top: 0; /* neutralized - global page spacing applies */
   box-sizing: border-box;
 }
 
 /* Search and Filter Section */
 .model-directory-controls {
-  background-color: white;
+  background-color: var(--card-bg);
   border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
   padding: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -33,18 +33,18 @@
 .model-directory-search-input {
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 3rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-light);
   border-radius: 0.5rem;
-  background-color: white;
+  background-color: var(--card-bg);
   font-size: 1rem;
-  color: #1f2937;
+  color: var(--text-neutral);
   transition: all 0.2s ease;
 }
 
 .model-directory-search-input:focus {
   outline: none;
-  border-color: #0ea5e9;
-  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+  border-color: var(--input-focus);
+  box-shadow: var(--glow-subtle);
 }
 
 .model-directory-search-icon {
@@ -54,7 +54,7 @@
   transform: translateY(-50%);
   width: 1.25rem;
   height: 1.25rem;
-  color: #9ca3af;
+  color: var(--text-muted-dark);
 }
 
 .model-directory-sort-section {
@@ -75,7 +75,7 @@
   color: #1f2937;
   transition: all 0.2s ease;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23475569' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 1rem center;
   background-repeat: no-repeat;
   background-size: 1rem;
@@ -110,7 +110,7 @@
 .model-directory-filter-title {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #4b5563;
+  color: var(--text-muted-dark);
   margin-bottom: 0.75rem;
 }
 
@@ -319,7 +319,7 @@
 }
 
 .model-details-btn:hover {
-  background-color: #0284c7;
+  background-color: var(--primary-600);
 }
 
 .model-details-btn svg {

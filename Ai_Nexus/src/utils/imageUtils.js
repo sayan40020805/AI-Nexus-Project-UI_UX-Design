@@ -48,7 +48,10 @@ export const getUserAvatar = (user) => {
   if (avatarPath && (avatarPath.startsWith('http://') || avatarPath.startsWith('https://'))) {
     return avatarPath;
   }
-    
+
+  // If no avatar path present, return default avatar to avoid null src
+  if (!avatarPath) return DEFAULT_AVATAR;
+
   return getImageUrl(avatarPath);
 };
 

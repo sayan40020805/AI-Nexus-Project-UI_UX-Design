@@ -79,6 +79,14 @@ app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Debug: log requests targeting events to trace why auth middleware runs
+app.use((req, res, next) => {
+  if (req.path && req.path.startsWith('/api/events')) {
+    console.log('[Global] Incoming events request:', req.method, req.originalUrl, 'Authorization present:', !!req.headers.authorization);
+  }
+  next();
+});
+
 // Serve static files from uploads directory (allow cross-origin resource loading)
 app.use('/uploads', (req, res, next) => {
   // Allow embedding/uploads to be loaded from frontend origins
@@ -421,6 +429,7 @@ app.use('/api/company', companyRouter);
 app.use('/api/user', userRouter);
 app.use('/api/posts', postsRouter);
 app.use('/api/search', searchRouter);
+app.use('/api/users', require('./routes/users'));
 app.use('/api/follow', followRouter);
 app.use('/api/feed', feedRouter);
 app.use('/api/messages', messagesRouter);

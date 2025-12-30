@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { ModernSidebar } from './components/ModernSidebar';
 import { Hero } from './components/Hero';
@@ -15,6 +16,7 @@ import Post from './pages/Post/Post';
 import ATSScore from './pages/ATSScore/ATSScore';
 import AiShorts from './pages/AIShorts/AiShorts';
 import ProfilePage from './pages/Profile/ProfilePage';
+import UserProfile from './pages/Profile/UserProfile';
 import CompanyPage from './pages/Company/CompanyPage';
 import ToolsPage from './pages/Tools/ToolsPage';
 import SearchResults from './pages/Search/SearchResults';
@@ -27,6 +29,9 @@ import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 import Dashboard from './pages/Dashboard/Dashboard';
 import FloatingMessageButton from './components/Messaging/FloatingMessageButton';
+import GlobalSearch from './components/Search/GlobalSearch';
+import CreateEvent from './pages/CreateEvent/CreateEvent';
+import CreateJob from './pages/CreateJob/CreateJob';
 import './App.css';
 import './styles/globals.css';
 import './styles/Live.css';
@@ -142,6 +147,32 @@ function App() {
                   </FeedLayout>
                 }
               />
+              {/* Protected route for creating events - company only */}
+              <Route
+                path="/create-event"
+                element={
+                  <ProtectedRoute allowedRoles={['company']}>
+                    <FeedLayout>
+                      <MainLayout>
+                        <CreateEvent />
+                      </MainLayout>
+                    </FeedLayout>
+                  </ProtectedRoute>
+                }
+              />
+              {/* Protected route for creating jobs - company only */}
+              <Route
+                path="/create-job"
+                element={
+                  <ProtectedRoute allowedRoles={['company']}>
+                    <FeedLayout>
+                      <MainLayout>
+                        <CreateJob />
+                      </MainLayout>
+                    </FeedLayout>
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/create-post"
                 element={
@@ -217,7 +248,18 @@ function App() {
                 element={
                   <FeedLayout>
                     <MainLayout>
-                      <ProfilePage />
+                      <UserProfile />
+                    </MainLayout>
+                  </FeedLayout>
+                }
+              />
+              {/* Route for viewing own profile */}
+              <Route
+                path="/profile"
+                element={
+                  <FeedLayout>
+                    <MainLayout>
+                      <UserProfile />
                     </MainLayout>
                   </FeedLayout>
                 }
@@ -283,14 +325,50 @@ function App() {
 }
 
 
-// Global layout that includes FloatingMessageButton for all pages
+// Global layout that includes FloatingMessageButton and GlobalSearch for all pages
 const GlobalLayout = ({ children }) => {
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  // Listen for search open event
+  useEffect(() => {
+    const handleOpenSearch = () => setSearchOpen(true);
+    window.addEventListener('openSearch', handleOpenSearch);
+    return () => window.removeEventListener('openSearch', handleOpenSearch);
+  }, []);
+
+  // Handle keyboard shortcut
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   return (
     <div className="global-layout-container">
       {children}
       <div className="content-relative-messaging">
         <FloatingMessageButton />
       </div>
+      <GlobalSearch 
+        isOpen={searchOpen} 
+        onClose={() => setSearchOpen(false)}
+        onSelect={(result) => {
+          // Navigate to the selected profile using existing routes
+          if (!result) return;
+          const type = result.type || (result.role === 'company' ? 'company' : 'user');
+          if (type === 'company') {
+            window.location.href = `/company/${result.id}`;
+          } else {
+            window.location.href = `/profile/${result.id}`;
+          }
+        }}
+        showTrigger={false}
+      />
     </div>
   );
 };

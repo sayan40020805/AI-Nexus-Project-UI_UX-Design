@@ -1,10 +1,10 @@
 /* Home Page Styles - Enhanced with Theme System */
 .home-container {
   max-width: 680px;
-  margin: 5% auto;
+  margin: var(--page-top-spacing) auto 0;
   padding: 1.5rem;
   background: var(--bg-primary);
-  min-height: 100vh;
+  min-height: calc(100vh - var(--page-top-spacing));
   color: var(--text-primary);
 }
 
@@ -32,6 +32,7 @@
   transition: opacity var(--transition-normal);
 }
 
+/* Ensure headings use theme color and are visible */
 .home-header:hover::before {
   opacity: 1;
 }
@@ -62,11 +63,15 @@
   margin: 0;
   font-size: 1.75rem;
   font-weight: 700;
+  /* Use the sky-blue text color directly so it remains visible across themes */
   color: var(--text-primary);
-  background: linear-gradient(135deg, var(--primary-600) 0%, var(--accent-cyan) 100%);
+  /* Apply a controlled sky-only glow */
+  text-shadow: var(--glow-medium);
+  /* Keep gradient as an optional decorative background but do not rely on text-fill transparency */
+  background-image: linear-gradient(135deg, var(--primary-600) 0%, var(--accent-cyan) 100%);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
+  -webkit-text-fill-color: initial; /* don't force transparent fill */
 }
 
 .home-subtitle {

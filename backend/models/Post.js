@@ -157,7 +157,23 @@ const PostSchema = new mongoose.Schema({
     required: true
   },
   
-  // Social interactions
+  // Share reference (for shared posts)
+  sharedFrom: {
+    postId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Post'
+    },
+    authorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    originalPostId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Post'
+    }
+  },
+  
+  // Social interactions - arrays for quick lookup
   likes: [{
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -236,10 +252,51 @@ const PostSchema = new mongoose.Schema({
     default: true
   },
   
+  // Denormalized counts for performance (updated via middleware/hooks)
+  likesCount: {
+    type: Number,
+    default: 0,
+    index: true
+  },
+  commentsCount: {
+    type: Number,
+    default: 0,
+    index: true
+  },
+  sharesCount: {
+    type: Number,
+    default: 0,
+    index: true
+  },
+  savesCount: {
+    type: Number,
+    default: 0
+  },
+  viewsCount: {
+    type: Number,
+    default: 0,
+    index: true
+  },
+  
+  // Soft delete support
+  isDeleted: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+  deletedAt: {
+    type: Date
+  },
+  deletedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  
   // Timestamps
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    index: true
   },
   updatedAt: {
     type: Date,
@@ -247,17 +304,225 @@ const PostSchema = new mongoose.Schema({
   }
 });
 
+// ========================
+// MIDDLEWARE
+// ========================
+
 // Update the updatedAt field before saving
 PostSchema.pre('save', function(next) {
   this.updatedAt = Date.now();
+  
+  // Update denormalized counts if arrays have changed
+  if (this.isModified('likes')) {
+    this.likesCount = this.likes ? this.likes.length : 0;
+  }
+  if (this.isModified('comments')) {
+    this.commentsCount = this.comments ? this.comments.length : 0;
+  }
+  if (this.isModified('shares')) {
+    this.sharesCount = this.shares ? this.shares.length : 0;
+  }
+  if (this.isModified('savedBy')) {
+    this.savesCount = this.savedBy ? this.savedBy.length : 0;
+  }
+  
   next();
 });
 
-// Indexes for better query performance
+// Pre-remove hook to cleanup related data
+PostSchema.pre('remove', async function(next) {
+  // Optionally cleanup related comments, etc.
+  next();
+});
+
+// ========================
+// INDEXES
+// ========================
+
+// Primary query indexes
 PostSchema.index({ postType: 1, createdAt: -1 });
 PostSchema.index({ author: 1, createdAt: -1 });
 PostSchema.index({ createdAt: -1 });
+PostSchema.index({ isDeleted: 1, createdAt: -1 });
+
+// Social interaction indexes
 PostSchema.index({ 'likes.user': 1 });
 PostSchema.index({ 'shares.user': 1 });
+PostSchema.index({ 'savedBy.user': 1 });
+
+// For engagement-based queries (trending, popular)
+PostSchema.index({ likesCount: -1, createdAt: -1 });
+PostSchema.index({ commentsCount: -1, createdAt: -1 });
+PostSchema.index({ sharesCount: -1, createdAt: -1 });
+PostSchema.index({ viewsCount: -1, createdAt: -1 });
+
+// Compound index for profile page queries
+PostSchema.index({ author: 1, isDeleted: 1, createdAt: -1 });
+
+// Text index for content search (if needed)
+PostSchema.index({ content: 'text', title: 'text' });
+
+// ========================
+// INSTANCE METHODS
+// ========================
+
+// Check if a user has liked this post
+PostSchema.methods.isLikedBy = function(userId) {
+  if (!userId || !this.likes) return false;
+  return this.likes.some(like => 
+    like.user && like.user.toString() === userId.toString()
+  );
+};
+
+// Check if a user has shared this post
+PostSchema.methods.isSharedBy = function(userId) {
+  if (!userId || !this.shares) return false;
+  return this.shares.some(share => 
+    share.user && share.user.toString() === userId.toString()
+  );
+};
+
+// Check if a user has saved this post
+PostSchema.methods.isSavedBy = function(userId) {
+  if (!userId || !this.savedBy) return false;
+  return this.savedBy.some(save => 
+    save.user && save.user.toString() === userId.toString()
+  );
+};
+
+// Soft delete the post
+PostSchema.methods.softDelete = async function(userId) {
+  this.isDeleted = true;
+  this.deletedAt = new Date();
+  this.deletedBy = userId;
+  await this.save();
+  return this;
+};
+
+// Get post with interaction status for a specific user
+PostSchema.methods.enrichWithInteraction = function(currentUserId) {
+  const postObj = this.toObject();
+  
+  return {
+    ...postObj,
+    isLiked: this.isLikedBy(currentUserId),
+    isShared: this.isSharedBy(currentUserId),
+    isSaved: this.isSavedBy(currentUserId),
+    isOwner: currentUserId && this.author.toString() === currentUserId.toString()
+  };
+};
+
+// ========================
+// STATIC METHODS
+// ========================
+
+// Get posts by author with cursor-based pagination
+PostSchema.statics.getByAuthor = async function(authorId, options = {}) {
+  const { cursor = null, limit = 20, includeDeleted = false } = options;
+  
+  const query = { author: authorId };
+  
+  if (!includeDeleted) {
+    query.isDeleted = false;
+  }
+  
+  if (cursor) {
+    query.createdAt = { $lt: new Date(cursor) };
+  }
+  
+  const posts = await this.find(query)
+    .populate('author', 'username companyName profilePicture companyLogo role')
+    .sort({ createdAt: -1 })
+    .limit(limit + 1); // Fetch one extra to check for more
+  
+  const hasMore = posts.length > limit;
+  const results = hasMore ? posts.slice(0, limit) : posts;
+  
+  return {
+    posts: results,
+    pagination: {
+      nextCursor: hasMore ? results[results.length - 1].createdAt.toISOString() : null,
+      hasMore,
+      total: await this.countDocuments({ author: authorId, isDeleted: false })
+    }
+  };
+};
+
+// Get posts with media only
+PostSchema.statics.getWithMedia = async function(authorId, options = {}) {
+  const { cursor = null, limit = 20, mediaType = 'all' } = options;
+  
+  const query = { 
+    author: authorId,
+    isDeleted: false,
+    $or: [
+      { 'media.images': { $exists: true, $ne: [] } },
+      { 'media.video': { $exists: true, $ne: '' } }
+    ]
+  };
+  
+  if (cursor) {
+    query.createdAt = { $lt: new Date(cursor) };
+  }
+  
+  const posts = await this.find(query)
+    .populate('author', 'username companyName profilePicture companyLogo role')
+    .sort({ createdAt: -1 })
+    .limit(limit + 1);
+  
+  const hasMore = posts.length > limit;
+  const results = hasMore ? posts.slice(0, limit) : posts;
+  
+  // Filter by media type if specified
+  let filteredResults = results;
+  if (mediaType === 'images') {
+    filteredResults = results.filter(p => p.media && p.media.images && p.media.images.length > 0);
+  } else if (mediaType === 'videos') {
+    filteredResults = results.filter(p => p.media && p.media.video);
+  }
+  
+  return {
+    posts: filteredResults,
+    pagination: {
+      nextCursor: hasMore ? results[results.length - 1].createdAt.toISOString() : null,
+      hasMore
+    }
+  };
+};
+
+// Get posts user has liked
+PostSchema.statics.getLikedByUser = async function(userId, options = {}) {
+  const { cursor = null, limit = 20 } = options;
+  
+  // This is a complex query - in production, consider denormalization
+  const query = { 
+    isDeleted: false,
+    'likes.user': userId
+  };
+  
+  if (cursor) {
+    // Find the post with this cursor to get its createdAt
+    const cursorPost = await this.findById(cursor);
+    if (cursorPost) {
+      query.createdAt = { $lt: cursorPost.createdAt };
+    }
+  }
+  
+  const posts = await this.find(query)
+    .populate('author', 'username companyName profilePicture companyLogo role')
+    .sort({ createdAt: -1 })
+    .limit(limit + 1);
+  
+  const hasMore = posts.length > limit;
+  const results = hasMore ? posts.slice(0, limit) : posts;
+  
+  return {
+    posts: results,
+    pagination: {
+      nextCursor: hasMore ? results[results.length - 1]._id : null,
+      hasMore
+    }
+  };
+};
 
 module.exports = mongoose.model('Post', PostSchema);

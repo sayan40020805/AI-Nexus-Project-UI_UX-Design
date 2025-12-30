@@ -4,6 +4,18 @@ const User = require('../models/User');
 // Middleware to verify JWT token
 const authMiddleware = async (req, res, next) => {
   try {
+    // Log path info to debug unexpected auth invocations
+    console.log('🔐 Auth Middleware - Path check:', { path: req.path, originalUrl: req.originalUrl });
+
+    // Allow public access to GET /api/events (published events endpoint)
+    const isEventsGet = req.method === 'GET' && (
+      req.path === '/api/events' || req.path === '/events' || (req.originalUrl && req.originalUrl.startsWith('/api/events'))
+    );
+    if (isEventsGet) {
+      console.log('🔐 Auth Middleware - Bypassing auth for public GET /api/events (matched)');
+      return next();
+    }
+
     console.log('🔐 Auth Middleware - Request started');
     console.log('🔐 Auth Middleware - Request URL:', req.originalUrl);
     console.log('🔐 Auth Middleware - Request method:', req.method);

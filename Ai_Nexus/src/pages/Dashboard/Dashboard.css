@@ -10,7 +10,7 @@
   min-height: 100vh;
   color: var(--text);
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  padding: 95px 0 0;
+  padding-top: var(--page-top-spacing); /* Account for fixed header */
   box-sizing: border-box;
 }
 
@@ -41,7 +41,7 @@
 
 .dashboard-header {
   text-align: center;
-  padding: 90px 2rem 1rem;
+  padding: var(--page-top-spacing) 2rem 1rem;
   background: linear-gradient(135deg, var(--bg) 0%, var(--bg-secondary) 100%);
   border-bottom: 1px solid var(--border-color);
   box-shadow: var(--glow-shadow);
@@ -124,7 +124,7 @@
   border-bottom: 1px solid var(--border-color);
   margin-bottom: 1.5rem;
   position: sticky;
-  top: 95px;
+  top: var(--header-height); /* Account for fixed header */
   z-index: 40;
   box-shadow: var(--glow-shadow);
 }
@@ -232,137 +232,7 @@
   gap: 1.5rem;
 }
 
-
-.post-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: var(--glow-shadow), 0 8px 24px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.post-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent 0%, rgba(125, 211, 252, 0.05) 50%, transparent 100%);
-  transition: left 0.4s ease;
-  pointer-events: none;
-}
-
-.post-card:hover {
-  border-color: rgba(125, 211, 252, 0.3);
-  box-shadow: var(--glow-shadow-hover), 0 12px 32px rgba(125, 211, 252, 0.15);
-  transform: translateY(-4px);
-}
-
-.post-card:hover::before {
-  left: 100%;
-}
-
-.post-author-info {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  margin-bottom: 1rem;
-  position: relative;
-  z-index: 1;
-}
-
-.post-author-pic {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--primary);
-  background: linear-gradient(135deg, rgba(125, 211, 252, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--primary);
-}
-
-.post-author-name {
-  font-weight: 700;
-  color: var(--text);
-  font-size: 1.1rem;
-}
-
-.post-timestamp {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-left: 0.5rem;
-}
-
-.post-content-text {
-  margin-bottom: 1rem;
-  line-height: 1.6;
-}
-
-.post-image {
-  width: 100%;
-  max-height: 400px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-top: 1rem;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 0 10px var(--glow-color-dark);
-}
-
-.post-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--input-border-color);
-}
-
-.post-actions button {
-  background: none;
-  border: none;
-  color: var(--glow-color-light);
-  cursor: pointer;
-  font-size: 0.95rem;
-  transition: color 0.3s ease;
-}
-
-.post-actions button:hover {
-  color: var(--glow-color-dark);
-}
-
-.post-comments {
-  margin-top: 1rem;
-  border-top: 1px dashed var(--input-border-color);
-  padding-top: 1rem;
-}
-
-.comment-item {
-  background-color: #2a2a4a;
-  padding: 0.7rem;
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-  border: 1px solid var(--input-border-color);
-}
-
-.comment-item strong {
-  color: var(--glow-color-light);
-}
-
-.comment-timestamp {
-  font-size: 0.75rem;
-  color: rgba(224, 224, 224, 0.4);
-  margin-left: 0.5rem;
-}
+/* Note: .post-card styles are handled by PostCard component in PostCard.css */
 
 .about-card h3 {
   color: var(--glow-color-light);
@@ -423,80 +293,80 @@
 }
 
 .light .cover-photo {
-  border-bottom: 2px solid rgba(2, 132, 199, 0.2);
-  box-shadow: 0 4px 20px rgba(2, 132, 199, 0.08);
+  border-bottom: 2px solid var(--border-accent);
+  box-shadow: var(--glow-subtle);
 }
 
 .light .profile-pic-large {
-  border: 5px solid #ffffff;
-  box-shadow: 0 0 15px rgba(2, 132, 199, 0.15), inset 0 0 10px rgba(0,0,0,0.1);
+  border: 5px solid var(--bg-primary);
+  box-shadow: var(--glow-subtle), inset 0 0 10px rgba(0,0,0,0.06);
 }
 
 .light .dashboard-header {
-  background: linear-gradient(135deg, #f0f2f5 0%, #ffffff 100%);
-  border-bottom: 1px solid rgba(2, 132, 199, 0.15);
-  box-shadow: 0 4px 20px rgba(2, 132, 199, 0.08);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-accent);
+  box-shadow: var(--glow-subtle);
 }
 
 .light .user-name {
-  color: #0284c7;
-  text-shadow: 0 0 10px rgba(2, 132, 199, 0.1);
+  color: var(--primary-600);
+  text-shadow: 0 0 10px rgba(14, 165, 233, 0.1);
 }
 
 .light .username {
-  color: #4b5563;
+  color: var(--text-muted-dark);
 }
 
 .light .user-bio {
-  color: #1f2937;
+  color: var(--text-neutral);
 }
 
 .light .user-stats span {
-  color: #0284c7;
+  color: var(--primary-600);
 }
 
 .light .follow-button,
 .light .message-button,
 .light .create-post-button {
-  background: linear-gradient(135deg, #0284c7 0%, #0891b2 100%);
+  background: var(--button-hover-bg);
   color: white;
-  box-shadow: 0 0 8px rgba(2, 132, 199, 0.2);
+  box-shadow: var(--glow-subtle);
 }
 
 .light .follow-button:hover,
 .light .message-button:hover,
 .light .create-post-button:hover {
-  box-shadow: 0 0 15px rgba(2, 132, 199, 0.3);
+  box-shadow: var(--glow-medium);
 }
 
 .light .dashboard-tabs {
-  background: linear-gradient(135deg, #f0f2f5 0%, #ffffff 100%);
-  border-bottom: 1px solid rgba(2, 132, 199, 0.15);
-  box-shadow: 0 4px 20px rgba(2, 132, 199, 0.08);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-accent);
+  box-shadow: var(--glow-subtle);
 }
 
 .light .tab-button {
-  color: #4b5563;
+  color: var(--text-muted-dark);
 }
 
 .light .tab-button:hover {
-  color: #0284c7;
+  color: var(--primary-600);
 }
 
 .light .tab-button.active {
-  color: #0284c7;
+  color: var(--primary-600);
 }
 
 .light .tab-button.active::after {
-  background: linear-gradient(135deg, #0284c7 0%, #0891b2 100%);
-  box-shadow: 0 0 10px rgba(2, 132, 199, 0.15);
+  background: var(--button-hover-bg);
+  box-shadow: var(--glow-subtle);
 }
 
 .light .post-creator-card,
 .light .about-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.95) 100%);
-  border: 1px solid rgba(2, 132, 199, 0.15);
-  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.08);
+  background: var(--card-bg);
+  border: 1px solid var(--border-accent);
+  box-shadow: var(--glow-subtle);
 }
 
 .light .post-creator-card:hover,
@@ -506,113 +376,48 @@
 }
 
 .light .post-creator-card textarea {
-  background: rgba(248, 249, 250, 0.9);
-  border: 1px solid rgba(2, 132, 199, 0.2);
-  color: #1f2937;
+  background: var(--input-bg);
+  border: 1px solid var(--border-accent);
+  color: var(--text-neutral);
 }
 
 .light .post-creator-card textarea:focus {
-  border-color: #0284c7;
-  box-shadow: 0 0 30px rgba(2, 132, 199, 0.2), inset 0 0 15px rgba(2, 132, 199, 0.05);
+  border-color: var(--primary-600);
+  box-shadow: var(--glow-subtle);
 }
 
 .light .post-creator-card textarea::placeholder {
-  color: #6b7b9a;
+  color: var(--text-muted-dark);
 }
 
-.light .post-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.95) 100%);
-  border: 1px solid rgba(2, 132, 199, 0.15);
-  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.08);
-}
-
-.light .post-card:hover {
-  border-color: rgba(2, 132, 199, 0.3);
-  box-shadow: 0 12px 32px rgba(2, 132, 199, 0.15);
-}
-
-.light .post-author-pic {
-  border: 2px solid #0284c7;
-  background: linear-gradient(135deg, rgba(2, 132, 199, 0.15) 0%, rgba(8, 145, 178, 0.15) 100%);
-  color: #0284c7;
-}
-
-.light .post-author-name {
-  color: #000000;
-}
-
-.light .post-timestamp {
-  color: #4b5563;
-}
-
-.light .post-content-text {
-  color: #1f2937;
-}
-
-.light .post-image {
-  border: 1px solid rgba(2, 132, 199, 0.15);
-}
-
-.light .post-card:hover .post-image {
-  border-color: rgba(2, 132, 199, 0.3);
-  box-shadow: 0 0 20px rgba(2, 132, 199, 0.1);
-}
-
-.light .post-actions {
-  border-top: 1px solid rgba(2, 132, 199, 0.1);
-}
-
-.light .post-actions button {
-  color: #4b5563;
-}
-
-.light .post-actions button:hover {
-  color: #0284c7;
-}
-
-.light .post-comments {
-  border-top: 1px dashed rgba(2, 132, 199, 0.15);
-}
-
-.light .comment-item {
-  background: rgba(2, 132, 199, 0.03);
-  border: 1px solid rgba(2, 132, 199, 0.15);
-  color: #1f2937;
-}
-
-.light .comment-item strong {
-  color: #0284c7;
-}
-
-.light .comment-timestamp {
-  color: #6b7b9a;
-}
+/* Note: .post-card, .post-author-* and .post-actions light mode styles 
+   are handled by PostCard component in PostCard.css */
 
 .light .about-card h3 {
-  color: #0284c7;
-  text-shadow: 0 0 8px rgba(2, 132, 199, 0.1);
+  color: var(--primary-600);
+  text-shadow: 0 0 8px rgba(14, 165, 233, 0.1);
 }
 
 .light .about-card p {
-  color: #1f2937;
+  color: var(--text-neutral);
 }
 
 .light .about-card h4 {
-  color: #0284c7;
+  color: var(--primary-600);
 }
 
 .light .skills-list li,
 .light .social-links-list li {
-  background: rgba(2, 132, 199, 0.08);
-  color: #0284c7;
-  border: 1px solid rgba(2, 132, 199, 0.2);
-  box-shadow: 0 0 5px rgba(2, 132, 199, 0.1);
+  background: var(--bg-tertiary);
+  color: var(--primary-600);
+  border: 1px solid var(--border-accent);
+  box-shadow: var(--glow-subtle);
 }
 
 .light .social-links-list a {
-  color: #0284c7;
+  color: var(--primary-600);
 }
 
 .light .social-links-list a:hover {
-  color: #0891b2;
+  color: var(--accent-cyan-dark);
 }

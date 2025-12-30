@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { MapPin, Briefcase, Building, Plus, Clock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import jobService from '../services/jobService';
-import { JobVacancyForm } from './JobVacancyForm';
 import { JobApplicationModal } from './JobApplicationModal';
 import '../styles/JobBoard_SIMPLE.css';
 
 export function JobBoard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showJobForm, setShowJobForm] = useState(false);
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
 
@@ -37,13 +37,11 @@ export function JobBoard() {
   };
 
   const handleCreateJob = () => {
-    setSelectedJob(null);
-    setShowJobForm(true);
+    navigate('/create-job');
   };
 
   const handleEditJob = (job) => {
-    setSelectedJob(job);
-    setShowJobForm(true);
+    navigate('/create-job', { state: { job } });
   };
 
   const handleDeleteJob = async (jobId) => {
@@ -226,18 +224,7 @@ export function JobBoard() {
         </div>
       ))}
 
-      {/* Modals */}
-      {showJobForm && (
-        <JobVacancyForm
-          job={selectedJob}
-          onClose={() => setShowJobForm(false)}
-          onSuccess={() => {
-            loadJobs();
-            setShowJobForm(false);
-          }}
-        />
-      )}
-
+      {/* Application Modal */}
       {showApplicationModal && selectedJob && (
         <JobApplicationModal
           job={selectedJob}

@@ -227,47 +227,47 @@
 /* Dark mode support (if needed) */
 @media (prefers-color-scheme: dark) {
   .post-menu-dropdown {
-    background: #1f2937;
-    border-color: #374151;
-    color: #f9fafb;
+    background: var(--bg-tertiary);
+    border-color: var(--border-medium);
+    color: var(--text-primary);
   }
   
   .menu-item {
-    color: #f9fafb;
+    color: var(--text-primary);
   }
   
   .menu-item:hover {
-    background: #374151;
+    background: var(--border-medium);
   }
   
   .menu-item:active {
-    background: #4b5563;
+    background: var(--text-muted-dark);
   }
   
   .menu-divider {
-    background: #374151;
+    background: var(--border-medium);
   }
   
   .submenu-dropdown {
-    background: #1f2937;
-    border-color: #374151;
+    background: var(--bg-tertiary);
+    border-color: var(--border-medium);
   }
   
   .submenu-item {
-    color: #f9fafb;
+    color: var(--text-primary);
   }
   
   .submenu-item:hover {
-    background: #374151;
+    background: var(--border-medium);
   }
   
   .submenu-item:active {
-    background: #4b5563;
+    background: var(--text-muted-dark);
   }
   
   .submenu-item.active {
-    background: #1e3a8a;
-    color: #93c5fd;
+    background: var(--primary-600);
+    color: var(--text-accent);
   }
 }
 
@@ -289,13 +289,13 @@
 
 /* Focus states for accessibility */
 .post-menu-trigger:focus {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid var(--info);
   outline-offset: 2px;
 }
 
 .menu-item:focus,
 .submenu-item:focus {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid var(--info);
   outline-offset: -2px;
 }
 

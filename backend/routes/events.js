@@ -5,6 +5,17 @@ const EventRegistration = require('../models/EventRegistration');
 const { authMiddleware, allowCompanyOnly, allowUserOrCompany } = require('../middleware/auth');
 const { upload } = require('../middleware/upload');
 
+// Debug middleware: log incoming requests to events routes (helps diagnose 401s)
+router.use((req, res, next) => {
+  console.log('[Events Router] incoming', req.method, req.originalUrl, 'Authorization present:', !!req.headers.authorization);
+  next();
+});
+
+// Simple ping endpoint to verify public access
+router.get('/ping', (req, res) => {
+  res.json({ ok: true, timestamp: new Date().toISOString() });
+});
+
 // GET /api/events - Get all public events (PUBLIC ENDPOINT - NO AUTH REQUIRED)
 router.get('/', async (req, res) => {
   try {
@@ -137,10 +148,11 @@ router.post('/', authMiddleware, allowCompanyOnly, upload.single('image'), async
       });
     }
 
-    // Validate eventType
-    if (!['Seminar', 'Hackathon', 'Quiz', 'Workshop'].includes(eventType)) {
+    // Validate eventType - accept all event types from frontend
+    const validEventTypes = ['Seminar', 'Hackathon', 'Quiz', 'Workshop', 'conference', 'networking', 'training', 'meetup', 'other'];
+    if (!validEventTypes.includes(eventType)) {
       return res.status(400).json({
-        message: 'Invalid event type. Must be one of: Seminar, Hackathon, Quiz, Workshop'
+        message: `Invalid event type. Must be one of: ${validEventTypes.join(', ')}`
       });
     }
     
@@ -224,11 +236,14 @@ router.put('/:id', authMiddleware, allowCompanyOnly, upload.single('image'), asy
       updateData.registrationDeadline = new Date(updateData.registrationDeadline);
     }
 
-    // Handle eventType validation
-    if (updateData.eventType && !['Seminar', 'Hackathon', 'Quiz', 'Workshop'].includes(updateData.eventType)) {
-      return res.status(400).json({
-        message: 'Invalid event type. Must be one of: Seminar, Hackathon, Quiz, Workshop'
-      });
+    // Handle eventType validation - accept all event types from frontend
+    if (updateData.eventType) {
+      const validEventTypes = ['Seminar', 'Hackathon', 'Quiz', 'Workshop', 'conference', 'networking', 'training', 'meetup', 'other'];
+      if (!validEventTypes.includes(updateData.eventType)) {
+        return res.status(400).json({
+          message: `Invalid event type. Must be one of: ${validEventTypes.join(', ')}`
+        });
+      }
     }
     
     // Handle image upload
@@ -531,9 +546,14 @@ router.get('/categories', async (req, res) => {
   try {
     const eventTypes = [
       'Seminar',
-      'Hackathon', 
+      'Hackathon',
       'Quiz',
-      'Workshop'
+      'Workshop',
+      'conference',
+      'networking',
+      'training',
+      'meetup',
+      'other'
     ];
     
     res.json(eventTypes);

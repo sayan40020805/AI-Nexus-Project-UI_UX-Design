@@ -90,6 +90,26 @@ const ProfilePage = () => {
           likes: totalLikes,
           comments: totalComments
         }));
+        // Fetch follower/following stats
+        try {
+          const statsRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/follow/stats/${id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (statsRes.ok) {
+            const statsData = await statsRes.json();
+            setStats(prev => ({
+              ...prev,
+              followers: statsData.followersCount || 0,
+              following: statsData.followingCount || 0
+            }));
+          }
+        } catch (err) {
+          console.warn('Failed to fetch follow stats:', err);
+        }
       } else {
         if (userResponse.ok) {
           const userData = await userResponse.json();
@@ -250,9 +270,14 @@ const ProfilePage = () => {
                   <span className="verified-badge">✓</span>
                 )}
               </h1>
-              {profileUser.username && profileUser.companyName && (
-                <p className="profile-handle">@{profileUser.username}</p>
-              )}
+                {/* Always show handle if username exists */}
+                {profileUser.username && (
+                  <p className="profile-handle">@{profileUser.username}</p>
+                )}
+                <div className="profile-follow-block">
+                  <span className="follow-count">{stats.followers || 0} Followers</span>
+                  <span className="follow-count">{stats.following || 0} Following</span>
+                </div>
             </div>
 
             <div className="profile-bio">
@@ -280,17 +305,17 @@ const ProfilePage = () => {
               )}
             </div>
 
-            {/* Profile Stats */}
+            {/* Profile Stats (posts/likes/comments kept but de-emphasized) */}
             <div className="profile-stats">
-              <div className="stat-item">
+              <div className="stat-item small">
                 <span className="stat-number">{stats.posts}</span>
                 <span className="stat-label">Posts</span>
               </div>
-              <div className="stat-item">
+              <div className="stat-item small">
                 <span className="stat-number">{stats.likes}</span>
                 <span className="stat-label">Likes</span>
               </div>
-              <div className="stat-item">
+              <div className="stat-item small">
                 <span className="stat-number">{stats.comments}</span>
                 <span className="stat-label">Comments</span>
               </div>
@@ -298,24 +323,24 @@ const ProfilePage = () => {
 
             {/* Action Buttons */}
             {isOwnProfile ? (
-              <div className="profile-actions">
-                <button className="edit-profile-btn">
-                  <Edit size={16} />
+              <div className="profile-actions inline">
+                <button className="edit-profile-btn small">
+                  <Edit size={14} />
                   Edit Profile
                 </button>
-                <button className="settings-btn">
-                  <Settings size={16} />
+                <button className="settings-btn small">
+                  <Settings size={14} />
                   Settings
                 </button>
               </div>
             ) : (
-              <div className="profile-actions">
-                <button className="message-btn">
-                  <Mail size={16} />
+              <div className="profile-actions inline">
+                <button className="message-btn small">
+                  <Mail size={14} />
                   Message
                 </button>
-                <button className="follow-btn">
-                  <Users size={16} />
+                <button className="follow-btn small">
+                  <Users size={14} />
                   Follow
                 </button>
               </div>

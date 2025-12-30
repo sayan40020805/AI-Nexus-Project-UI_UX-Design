@@ -38,10 +38,10 @@ const PostContent = ({ post, compact = false }) => {
   const getPostTypeConfig = (type) => {
     const configs = {
       'normal': { icon: FileText, label: 'Post', color: '#6366f1' },
-      'news': { icon: Newspaper, label: 'AI News', color: '#ef4444' },
-      'shorts': { icon: Zap, label: 'AI Short', color: '#f59e0b' },
-      'model': { icon: Lightbulb, label: 'AI Model', color: '#10b981' },
-      'showcase': { icon: Users, label: 'Showcase', color: '#8b5cf6' },
+      'ai_news': { icon: Newspaper, label: 'AI News', color: '#ef4444' },
+      'ai_short': { icon: Zap, label: 'AI Short', color: '#f59e0b' },
+      'ai_models': { icon: Lightbulb, label: 'AI Model', color: '#10b981' },
+      'ai_showcase': { icon: Users, label: 'Showcase', color: '#8b5cf6' },
       'career': { icon: Briefcase, label: 'Career', color: '#06b6d4' },
       'event': { icon: Calendar, label: 'Event', color: '#ec4899' }
     };

@@ -248,6 +248,16 @@ router.post('/', authMiddleware, upload.any(), async (req, res) => {
     // Populate author information
     await newPost.populate('author', 'username companyName profilePicture companyLogo role');
 
+    // Increment author's postsCount for consistency (non-blocking if it fails)
+    try {
+      const User = require('../models/User');
+      User.findByIdAndUpdate(req.user.id, { $inc: { postsCount: 1 } }).catch(err => {
+        console.warn('Failed to increment postsCount for user:', req.user.id, err.message);
+      });
+    } catch (e) {
+      console.warn('Error updating postsCount:', e.message);
+    }
+
     // Transform media URLs to include base URL for client
     const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
     const result = transformPostMedia(newPost, baseUrl);

@@ -13,14 +13,14 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
   padding: 4px 8px;
   border-radius: 16px;
   font-size: 12px;
   font-weight: 500;
   margin-bottom: 8px;
-  color: #475569;
+  color: var(--text-muted-dark);
 }
 
 .post-type-badge svg {
@@ -32,7 +32,7 @@
 .post-title {
   font-size: 18px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-neutral);
   margin: 8px 0;
   line-height: 1.4;
 }
@@ -47,7 +47,7 @@
 }
 
 .post-text {
-  color: #374151;
+  color: var(--text-muted-dark);
   line-height: 1.6;
   font-size: 14px;
   word-wrap: break-word;
@@ -59,7 +59,7 @@
 }
 
 .post-text a {
-  color: #2563eb;
+  color: var(--primary-600);
   text-decoration: none;
 }
 
@@ -71,7 +71,7 @@
 .show-less-btn {
   background: none;
   border: none;
-  color: #6b7280;
+  color: var(--text-muted-dark);
   font-size: 13px;
   cursor: pointer;
   padding: 4px 0;
@@ -89,7 +89,7 @@
   margin-bottom: 12px;
   border-radius: 12px;
   overflow: hidden;
-  background: #f9fafb;
+  background: var(--bg-secondary);
 }
 
 /* Images */

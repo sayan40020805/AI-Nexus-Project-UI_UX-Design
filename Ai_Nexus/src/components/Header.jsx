@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Sparkles, Sun, Moon, LogOut, User, Building } from 'lucide-react';
+import { Menu, X, Sparkles, Sun, Moon, LogOut, User, Building, Search } from 'lucide-react';
 import { useThemeContext } from './theme-provider';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -50,6 +50,10 @@ export function Header() {
 
   const toggleSidebar = () => {
     window.dispatchEvent(new Event("toggle-modern-sidebar"));
+  };
+
+  const openSearch = () => {
+    window.dispatchEvent(new CustomEvent('openSearch'));
   };
 
   const isActivePath = (path) => {
@@ -106,6 +110,15 @@ export function Header() {
 
           {/* Right side icons */}
           <div className="header-right">
+            {/* Search Button */}
+            <button
+              className="header-icon-button"
+              onClick={openSearch}
+              title="Search (⌘K)"
+            >
+              <Search className="header-icon" />
+            </button>
+
             {user ? (
               // Authenticated user UI
               <>

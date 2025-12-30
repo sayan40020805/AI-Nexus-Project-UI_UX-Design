@@ -13,8 +13,10 @@ router.get('/', authMiddleware, async (req, res) => {
     const { page = 1, limit = 20 } = req.query;
     
     // PUBLIC FEED: Show ALL public posts from ALL users (Facebook-like behavior)
+    // ALWAYS exclude soft-deleted posts
     const filter = {
-      isPublic: true
+      isPublic: true,
+      isDeleted: { $ne: true }
     };
     
     const skip = (page - 1) * limit;
@@ -90,7 +92,11 @@ router.get('/trending', authMiddleware, async (req, res) => {
     const skip = (page - 1) * limit;
     
     // Get posts with highest engagement (likes + comments + shares)
-    const posts = await Post.find({ isPublic: true })
+    // ALWAYS exclude soft-deleted posts
+    const posts = await Post.find({ 
+      isPublic: true,
+      isDeleted: { $ne: true }
+    })
       .populate('author', 'username companyName profilePicture companyLogo role')
       .sort({ 
         createdAt: -1, // Primary sort by recent
@@ -162,8 +168,10 @@ router.get('/companies', authMiddleware, async (req, res) => {
     
 
     // Get posts from company accounts only
+    // ALWAYS exclude soft-deleted posts
     const posts = await Post.find({ 
       isPublic: true,
+      isDeleted: { $ne: true },
       'author.role': 'company'
     })
       .populate('author', 'username companyName profilePicture companyLogo role')
@@ -312,9 +320,11 @@ router.get('/by-type/:postType', authMiddleware, async (req, res) => {
     console.log('📋 Feed by-type - Starting database query...');
     
     // Get posts filtered by type
+    // ALWAYS exclude soft-deleted posts
     const posts = await Post.find({
       postType: finalPostType,
-      isPublic: true
+      isPublic: true,
+      isDeleted: { $ne: true }
     })
       .populate('author', 'username companyName profilePicture companyLogo role')
       .sort({ createdAt: -1 })
@@ -373,36 +383,66 @@ router.get('/by-type/:postType', authMiddleware, async (req, res) => {
 });
 
 // ========================
-// GET USER'S OWN POSTS (for profile page)
+// GET USER'S POSTS (for profile page - handles private profiles)
 // ========================
 router.get('/user/:userId', authMiddleware, async (req, res) => {
   try {
     const { userId } = req.params;
-    const { page = 1, limit = 20 } = req.query;
+    const { page = 1, limit = 50 } = req.query;
     
     // Check if user exists
-    const user = await require('../models/User').findById(userId);
+    const UserModel = require('../models/User');
+    const user = await UserModel.findById(userId);
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
     }
     
     const skip = (page - 1) * limit;
+    const isOwnProfile = userId === req.user.id;
+    
+    // Build filter - ALWAYS exclude soft-deleted posts
+    let filter = { 
+      author: userId,
+      isDeleted: { $ne: true }
+    };
+    
+    if (!isOwnProfile) {
+      // For other users' profiles, only show public posts
+      // OR check if following for private profiles
+      const userSettings = user.settings || {};
+      const isPrivate = userSettings.privacy === 'private';
+      
+      if (isPrivate) {
+        // Check if following
+        const Follow = require('../models/Follow');
+        const follow = await Follow.findOne({
+          follower: req.user.id,
+          following: userId
+        });
+        
+        if (!follow) {
+          // Not following, only show public posts (or none for fully private)
+          filter.isPublic = true;
+        }
+        // If following, show all posts including private
+      } else {
+        filter.isPublic = true;
+      }
+    }
+    // If own profile, show all posts (both public and private)
+    
+    console.log('🔍 Feed user posts - Filter:', filter);
+    console.log('🔍 Feed user posts - Is own profile:', isOwnProfile);
     
     // Get posts by specific user
-    const posts = await Post.find({ 
-      author: userId,
-      isPublic: true
-    })
+    const posts = await Post.find(filter)
       .populate('author', 'username companyName profilePicture companyLogo role')
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip(skip)
       .lean();
     
-    const total = await Post.countDocuments({ 
-      author: userId,
-      isPublic: true
-    });
+    const total = await Post.countDocuments(filter);
     
     const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
     const enrichedPosts = posts.map(post => {
@@ -419,28 +459,18 @@ router.get('/user/:userId', authMiddleware, async (req, res) => {
 
       // Ensure media URLs are properly formatted
       if (p.media) {
-        console.log('🔍 Backend - Post media found:', {
-          postId: p._id,
-          media: p.media,
-          hasImages: p.media.images?.length,
-          hasVideo: p.media.video
-        });
-        
         if (Array.isArray(p.media.images) && p.media.images.length) {
           p.media.images = p.media.images.map(img => 
             img.startsWith('http') ? img : `${baseUrl}${img}`
           );
-          console.log('🔍 Backend - Images formatted:', p.media.images);
         }
         if (p.media.video) {
           p.media.video = p.media.video.startsWith('http') ? 
             p.media.video : `${baseUrl}${p.media.video}`;
-          console.log('🔍 Backend - Video formatted:', p.media.video);
         }
         if (p.media.document) {
           p.media.document = p.media.document.startsWith('http') ? 
             p.media.document : `${baseUrl}${p.media.document}`;
-          console.log('🔍 Backend - Document formatted:', p.media.document);
         }
       }
 
@@ -453,6 +483,7 @@ router.get('/user/:userId', authMiddleware, async (req, res) => {
       username: user.username,
       companyName: user.companyName,
       role: user.role,
+      settings: user.settings,
       // Profile fields
       profilePicture: user.profilePicture ? 
         (user.profilePicture.startsWith('http') ? user.profilePicture : `${baseUrl}${user.profilePicture}`) : 
@@ -511,6 +542,7 @@ router.get('/refresh/:lastPostId', authMiddleware, async (req, res) => {
     const posts = await Post.find({
       author: { $in: followingIds },
       isPublic: true,
+      isDeleted: { $ne: true },
       createdAt: { $gt: lastPost.createdAt }
     })
       .populate('author', 'username companyName profilePicture companyLogo role')

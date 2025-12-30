@@ -1,13 +1,13 @@
 /* AIShowcase Component Styles */
 
 .ai-showcase-container {
-  margin-top: 20px;
+  margin: var(--page-top-spacing) auto 0; /* Account for fixed header */
   max-width: 1200px;
-  margin: 0 auto;
   padding: 2rem 1rem;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background-color: #f8fafc;
+  background-color: var(--bg-primary, #f8fafc);
 }
+
 
 .ai-showcase-container * {
   box-sizing: border-box;
@@ -361,7 +361,7 @@
 .showcase-nav-btn svg {
   width: 1.5rem;
   height: 1.5rem;
-  color: #1f2937;
+  color: var(--text-neutral);
 }
 
 /* Thumbnail Grid */

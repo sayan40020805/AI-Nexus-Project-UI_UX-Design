@@ -4,7 +4,7 @@
 .job-board-container {
 
   max-width: 800px;
-  margin-top: 10%;
+  margin-top: 0; /* use global spacing */
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }

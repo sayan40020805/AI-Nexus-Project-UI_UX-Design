@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Calendar as CalendarIcon, Clock, MapPin, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { CompanyOnly } from './RoleBasedComponents';
 import eventService from '../services/eventService';
-import EventCreationForm from './EventCreationForm';
 import EventRegistrationModal from './EventRegistrationModal';
 import '../styles/Events.css';
 
 const Events = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showEventForm, setShowEventForm] = useState(false);
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [registeredEvents, setRegisteredEvents] = useState(new Set());
@@ -46,13 +46,11 @@ const Events = () => {
   };
 
   const handleCreateEvent = () => {
-    setSelectedEvent(null);
-    setShowEventForm(true);
+    navigate('/create-event');
   };
 
   const handleEditEvent = (event) => {
-    setSelectedEvent(event);
-    setShowEventForm(true);
+    navigate('/create-event', { state: { event } });
   };
 
   const handleDeleteEvent = async (eventId) => {
@@ -249,18 +247,7 @@ const Events = () => {
           </div>
         ))}
 
-        {/* Modals */}
-        {showEventForm && (
-          <EventCreationForm
-            event={selectedEvent}
-            onClose={() => setShowEventForm(false)}
-            onSuccess={() => {
-              loadEvents();
-              setShowEventForm(false);
-            }}
-          />
-        )}
-
+        {/* Registration Modal */}
         {showRegistrationModal && selectedEvent && (
           <EventRegistrationModal
             event={selectedEvent}

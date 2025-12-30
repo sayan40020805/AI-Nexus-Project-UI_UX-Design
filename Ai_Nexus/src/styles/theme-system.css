@@ -35,6 +35,9 @@
   --text-secondary: #bae6fd;    /* Lighter sky blue */
   --text-muted: #e0f2fe;        /* Very light sky blue */
   --text-accent: #67e8f9;       /* Bright sky blue for accents */
+  /* Neutral Text (for standard dark text on light backgrounds) */
+  --text-neutral: #0f172a;      /* Dark neutral text for light mode */
+  --text-muted-dark: #475569;   /* Muted neutral for secondary text */
   
   /* Border Colors */
   --border-light: #e2e8f0;      /* Light gray border */
@@ -108,6 +111,9 @@
   --text-secondary: #bae6fd;    /* Light sky blue */
   --text-muted: #f0f9ff;        /* Very light sky blue */
   --text-accent: #67e8f9;       /* Bright sky blue for accents */
+  /* Neutral Text (for standard light text on dark backgrounds) */
+  --text-neutral: #e2e8f0;      /* Light neutral text for dark mode */
+  --text-muted-dark: #94a3b8;   /* Muted light neutral for secondary text */
   
   /* Border Colors (Sky blue glow) */
   --border-light: #1e293b;      /* Dark border */
@@ -153,6 +159,21 @@
 
 /* ===== BASE STYLES ===== */
 
+/* Global page spacing — small percentage so content sits below header without excessive gap */
+:root {
+  --header-height: 95px; /* default desktop header height */
+  --page-top-spacing: 5%;
+}
+
+@media (max-width: 768px) {
+  :root { --header-height: 72px; --page-top-spacing: 4%; }
+}
+
+@media (max-width: 480px) {
+  :root { --header-height: 64px; --page-top-spacing: 3%; }
+}
+
+
 /* Smooth theme transitions */
 * {
   transition: 
@@ -165,10 +186,10 @@
 /* Body styles */
 body {
   background-color: var(--bg-primary);
+  /* margin-top: 10%; */
   color: var(--text-primary);
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   line-height: 1.6;
-  text-shadow: 0 0 8px currentColor, 0 0 16px currentColor, 0 0 24px currentColor, 0 0 32px currentColor;
 }
 
 /* ===== COMPONENT STYLES ===== */
@@ -297,12 +318,10 @@ a {
   color: var(--text-accent);
   text-decoration: none;
   transition: all var(--transition-normal);
-  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
 }
 
 a:hover {
   color: var(--accent-cyan-light);
-  text-shadow: 0 0 15px currentColor, 0 0 30px currentColor, 0 0 45px currentColor, 0 0 60px currentColor;
 }
 
 /* Headings */
@@ -311,7 +330,6 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   line-height: 1.2;
   margin-bottom: 1rem;
-  text-shadow: 0 0 15px currentColor, 0 0 30px currentColor, 0 0 45px currentColor, 0 0 60px currentColor, 0 0 75px currentColor;
 }
 
 h1 {
@@ -320,13 +338,11 @@ h1 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: var(--glow-medium);
 }
 
 h2 {
   font-size: 2.5rem;
   color: var(--text-accent);
-  text-shadow: var(--glow-subtle);
 }
 
 h3 {
@@ -338,7 +354,17 @@ h3 {
 p {
   color: var(--text-secondary);
   margin-bottom: 1rem;
-  text-shadow: 0 0 8px currentColor, 0 0 16px currentColor, 0 0 24px currentColor, 0 0 32px currentColor;
+}
+
+/* Sky color text glow helpers */
+.text-sky-glow {
+  color: var(--text-primary);
+  text-shadow: var(--glow-medium);
+}
+
+.text-accent-glow {
+  color: var(--text-accent);
+  text-shadow: var(--glow-subtle);
 }
 
 /* ===== SCROLLBAR STYLING ===== */
@@ -402,15 +428,18 @@ p {
 /* ===== UTILITY CLASSES ===== */
 
 .text-glow {
-  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+  color: var(--text-primary);
+  text-shadow: var(--glow-medium);
 }
 
 .text-glow-intense {
-  text-shadow: 0 0 15px currentColor, 0 0 30px currentColor, 0 0 45px currentColor, 0 0 60px currentColor, 0 0 75px currentColor;
+  color: var(--text-primary);
+  text-shadow: var(--glow-strong);
 }
 
 .text-glow-ultra {
-  text-shadow: 0 0 20px currentColor, 0 0 40px currentColor, 0 0 60px currentColor, 0 0 80px currentColor, 0 0 100px currentColor;
+  color: var(--text-primary);
+  text-shadow: var(--glow-intense);
 }
 
 .border-glow {

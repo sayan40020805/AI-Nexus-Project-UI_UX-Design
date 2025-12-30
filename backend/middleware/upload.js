@@ -89,8 +89,11 @@ const upload = multer({
 // =========================
 const uploadFlexible = (req, res, next) => {
   upload.fields([
+    // Accept both dash-separated and camelCase field names from frontend
     { name: 'profile-pic', maxCount: 1 },
+    { name: 'profilePicture', maxCount: 1 },
     { name: 'company-logo', maxCount: 1 },
+    { name: 'companyLogo', maxCount: 1 },
   ])(req, res, next);
 };
 

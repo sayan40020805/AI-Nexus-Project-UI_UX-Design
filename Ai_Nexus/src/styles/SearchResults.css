@@ -1,15 +1,15 @@
 /* Search Results Page Styles */
 .search-results-page {
   min-height: 100vh;
-  background-color: #f8fafc;
+  background-color: var(--bg-secondary);
 }
 
 .search-header {
-  background: white;
+  background: var(--card-bg);
   padding: 24px;
   border-radius: 8px;
   margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .search-title-section {
@@ -18,7 +18,7 @@
 
 .search-title-section h1 {
   margin: 0 0 8px 0;
-  color: #1f2937;
+  color: var(--text-neutral);
   font-size: 28px;
   font-weight: bold;
   display: flex;
@@ -28,12 +28,12 @@
 }
 
 .search-icon {
-  color: #3b82f6;
+  color: var(--info);
 }
 
 .search-subtitle {
   margin: 0;
-  color: #6b7280;
+  color: var(--text-muted-dark);
   font-size: 16px;
 }
 
@@ -53,20 +53,20 @@
 .search-input-wrapper {
   display: flex;
   align-items: center;
-  background: #f9fafb;
-  border: 2px solid #e5e7eb;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-light);
   border-radius: 8px;
   overflow: hidden;
   transition: border-color 0.2s;
 }
 
 .search-input-wrapper:focus-within {
-  border-color: #3b82f6;
+  border-color: var(--info);
 }
 
 .search-input-icon {
   padding: 12px 16px;
-  color: #6b7280;
+  color: var(--text-muted-dark);
 }
 
 .search-input {
@@ -76,16 +76,16 @@
   background: none;
   font-size: 16px;
   outline: none;
-  color: #1f2937;
+  color: var(--text-neutral);
 }
 
 .search-input::placeholder {
-  color: #9ca3af;
+  color: var(--text-muted-dark);
 }
 
 .search-submit-btn {
   padding: 12px 24px;
-  background: #3b82f6;
+  background: var(--info);
   color: white;
   border: none;
   cursor: pointer;
@@ -95,7 +95,7 @@
 }
 
 .search-submit-btn:hover {
-  background: #2563eb;
+  background: var(--primary-600);
 }
 
 .search-controls {
@@ -295,7 +295,7 @@
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-neutral);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -303,8 +303,8 @@
 
 .result-type {
   font-size: 12px;
-  color: #6b7280;
-  background: #f3f4f6;
+  color: var(--text-muted-dark);
+  background: var(--bg-tertiary);
   padding: 2px 8px;
   border-radius: 12px;
   text-transform: capitalize;
@@ -312,7 +312,7 @@
 
 .result-bio {
   margin: 0 0 12px 0;
-  color: #4b5563;
+  color: var(--text-muted-dark);
   font-size: 14px;
   line-height: 1.4;
   display: -webkit-box;

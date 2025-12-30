@@ -2,66 +2,12 @@ const express = require('express');
 const { authMiddleware, roleMiddleware } = require('../middleware/auth');
 const User = require('../models/User');
 const Post = require('../models/Post');
-const multer = require('multer');
-const path = require('path');
+const { uploadFlexible, handleUploadError } = require('../middleware/upload');
 
 const router = express.Router();
 
-// Configure multer for profile picture uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/profiles/');
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'profile_pic-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
-const upload = multer({ 
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: function (req, file, cb) {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed'), false);
-    }
-  }
-});
-
 // Public routes (authentication required but no role restriction)
 router.use(authMiddleware);
-
-// User role restricted routes
-router.use(roleMiddleware('user'));
-
-// ========================
-// GET ANY USER'S PUBLIC PROFILE BY ID (no role restriction)
-// ========================
-router.get('/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    // Check if user exists
-    const user = await User.findById(id).select('-password');
-    if (!user) {
-      return res.status(404).json({ msg: 'User not found' });
-    }
-    
-    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
-    
-    // Prefix stored media paths with base URL if present
-    const userObj = user.toObject();
-    if (userObj.profilePicture) userObj.profilePicture = `${baseUrl}${userObj.profilePicture}`;
-    if (userObj.companyLogo) userObj.companyLogo = `${baseUrl}${userObj.companyLogo}`;
-    
-    res.json(userObj);
-  } catch (err) {
-    console.error('Get user profile by ID error:', err);
-    res.status(500).json({ msg: 'Server error getting user profile' });
-  }
-});
 
 // ========================
 // GET USER PROFILE
@@ -87,7 +33,7 @@ router.get('/profile', async (req, res) => {
 // ========================
 // UPDATE USER PROFILE
 // ========================
-router.put('/profile', upload.single('profilePicture'), async (req, res) => {
+router.put('/profile', uploadFlexible, handleUploadError, async (req, res) => {
   try {
     const { username, bio } = req.body;
     
@@ -98,8 +44,15 @@ router.put('/profile', upload.single('profilePicture'), async (req, res) => {
     };
     
     // Add profile picture if uploaded
+    // Handle both single-file (req.file) and flexible fields (req.files)
     if (req.file) {
       updateData.profilePicture = `/uploads/profiles/${req.file.filename}`;
+    } else if (req.files) {
+      const profileFile = req.files['profile-pic']?.[0] || req.files['profilePicture']?.[0];
+      if (profileFile) {
+        // If middleware stored it under uploads/profiles via upload middleware
+        updateData.profilePicture = `/uploads/profiles/${profileFile.filename}`;
+      }
     }
     
     // Update user info
@@ -124,36 +77,75 @@ router.put('/profile', upload.single('profilePicture'), async (req, res) => {
 // ========================
 router.get('/posts', async (req, res) => {
   try {
-    const { page = 1, limit = 20 } = req.query;
+    const { page = 1, limit = 50 } = req.query;
     const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
     
-    const posts = await Post.find({ author: req.user.id })
+    // Get ALL posts by user (including private posts) - show all on own dashboard
+    // Exclude soft-deleted posts (isDeleted: true)
+    const posts = await Post.find({ 
+      author: req.user.id,
+      isDeleted: { $ne: true }
+    })
       .populate('author', 'username profilePicture role')
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
     
-    const total = await Post.countDocuments({ author: req.user.id });
+    const total = await Post.countDocuments({ 
+      author: req.user.id,
+      isDeleted: { $ne: true }
+    });
 
-    // Prefix media paths with base URL and provide mediaList
+    // Format posts for PostCard compatibility
     const postsWithMedia = posts.map(p => {
       const obj = p.toObject();
+      
+      // Create author object with all needed fields
+      obj.author = {
+        _id: obj.author._id,
+        id: obj.author._id,
+        username: obj.author.username,
+        displayName: obj.author.username,
+        profilePicture: obj.author.profilePicture ? 
+          (obj.author.profilePicture.startsWith('http') ? obj.author.profilePicture : `${baseUrl}${obj.author.profilePicture}`) : 
+          null,
+        role: obj.author.role
+      };
+      
+      // Provide mediaList for gallery views
       obj.mediaList = [];
-      // Format profile picture with full URL
-      if (obj.author && obj.author.profilePicture) {
-        obj.author.profilePicture = `${baseUrl}${obj.author.profilePicture}`;
-      }
-      // Format post media
+      
+      // Format post media with full URLs
       if (obj.media) {
         if (Array.isArray(obj.media.images) && obj.media.images.length) {
-          obj.media.images = obj.media.images.map(img => `${baseUrl}${img}`);
+          obj.media.images = obj.media.images.map(img => 
+            img.startsWith('http') ? img : `${baseUrl}${img}`
+          );
           obj.media.images.forEach(img => obj.mediaList.push({ type: 'image', url: img }));
         }
         if (obj.media.video) {
-          obj.media.video = `${baseUrl}${obj.media.video}`;
+          obj.media.video = obj.media.video.startsWith('http') ? 
+            obj.media.video : `${baseUrl}${obj.media.video}`;
           obj.mediaList.push({ type: 'video', url: obj.media.video });
         }
+        if (obj.media.document) {
+          obj.media.document = obj.media.document.startsWith('http') ? 
+            obj.media.document : `${baseUrl}${obj.media.document}`;
+          obj.mediaList.push({ type: 'document', url: obj.media.document });
+        }
       }
+      
+      // Add interaction counts and flags for PostCard
+      obj.likesCount = obj.likes ? obj.likes.length : 0;
+      obj.commentsCount = obj.comments ? obj.comments.length : 0;
+      obj.sharesCount = obj.shares ? obj.shares.length : 0;
+      obj.isLiked = false;
+      obj.isOwner = true;
+      obj.isPublic = obj.isPublic !== false;
+      
+      // Add isAuthor flag for PostCard
+      obj.isAuthor = true;
+      
       return obj;
     });
     
@@ -205,3 +197,31 @@ router.get('/applications', async (req, res) => {
 });
 
 module.exports = router;
+
+// ========================
+// GET ANY USER'S PUBLIC PROFILE BY ID (no role restriction)
+// NOTE: Placed at end to avoid matching fixed paths earlier
+// ========================
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Check if user exists
+    const user = await User.findById(id).select('-password');
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    
+    // Prefix stored media paths with base URL if present
+    const userObj = user.toObject();
+    if (userObj.profilePicture) userObj.profilePicture = `${baseUrl}${userObj.profilePicture}`;
+    if (userObj.companyLogo) userObj.companyLogo = `${baseUrl}${userObj.companyLogo}`;
+    
+    res.json(userObj);
+  } catch (err) {
+    console.error('Get user profile by ID error:', err);
+    res.status(500).json({ msg: 'Server error getting user profile' });
+  }
+});

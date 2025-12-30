@@ -1,8 +1,467 @@
-(node:77874) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+nohup: ignoring input
+Attempting to connect to MongoDB...
+MongoDB URI: mongodb+srv://ssayanmjhi410_db_user:sayan@cluster0.xhcjuix.mongodb.net/?appName=Cluster0
+ZEGOCLOUD credentials not found. Live streaming functionality will be disabled.
+To enable live streaming, please add these environment variables:
+ZEGO_APP_ID=1606771526
+ZEGO_SERVER_SECRET=your_server_secret_from_zegocloud
+(node:17268) [MONGOOSE] Warning: Duplicate schema index on {"email":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
 (Use `node --trace-warnings ...` to show where the warning was created)
-(node:77874) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
-(node:77874) [MONGOOSE] Warning: Duplicate schema index on {"email":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
-Server started on port 5000
+(node:17268) [MONGOOSE] Warning: Duplicate schema index on {"conversationId":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+Server started on port 5001
 Environment: development
 Uploads served from: /workspaces/AI-Nexus-Project-UI_UX-Design/backend/uploads
-MongoDB Connected: ac-nxn5qqk-shard-00-00.cg391uu.mongodb.net
+Socket.IO enabled for real-time features
+Chat functionality integrated with enhanced real-time messaging
+MongoDB Connected: ac-lb5lgpt-shard-00-00.xhcjuix.mongodb.net
+::1 - - [30/Dec/2025:13:48:30 +0000] "POST /api/auth/signup HTTP/1.1" 201 595 "-" "curl/8.5.0"
+::1 - - [30/Dec/2025:13:48:48 +0000] "HEAD /uploads/profiles/profile_pic-1767102510001-301393815.png HTTP/1.1" 200 68 "-" "curl/8.5.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/auth/me
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 6953d82e783765d863e04eea
+🔐 Auth Middleware - Extracted user ID: 6953d82e783765d863e04eea
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: testuser_autotest_5001
+::1 - - [30/Dec/2025:13:48:59 +0000] "GET /api/auth/me HTTP/1.1" 200 383 "-" "curl/8.5.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/follow/stats/6953d82e783765d863e04eea
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 6953d82e783765d863e04eea
+🔐 Auth Middleware - Extracted user ID: 6953d82e783765d863e04eea
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: testuser_autotest_5001
+::1 - - [30/Dec/2025:13:49:45 +0000] "GET /api/follow/stats/6953d82e783765d863e04eea HTTP/1.1" 200 59 "-" "curl/8.5.0"
+::1 - - [30/Dec/2025:13:53:38 +0000] "POST /api/auth/signup HTTP/1.1" 201 600 "-" "axios/1.13.2"
+::1 - - [30/Dec/2025:13:53:38 +0000] "HEAD /uploads/profiles/profile_pic-1767102818347-20456273.png HTTP/1.1" 200 68 "-" "axios/1.13.2"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/follow/stats/6953d962783765d863e04ef4
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 6953d962783765d863e04ef4
+🔐 Auth Middleware - Extracted user ID: 6953d962783765d863e04ef4
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: e2e_user_e2e1767102818319
+::1 - - [30/Dec/2025:13:53:38 +0000] "GET /api/follow/stats/6953d962783765d863e04ef4 HTTP/1.1" 200 59 "-" "axios/1.13.2"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/feed
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/live
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+::1 - - [30/Dec/2025:13:54:02 +0000] "GET /api/feed HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+::1 - - [30/Dec/2025:13:54:02 +0000] "GET /api/live HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/feed
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/live
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+::1 - - [30/Dec/2025:13:54:02 +0000] "GET /api/feed HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+::1 - - [30/Dec/2025:13:54:02 +0000] "GET /api/live HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+::1 - - [30/Dec/2025:13:54:03 +0000] "GET /uploads/posts/images/media-1767021966096-994189810.png HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+::1 - - [30/Dec/2025:13:54:03 +0000] "GET /uploads/posts/images/media-1766955354829-702711551.png HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+::1 - - [30/Dec/2025:13:54:03 +0000] "GET /uploads/posts/videos/media-1767016525319-247800017.mp4 HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+::1 - - [30/Dec/2025:13:54:03 +0000] "GET /uploads/posts/videos/media-1766951662357-631739399.mp4 HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+::1 - - [30/Dec/2025:13:54:03 +0000] "GET /uploads/posts/videos/media-1766952412477-838946792.mp4 HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+::1 - - [30/Dec/2025:13:54:03 +0000] "GET /uploads/posts/videos/media-1767016525319-247800017.mp4 HTTP/1.1" 206 1664301 "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+::1 - - [30/Dec/2025:13:54:03 +0000] "GET /uploads/posts/videos/media-1766951662357-631739399.mp4 HTTP/1.1" 206 1947588 "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+::1 - - [30/Dec/2025:13:54:04 +0000] "GET /uploads/posts/videos/media-1766952412477-838946792.mp4 HTTP/1.1" 206 1904068 "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/user/profile
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/feed
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+::1 - - [30/Dec/2025:13:54:12 +0000] "GET /api/user/profile HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+::1 - - [30/Dec/2025:13:54:12 +0000] "GET /api/feed HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/live
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+::1 - - [30/Dec/2025:13:54:12 +0000] "GET /api/live HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/user/profile
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/feed
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+::1 - - [30/Dec/2025:13:54:12 +0000] "GET /api/user/profile HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+::1 - - [30/Dec/2025:13:54:12 +0000] "GET /api/feed HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/live
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+::1 - - [30/Dec/2025:13:54:12 +0000] "GET /api/live HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/user/posts
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+::1 - - [30/Dec/2025:13:54:12 +0000] "GET /api/user/posts HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/user/posts
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+::1 - - [30/Dec/2025:13:54:12 +0000] "GET /uploads/profiles/profile_pic-1767087220778-991332348.png HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+::1 - - [30/Dec/2025:13:54:12 +0000] "GET /api/user/posts HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/feed
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+::1 - - [30/Dec/2025:13:54:22 +0000] "GET /api/feed HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/live
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+::1 - - [30/Dec/2025:13:54:22 +0000] "GET /api/live HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/feed
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+::1 - - [30/Dec/2025:13:54:22 +0000] "GET /api/feed HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/live
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+::1 - - [30/Dec/2025:13:54:22 +0000] "GET /api/live HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/feed/by-type/shorts?page=1&limit=50
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+📋 Feed by-type - Request started
+📋 Feed by-type - Request URL: /api/feed/by-type/shorts?page=1&limit=50
+📋 Feed by-type - User authenticated: true
+📋 Feed by-type - User ID: 69539c7567b7e38f57707160
+📋 Feed by-type - Raw post type: shorts
+📋 Feed by-type - Trimmed post type: shorts
+📋 Feed by-type - Query params: { page: '1', limit: '50' }
+📋 Feed by-type - Query params types: { pageType: 'string', limitType: 'string' }
+📋 Feed by-type - Mapped post type: { original: 'shorts', mapped: 'ai_short' }
+📋 Feed by-type - Valid post types: [
+  'normal',    'shorts',
+  'ai_short',  'news',
+  'ai_news',   'model',
+  'ai_models', 'career',
+  'event',     'ai_showcase',
+  'showcase'
+]
+📋 Feed by-type - Is post type valid: true
+📋 Feed by-type - Calculated skip: 0
+📋 Feed by-type - Starting database query...
+📋 Feed by-type - Database query completed, posts found: 3
+📋 Feed by-type - Total count query completed, total posts: 3
+📋 Feed by-type - Response prepared successfully
+::1 - - [30/Dec/2025:13:54:26 +0000] "GET /api/feed/by-type/shorts?page=1&limit=50 HTTP/1.1" 200 2292 "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/feed/by-type/shorts?page=1&limit=50
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+📋 Feed by-type - Request started
+📋 Feed by-type - Request URL: /api/feed/by-type/shorts?page=1&limit=50
+📋 Feed by-type - User authenticated: true
+📋 Feed by-type - User ID: 69539c7567b7e38f57707160
+📋 Feed by-type - Raw post type: shorts
+📋 Feed by-type - Trimmed post type: shorts
+📋 Feed by-type - Query params: { page: '1', limit: '50' }
+📋 Feed by-type - Query params types: { pageType: 'string', limitType: 'string' }
+📋 Feed by-type - Mapped post type: { original: 'shorts', mapped: 'ai_short' }
+📋 Feed by-type - Valid post types: [
+  'normal',    'shorts',
+  'ai_short',  'news',
+  'ai_news',   'model',
+  'ai_models', 'career',
+  'event',     'ai_showcase',
+  'showcase'
+]
+📋 Feed by-type - Is post type valid: true
+📋 Feed by-type - Calculated skip: 0
+📋 Feed by-type - Starting database query...
+📋 Feed by-type - Database query completed, posts found: 3
+📋 Feed by-type - Total count query completed, total posts: 3
+📋 Feed by-type - Response prepared successfully
+::1 - - [30/Dec/2025:13:54:27 +0000] "GET /api/feed/by-type/shorts?page=1&limit=50 HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/feed/by-type/ai_showcase?page=1&limit=50
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+📋 Feed by-type - Request started
+📋 Feed by-type - Request URL: /api/feed/by-type/ai_showcase?page=1&limit=50
+📋 Feed by-type - User authenticated: true
+📋 Feed by-type - User ID: 69539c7567b7e38f57707160
+📋 Feed by-type - Raw post type: ai_showcase
+📋 Feed by-type - Trimmed post type: ai_showcase
+📋 Feed by-type - Query params: { page: '1', limit: '50' }
+📋 Feed by-type - Query params types: { pageType: 'string', limitType: 'string' }
+📋 Feed by-type - Mapped post type: { original: 'ai_showcase', mapped: 'ai_showcase' }
+📋 Feed by-type - Valid post types: [
+  'normal',    'shorts',
+  'ai_short',  'news',
+  'ai_news',   'model',
+  'ai_models', 'career',
+  'event',     'ai_showcase',
+  'showcase'
+]
+📋 Feed by-type - Is post type valid: true
+📋 Feed by-type - Calculated skip: 0
+📋 Feed by-type - Starting database query...
+📋 Feed by-type - Database query completed, posts found: 1
+📋 Feed by-type - Total count query completed, total posts: 1
+📋 Feed by-type - Response prepared successfully
+::1 - - [30/Dec/2025:13:54:33 +0000] "GET /api/feed/by-type/ai_showcase?page=1&limit=50 HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/feed/by-type/ai_showcase?page=1&limit=50
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+📋 Feed by-type - Request started
+📋 Feed by-type - Request URL: /api/feed/by-type/ai_showcase?page=1&limit=50
+📋 Feed by-type - User authenticated: true
+📋 Feed by-type - User ID: 69539c7567b7e38f57707160
+📋 Feed by-type - Raw post type: ai_showcase
+📋 Feed by-type - Trimmed post type: ai_showcase
+📋 Feed by-type - Query params: { page: '1', limit: '50' }
+📋 Feed by-type - Query params types: { pageType: 'string', limitType: 'string' }
+📋 Feed by-type - Mapped post type: { original: 'ai_showcase', mapped: 'ai_showcase' }
+📋 Feed by-type - Valid post types: [
+  'normal',    'shorts',
+  'ai_short',  'news',
+  'ai_news',   'model',
+  'ai_models', 'career',
+  'event',     'ai_showcase',
+  'showcase'
+]
+📋 Feed by-type - Is post type valid: true
+📋 Feed by-type - Calculated skip: 0
+📋 Feed by-type - Starting database query...
+📋 Feed by-type - Database query completed, posts found: 1
+📋 Feed by-type - Total count query completed, total posts: 1
+📋 Feed by-type - Response prepared successfully
+::1 - - [30/Dec/2025:13:54:33 +0000] "GET /api/feed/by-type/ai_showcase?page=1&limit=50 HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/feed/by-type/ai_models?page=1&limit=50
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+📋 Feed by-type - Request started
+📋 Feed by-type - Request URL: /api/feed/by-type/ai_models?page=1&limit=50
+📋 Feed by-type - User authenticated: true
+📋 Feed by-type - User ID: 69539c7567b7e38f57707160
+📋 Feed by-type - Raw post type: ai_models
+📋 Feed by-type - Trimmed post type: ai_models
+📋 Feed by-type - Query params: { page: '1', limit: '50' }
+📋 Feed by-type - Query params types: { pageType: 'string', limitType: 'string' }
+📋 Feed by-type - Mapped post type: { original: 'ai_models', mapped: 'ai_models' }
+📋 Feed by-type - Valid post types: [
+  'normal',    'shorts',
+  'ai_short',  'news',
+  'ai_news',   'model',
+  'ai_models', 'career',
+  'event',     'ai_showcase',
+  'showcase'
+]
+📋 Feed by-type - Is post type valid: true
+📋 Feed by-type - Calculated skip: 0
+📋 Feed by-type - Starting database query...
+📋 Feed by-type - Database query completed, posts found: 1
+📋 Feed by-type - Total count query completed, total posts: 1
+📋 Feed by-type - Response prepared successfully
+::1 - - [30/Dec/2025:13:54:39 +0000] "GET /api/feed/by-type/ai_models?page=1&limit=50 HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
+🔐 Auth Middleware - Request started
+🔐 Auth Middleware - Request URL: /api/feed/by-type/ai_models?page=1&limit=50
+🔐 Auth Middleware - Request method: GET
+🔐 Auth Middleware - Auth header present: true
+🔐 Auth Middleware - Auth header starts with Bearer: true
+🔐 Auth Middleware - Token extracted, length: 201
+🔐 Auth Middleware - Using JWT secret (first 10 chars): your-super...
+🔐 Auth Middleware - Token verified successfully, user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - Extracted user ID: 69539c7567b7e38f57707160
+🔐 Auth Middleware - User found: true
+🔐 Auth Middleware - User authenticated successfully: chayan
+📋 Feed by-type - Request started
+📋 Feed by-type - Request URL: /api/feed/by-type/ai_models?page=1&limit=50
+📋 Feed by-type - User authenticated: true
+📋 Feed by-type - User ID: 69539c7567b7e38f57707160
+📋 Feed by-type - Raw post type: ai_models
+📋 Feed by-type - Trimmed post type: ai_models
+📋 Feed by-type - Query params: { page: '1', limit: '50' }
+📋 Feed by-type - Query params types: { pageType: 'string', limitType: 'string' }
+📋 Feed by-type - Mapped post type: { original: 'ai_models', mapped: 'ai_models' }
+📋 Feed by-type - Valid post types: [
+  'normal',    'shorts',
+  'ai_short',  'news',
+  'ai_news',   'model',
+  'ai_models', 'career',
+  'event',     'ai_showcase',
+  'showcase'
+]
+📋 Feed by-type - Is post type valid: true
+📋 Feed by-type - Calculated skip: 0
+📋 Feed by-type - Starting database query...
+📋 Feed by-type - Database query completed, posts found: 1
+📋 Feed by-type - Total count query completed, total posts: 1
+📋 Feed by-type - Response prepared successfully
+::1 - - [30/Dec/2025:13:54:39 +0000] "GET /api/feed/by-type/ai_models?page=1&limit=50 HTTP/1.1" 304 - "http://127.0.0.1:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"

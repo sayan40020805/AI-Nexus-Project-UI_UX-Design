@@ -18,7 +18,7 @@ import { PostForm } from '../../components/PostCreation';
 
 const CreatePostPage = () => {
   return (
-    <div className="create-post-page">
+    <div className="create-post-page page-with-header">
       <PostForm />
     </div>
   );

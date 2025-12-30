@@ -251,49 +251,49 @@
 
 /* ===== LIGHT MODE ===== */
 .light .footer {
-  background: linear-gradient(135deg, #f0f2f5 0%, #e8eaed 100%);
-  border-top: 1px solid rgba(2, 132, 199, 0.3);
-  box-shadow: 0 -8px 32px rgba(2, 132, 199, 0.08);
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-accent);
+  box-shadow: var(--glow-subtle);
 }
 
 .light .footer::before {
   background:
-    radial-gradient(circle at 20% 80%, rgba(2, 132, 199, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(14, 165, 233, 0.06) 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, rgba(8, 145, 178, 0.06) 0%, transparent 50%);
 }
 
 .light .footer-h3 {
-  color: #0284c7;
-  background: linear-gradient(135deg, #0284c7 0%, #0891b2 100%);
+  color: var(--primary-600);
+  background: var(--button-primary-bg);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .light .footer-h3::after {
-  background: linear-gradient(90deg, #0284c7, transparent);
+  background: linear-gradient(90deg, var(--primary-600), transparent);
 }
 
 .light .footer-p {
-  color: #4b5563;
+  color: var(--text-muted-dark);
 }
 
 .light .footer-a {
-  color: #4b5563;
+  color: var(--text-muted-dark);
 }
 
 .light .footer-a:hover {
-  color: #0284c7;
+  color: var(--primary-600);
 }
 
 .light .footer-a::before {
-  background: linear-gradient(90deg, #0284c7, #0891b2);
+  background: linear-gradient(90deg, var(--primary-600), var(--accent-cyan));
 }
 
 .light .footer-input {
-  background: linear-gradient(135deg, rgba(248, 249, 250, 0.8) 0%, rgba(240, 242, 245, 0.6) 100%);
-  border: 1px solid rgba(2, 132, 199, 0.2);
-  color: #1f2937;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  color: var(--text-neutral);
 }
 
 .light .footer-input::placeholder {
@@ -301,20 +301,19 @@
 }
 
 .light .footer-input:focus {
-  box-shadow: 0 0 30px rgba(2, 132, 199, 0.2),
-              inset 0 0 15px rgba(2, 132, 199, 0.05);
-  border-color: #0284c7;
-  background: linear-gradient(135deg, rgba(248, 249, 250, 1) 0%, rgba(240, 242, 245, 0.8) 100%);
+  box-shadow: var(--glow-subtle), inset 0 0 15px rgba(14, 165, 233, 0.05);
+  border-color: var(--primary-600);
+  background: var(--bg-primary);
 }
 
 .light .footer-button {
-  background: linear-gradient(135deg, #0284c7 0%, #0891b2 100%);
+  background: var(--button-hover-bg);
   color: #ffffff;
-  box-shadow: 0 4px 20px rgba(2, 132, 199, 0.25);
+  box-shadow: var(--glow-medium);
 }
 
 .light .footer-button:hover {
-  box-shadow: 0 8px 40px rgba(2, 132, 199, 0.3), 0 0 20px rgba(8, 145, 178, 0.15);
+  box-shadow: var(--glow-strong), 0 0 20px rgba(8, 145, 178, 0.15);
 }
 
 .light .footer-button::before {
@@ -322,17 +321,17 @@
 }
 
 .light .footer-icon {
-  color: #0284c7;
-  filter: drop-shadow(0 0 8px rgba(2, 132, 199, 0.15));
+  color: var(--primary-600);
+  filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.15));
 }
 
 .light .footer-icon:hover {
-  color: #0891b2;
-  filter: drop-shadow(0 0 12px rgba(2, 132, 199, 0.3));
+  color: var(--accent-cyan);
+  filter: drop-shadow(0 0 12px rgba(14, 165, 233, 0.3));
 }
 
 .light .footer-bottom {
-  border-top: 1px solid rgba(2, 132, 199, 0.15);
-  background: linear-gradient(180deg, transparent 0%, rgba(2, 132, 199, 0.04) 100%);
-  color: #4b5563;
+  border-top: 1px solid var(--border-accent);
+  background: linear-gradient(180deg, transparent 0%, rgba(14, 165, 233, 0.04) 100%);
+  color: var(--text-muted-dark);
 }

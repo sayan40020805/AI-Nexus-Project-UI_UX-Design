@@ -65,8 +65,8 @@ h1 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: var(--glow-medium);
   letter-spacing: -0.02em;
+  color: aqua;
 }
 
 h2 {
@@ -75,7 +75,6 @@ h2 {
   line-height: 1.2;
   margin-bottom: 1.5rem;
   color: var(--text-accent);
-  text-shadow: var(--glow-subtle);
 }
 
 h3 {
@@ -190,4 +189,30 @@ input::placeholder {
 /* Light theme legacy compatibility */
 .light {
   /* All variables already set for light mode via theme system */
+}
+
+/* Ensure content never hides under the fixed header across all pages */
+/* Apply a consistent top spacing to commonly used page wrappers. This
+   covers pages that use MainLayout (.app-main-content/.app-content) and
+   PageLayout (.page-with-header), plus a small set of page root classes
+   that existed without the header-aware class. */
+.app-main-content,
+.page-with-header,
+.app-content,
+.app-main,
+.app-section,
+.home-container,
+.create-post-page,
+.post-container,
+.ai-showcase-page,
+.ai-models-page,
+.ai-shorts-page,
+.ai-news-page,
+.search-results-page,
+.profile-page,
+.quiz-page,
+.tools-page,
+.live-page {
+  padding-top: var(--page-top-spacing) !important;
+  box-sizing: border-box;
 }

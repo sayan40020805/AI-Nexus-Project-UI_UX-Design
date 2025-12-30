@@ -38,14 +38,14 @@ header {
   top: 0;
   left: 0;
   right: 0;
-  height: 70px;
+  height: var(--header-height);
   z-index: 50;
 }
 
 /* Main content area */
 .app-main-content {
   flex: 1;
-  margin-top: 70px;
+  margin-top: var(--page-top-spacing);
   width: 100%;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
@@ -66,7 +66,7 @@ header {
 
 .app-content-wrapper {
   width: 100%;
-  min-height: calc(100vh - 70px);
+  min-height: calc(100vh - var(--page-top-spacing));
   animation: fadeInUp 0.6s ease-out;
 }
 
@@ -93,12 +93,13 @@ footer {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  padding-top: var(--page-top-spacing); /* Global top spacing for all pages */
 }
 
 /* Sections & Typography */
 .app-section {
   position: relative;
-  scroll-margin-top: 80px;
+  scroll-margin-top: var(--page-top-spacing);
   animation: fadeInUp 0.8s ease-out;
 }
 

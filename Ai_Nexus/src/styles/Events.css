@@ -3,36 +3,36 @@
    ============================================= */
 
 :root {
-  --events-bg: #ffffff;
-  --events-text: #1f2937;
-  --events-border: #e5e7eb;
-  --events-shadow: rgba(0, 0, 0, 0.05);
-  --events-primary: #0284c7;
-  --events-primary-light: #e0f2fe;
-  --events-hover: #f3f4f6;
-  --events-accent: #06b6d4;
+  --events-bg: var(--bg-primary);
+  --events-text: var(--text-neutral);
+  --events-border: var(--border-light);
+  --events-shadow: var(--shadow-sm);
+  --events-primary: var(--primary-600);
+  --events-primary-light: var(--primary-100);
+  --events-hover: var(--bg-secondary);
+  --events-accent: var(--accent-cyan);
 }
 
 .light {
-  --events-bg: #ffffff;
-  --events-text: #1f2937;
-  --events-border: #e5e7eb;
-  --events-shadow: rgba(0, 0, 0, 0.05);
-  --events-primary: #0284c7;
-  --events-primary-light: #e0f2fe;
-  --events-hover: #f3f4f6;
-  --events-accent: #06b6d4;
+  --events-bg: var(--bg-primary);
+  --events-text: var(--text-neutral);
+  --events-border: var(--border-light);
+  --events-shadow: var(--shadow-sm);
+  --events-primary: var(--primary-600);
+  --events-primary-light: var(--primary-100);
+  --events-hover: var(--bg-secondary);
+  --events-accent: var(--accent-cyan);
 }
 
 .dark {
-  --events-bg: #1a202c;
-  --events-text: #e5e7eb;
-  --events-border: #374151;
-  --events-shadow: rgba(0, 0, 0, 0.3);
-  --events-primary: #0ea5e9;
-  --events-primary-light: #082f49;
-  --events-hover: #2d3748;
-  --events-accent: #06b6d4;
+  --events-bg: var(--bg-primary);
+  --events-text: var(--text-primary);
+  --events-border: var(--border-medium);
+  --events-shadow: var(--shadow-glow);
+  --events-primary: var(--primary-500);
+  --events-primary-light: var(--primary-300);
+  --events-hover: var(--bg-tertiary);
+  --events-accent: var(--accent-cyan);
 }
 
 /* =============================================
@@ -46,7 +46,7 @@
 }
 
 .events-container {
-  margin-top: 4%;
+  margin-top: var(--page-top-spacing); /* Account for fixed header */
   max-width: 1400px;
   /* margin: 0; */
   padding: 2rem 1.5rem;
@@ -65,17 +65,24 @@
   font-weight: 700;
   color: var(--events-text);
   margin-bottom: 0.75rem;
-  background: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%);
+  background: var(--button-primary-bg);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .light .events-page-header h1 {
-  background: linear-gradient(135deg, #0284c7 0%, #0891b2 100%);
+  background: var(--button-primary-bg);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.events-page-header p {
+  font-size: 1.125rem;
+  color: var(--text-muted-dark);
+  margin: 0;
+  letter-spacing: -0.3px;
 }
 
 .dark .events-page-header h1 {

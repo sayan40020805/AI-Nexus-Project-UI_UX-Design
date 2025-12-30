@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { FeedContext } from '../../context/FeedContext';
 import PostCard from '../../components/PostCard/PostCard';
@@ -8,6 +8,7 @@ import './Dashboard.css';
 
 const UserDashboard = () => {
   const { user, token } = useAuth();
+  const feedCtx = useContext(FeedContext);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newPost, setNewPost] = useState('');
@@ -28,12 +29,13 @@ const UserDashboard = () => {
       try {
         setLoading(true);
         
-        // Fetch user profile data
+        // Fetch user profile data (avoid cached 304 responses)
         const profileResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/user/profile`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
-          }
+          },
+          cache: 'no-store'
         });
 
         if (profileResponse.ok) {
@@ -48,38 +50,85 @@ const UserDashboard = () => {
           });
         }
 
-        // Fetch user's posts
-        const postsResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/user/posts`, {
+        // Fetch user's posts with high limit to get ALL posts
+        let postsResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/user/posts?limit=100`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
-          }
+          },
+          cache: 'no-store'
         });
 
+        // If server responds with 304 Not Modified (often due to caching proxies), force a fresh fetch
+        if (postsResponse && postsResponse.status === 304) {
+          console.log('📋 Dashboard - Received 304 for /api/user/posts, re-fetching with no-store');
+          postsResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/user/posts?limit=100`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            cache: 'no-store'
+          });
+        }
+
+        console.log('📋 Dashboard - Posts API response status:', postsResponse.status);
+        
         if (postsResponse.ok) {
           const postsResult = await postsResponse.json();
+          console.log('📋 Dashboard - Posts API result:', {
+            postsCount: postsResult.posts?.length || 0,
+            pagination: postsResult.pagination
+          });
+          
           const userPosts = postsResult.posts || [];
           
-          // Format posts for display
-          const formattedPosts = userPosts.map(post => ({
-            _id: post._id,
-            content: post.content,
-            postType: post.postType || 'normal',
-            author: {
-              _id: user._id,
-              username: userData.username || user?.username || 'User',
-              profilePicture: userData.profilePicture || user?.profilePicture || '',
-              role: user?.role || 'user'
-            },
-            media: post.media || {},
-            likes: post.likes || [],
-            comments: post.comments || [],
-            shares: post.shares || [],
-            createdAt: post.createdAt,
-            updatedAt: post.updatedAt
-          }));
+          // Format posts for PostCard compatibility
+          const formattedPosts = userPosts.map((post, index) => {
+            console.log(`📋 Dashboard - Processing post ${index + 1}:`, {
+              id: post._id,
+              content: post.content?.substring(0, 30)
+            });
+            return {
+              _id: post._id || post.id,
+              id: post._id || post.id,
+              content: post.content,
+              title: post.title,
+              postType: post.postType || 'normal',
+              author: {
+                _id: user._id,
+                id: user._id,
+                username: userData.username || user?.username || 'User',
+                displayName: userData.username || user?.username || 'User',
+                profilePicture: userData.profilePicture || user?.profilePicture || '',
+                role: user?.role || 'user'
+              },
+              media: post.media || { images: [], video: '', document: '' },
+              mediaList: post.mediaList || [],
+              likes: post.likes || [],
+              likesCount: post.likesCount || post.likes?.length || 0,
+              comments: post.comments || [],
+              commentsCount: post.commentsCount || post.comments?.length || 0,
+              shares: post.shares || [],
+              sharesCount: post.sharesCount || post.shares?.length || 0,
+              createdAt: post.createdAt,
+              updatedAt: post.updatedAt,
+              isLiked: post.isLiked || false,
+              isOwner: true,
+              isPublic: post.isPublic !== false
+            };
+          });
           
-          setPosts(formattedPosts);
+          console.log('📋 Dashboard - Final formatted posts:', formattedPosts.length);
+          
+          // Only set posts if we have them and state is empty (avoid overwriting with empty)
+          if (formattedPosts.length > 0) {
+            setPosts(formattedPosts);
+          } else {
+            console.log('📋 Dashboard - No posts found in API response');
+          }
+        } else {
+          const errorText = await postsResponse.text();
+          console.error('📋 Dashboard - Posts API error:', postsResponse.status, errorText);
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -121,14 +170,32 @@ const UserDashboard = () => {
         const result = await response.json();
         
         const newPostData = {
+          _id: result.post._id,
           id: result.post._id,
-          author: user?.username || 'User',
-          authorPic: user?.profilePicture || '/default-avatar.svg',
           content: newPost,
-          timestamp: 'Just now',
-          image: '',
-          likes: 0,
+          title: result.post.title,
+          postType: result.post.postType || 'normal',
+          author: {
+            _id: user._id,
+            id: user._id,
+            username: user?.username || 'User',
+            displayName: user?.username || 'User',
+            profilePicture: user?.profilePicture || '',
+            role: user?.role || 'user'
+          },
+          media: result.post.media || { images: [], video: '', document: '' },
+          mediaList: result.post.mediaList || [],
+          likes: [],
+          likesCount: 0,
           comments: [],
+          commentsCount: 0,
+          shares: [],
+          sharesCount: 0,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          isLiked: false,
+          isOwner: true,
+          isPublic: true
         };
 
         setPosts([newPostData, ...posts]);
@@ -190,6 +257,39 @@ const UserDashboard = () => {
       }));
     }
   };
+
+  // Listen for new posts added to the global feed and add them to dashboard if authored by current user
+  useEffect(() => {
+    if (!feedCtx || !feedCtx.posts || !user) return;
+
+    const latest = feedCtx.posts[0];
+    if (!latest) return;
+
+    const latestAuthorId = latest.author?._id || latest.author;
+    const currentUserId = user._id || user.id || user;
+
+    try {
+      // Only add to existing posts if the latest post is from the current user
+      // and we already have posts loaded (avoid overwriting all posts)
+      if (latestAuthorId && currentUserId && latestAuthorId.toString() === currentUserId.toString()) {
+        setPosts(prev => {
+          // If we have no posts yet, use all feed posts from current user
+          if (prev.length === 0) {
+            return feedCtx.posts.filter(p => {
+              const authorId = p.author?._id || p.author;
+              return authorId?.toString() === currentUserId.toString();
+            });
+          }
+          // Otherwise, just prepend the latest post if not duplicate
+          if (prev.some(p => p._id === latest._id || p.id === latest._id)) return prev;
+          return [latest, ...prev];
+        });
+      }
+    } catch (err) {
+      // Defensive: if author shape differs, ignore
+      console.warn('Feed integration check failed:', err.message);
+    }
+  }, [feedCtx?.posts, user]);
 
   if (loading) {
     return (
@@ -326,19 +426,34 @@ const UserDashboard = () => {
 
           {/* Posts Feed */}
           <div className="post-feed">
-            {posts.map((post) => (
-              <PostCard
-                key={post.id || post._id}
-                post={post}
-                onPostUpdate={(updatedPost) => {
-                  setPosts(prev => prev.map(p => (p.id || p._id) === (updatedPost.id || updatedPost._id) ? updatedPost : p));
-                }}
-                onPostDelete={(deletedPostId) => {
-                  setPosts(prev => prev.filter(p => (p.id || p._id) !== deletedPostId));
-                }}
-                showComments={false}
-              />
-            ))} 
+            {posts.length === 0 ? (
+              <div className="no-posts-message" style={{
+                textAlign: 'center',
+                padding: '3rem 1rem',
+                color: 'var(--text-muted)',
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '16px',
+                marginTop: '1rem'
+              }}>
+                <p style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>No posts yet</p>
+                <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>Share your first AI discovery or update above!</p>
+              </div>
+            ) : (
+              posts.map((post) => (
+                <PostCard
+                  key={post.id || post._id}
+                  post={post}
+                  onPostUpdate={(updatedPost) => {
+                    setPosts(prev => prev.map(p => (p.id || p._id) === (updatedPost.id || updatedPost._id) ? updatedPost : p));
+                  }}
+                  onPostDelete={(deletedPostId) => {
+                    setPosts(prev => prev.filter(p => (p.id || p._id) !== deletedPostId));
+                  }}
+                  showComments={false}
+                />
+              ))
+            )}
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 /* Profile Page Styles */
 .profile-page {
   min-height: 100vh;
-  background-color: #f8fafc;
+  background: var(--bg);
 }
 
 .profile-loading,
@@ -19,8 +19,8 @@
 .loading-spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid #e2e8f0;
-  border-top: 3px solid #3b82f6;
+  border: 3px solid var(--border);
+  border-top: 3px solid var(--accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -31,16 +31,16 @@
 }
 
 .profile-header {
-  background: white;
-  border-radius: 8px;
+  background: var(--bg-2);
+  border-radius: var(--radius-md);
   margin-bottom: 20px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-glow);
 }
 
 .profile-cover {
   height: 200px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--bg-2);
   position: relative;
 }
 
@@ -49,11 +49,11 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: white;
-  opacity: 0.7;
+  color: var(--text-2);
+  opacity: 0.85;
   gap: 0.5rem;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: opacity var(--transition-fast);
 }
 
 .cover-placeholder:hover {
@@ -83,9 +83,9 @@
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  border: 4px solid white;
+  border: 4px solid var(--bg);
   overflow: hidden;
-  background: #e2e8f0;
+  background: var(--bg-tertiary);
 }
 
 .profile-avatar img {
@@ -101,18 +101,18 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #3b82f6;
-  color: white;
+  background: var(--accent);
+  color: var(--bg);
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background var(--transition-fast);
 }
 
 .avatar-edit-btn:hover {
-  background: #2563eb;
+  background: var(--accent-contrast);
 }
 
 .profile-details {
@@ -127,7 +127,7 @@
   font-size: 28px;
   font-weight: bold;
   margin: 0 0 4px 0;
-  color: #1f2937;
+  color: var(--text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -135,12 +135,12 @@
 }
 
 .verified-badge {
-  color: #3b82f6;
+  color: var(--info);
   font-weight: bold;
 }
 
 .profile-handle {
-  color: #6b7280;
+  color: var(--text-muted-dark);
   margin: 0;
   font-size: 16px;
 }
@@ -150,7 +150,7 @@
 }
 
 .profile-bio p {
-  color: #4b5563;
+  color: var(--text-muted-dark);
   margin: 0;
   line-height: 1.5;
 }
@@ -167,7 +167,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #6b7280;
+  color: var(--text-muted-dark);
   font-size: 14px;
 }
 
@@ -177,7 +177,7 @@
   gap: 24px;
   margin-bottom: 20px;
   padding: 16px;
-  background: #f9fafb;
+  background: var(--bg-secondary);
   border-radius: 8px;
 }
 
@@ -189,13 +189,13 @@
   display: block;
   font-size: 20px;
   font-weight: bold;
-  color: #1f2937;
+  color: var(--text-neutral);
 }
 
 .stat-label {
   display: block;
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-muted-dark);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -224,37 +224,37 @@
 
 .edit-profile-btn,
 .message-btn {
-  background: #3b82f6;
+  background: var(--primary-400);
   color: white;
 }
 
 .edit-profile-btn:hover,
 .message-btn:hover {
-  background: #2563eb;
+  background: var(--primary-600);
 }
 
 .settings-btn,
 .follow-btn {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--bg-tertiary);
+  color: var(--text-neutral);
 }
 
 .settings-btn:hover,
 .follow-btn:hover {
-  background: #d1d5db;
+  background: var(--border-light);
 }
 
 .profile-content {
-  background: white;
+  background: var(--card-bg);
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .profile-tabs {
   display: flex;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-secondary);
 }
 
 .tab-btn {

@@ -778,27 +778,27 @@
 }
 
 .light .profile-status {
-  color: #4b5563;
+  color: var(--text-muted-dark);
 }
 
 .light .stat-value {
-  color: #0284c7;
+  color: var(--primary-600);
 }
 
 .light .profile-btn {
-  background: linear-gradient(135deg, #0284c7 0%, #0891b2 100%);
+  background: var(--button-hover-bg);
   color: white;
-  box-shadow: 0 4px 15px rgba(2, 132, 199, 0.2);
+  box-shadow: var(--glow-subtle);
 }
 
 .light .profile-btn:hover {
-  box-shadow: 0 6px 25px rgba(2, 132, 199, 0.3);
+  box-shadow: var(--glow-medium);
 }
 
 .light .suggestion-item {
-  background: rgba(2, 132, 199, 0.06);
-  border: 1px solid rgba(2, 132, 199, 0.15);
-  color: #0284c7;
+  background: rgba(14, 165, 233, 0.06);
+  border: 1px solid var(--border-accent);
+  color: var(--primary-600);
 }
 
 .light .suggestion-item:hover {
@@ -813,45 +813,45 @@
 }
 
 .light .welcome-badge {
-  background: rgba(2, 132, 199, 0.1);
-  border: 1px solid rgba(2, 132, 199, 0.3);
-  color: #0284c7;
+  background: rgba(14, 165, 233, 0.1);
+  border: 1px solid var(--border-accent);
+  color: var(--primary-600);
 }
 
 .light .welcome-title {
-  background: linear-gradient(135deg, #0284c7 0%, #0891b2 100%);
+  background: var(--button-primary-bg);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .light .post-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.95) 100%);
-  border: 1px solid rgba(2, 132, 199, 0.15);
-  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.08);
+  background: var(--card-bg);
+  border: 1px solid var(--border-accent);
+  box-shadow: var(--glow-subtle);
 }
 
 .light .post-card:hover {
-  border-color: rgba(2, 132, 199, 0.3);
-  box-shadow: 0 12px 32px rgba(2, 132, 199, 0.12);
+  border-color: var(--border-accent-strong);
+  box-shadow: var(--glow-medium);
 }
 
 .light .post-card-name {
-  color: #000000;
+  color: var(--text-neutral);
 }
 
 .light .post-card-time {
-  color: #4b5563;
+  color: var(--text-muted-dark);
 }
 
 .light .post-card-content {
-  color: #1f2937;
+  color: var(--text-neutral);
 }
 
 .light .post-card-avatar {
-  background: linear-gradient(135deg, rgba(2, 132, 199, 0.15) 0%, rgba(8, 145, 178, 0.15) 100%);
-  border: 2px solid rgba(2, 132, 199, 0.25);
-  color: #0284c7;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(8, 145, 178, 0.15) 100%);
+  border: 2px solid var(--border-accent);
+  color: var(--primary-600);
 }
 
 .light .post-card-stats {
@@ -860,22 +860,22 @@
 }
 
 .light .stat-icon {
-  color: #0284c7;
+  color: var(--primary-600);
 }
 
 .light .action-btn {
-  color: #4b5563;
+  color: var(--text-muted-dark);
 }
 
 .light .action-btn:hover {
-  background: rgba(2, 132, 199, 0.08);
-  border-color: rgba(2, 132, 199, 0.2);
-  color: #0284c7;
+  background: rgba(14, 165, 233, 0.08);
+  border-color: var(--border-accent);
+  color: var(--primary-600);
 }
 
 .light .live-video-card {
-  background: rgba(2, 132, 199, 0.03);
-  border: 1px solid rgba(2, 132, 199, 0.15);
+  background: rgba(14, 165, 233, 0.03);
+  border: 1px solid var(--border-accent);
 }
 
 .light .live-video-card:hover {
@@ -888,21 +888,21 @@
 }
 
 .light .live-video-streamer {
-  color: #4b5563;
+  color: var(--text-muted-dark);
 }
 
 .light .feed-error,
 .light .panel-error {
   background: rgba(239, 68, 68, 0.04);
   border: 1px solid rgba(239, 68, 68, 0.15);
-  color: #4b5563;
+  color: var(--text-muted-dark);
 }
 
 .light .feed-empty,
 .light .panel-empty {
   background: rgba(2, 132, 199, 0.04);
   border: 1px solid rgba(2, 132, 199, 0.15);
-  color: #4b5563;
+  color: var(--text-muted-dark);
 }
 
 /* ===== RESPONSIVE DESIGN ===== */

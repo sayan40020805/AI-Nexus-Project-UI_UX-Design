@@ -135,7 +135,7 @@ export function Post() {
   };
 
   return (
-    <div className="post-container">
+    <div className="post-container page-with-header">
       <div className="post-header">
         <div className="post-title">
           <FileText className="w-6 h-6" />
