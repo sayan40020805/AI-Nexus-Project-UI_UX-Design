@@ -9,6 +9,31 @@ const { authMiddleware } = require('../middleware/auth');
 const router = express.Router();
 
 // ========================
+// HEALTH CHECK (NO AUTH REQUIRED)
+// ========================
+router.get('/health', async (req, res) => {
+  try {
+    // Basic health check
+    const healthCheck = {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      message: 'AI Nexus Backend is running',
+      version: '1.0.0'
+    };
+    
+    res.json(healthCheck);
+  } catch (err) {
+    console.error('Health check error:', err);
+    res.status(500).json({ 
+      status: 'error', 
+      message: 'Health check failed',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// ========================
 // HELPERS
 // ========================
 
@@ -42,6 +67,7 @@ const getUserData = (user) => {
     companyDescription: user.companyDescription,
     profilePicture: user.profilePicture ? `${baseUrl}${user.profilePicture}` : '',
     companyLogo: user.companyLogo ? `${baseUrl}${user.companyLogo}` : '',
+    coverPhoto: user.coverPhoto ? `${baseUrl}${user.coverPhoto}` : '',
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };

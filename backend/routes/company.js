@@ -74,7 +74,15 @@ router.get('/:id', async (req, res) => {
 router.get('/profile', async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
-    res.json({ user });
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+
+    // Prefix stored media paths with base URL if present
+    const userObj = user.toObject();
+    if (userObj.profilePicture) userObj.profilePicture = `${baseUrl}${userObj.profilePicture}`;
+    if (userObj.companyLogo) userObj.companyLogo = `${baseUrl}${userObj.companyLogo}`;
+    if (userObj.coverPhoto) userObj.coverPhoto = `${baseUrl}${userObj.coverPhoto}`;
+
+    res.json({ company: userObj });
   } catch (err) {
     console.error('Get company profile error:', err);
     res.status(500).json({ msg: 'Server error getting company profile' });
@@ -122,6 +130,7 @@ router.put('/profile', upload.single('companyLogo'), async (req, res) => {
 router.get('/posts', async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
     
     const posts = await Post.find({ author: req.user.id })
       .populate('author', 'companyName companyLogo role')
@@ -131,8 +140,17 @@ router.get('/posts', async (req, res) => {
     
     const total = await Post.countDocuments({ author: req.user.id });
     
+    // Format posts with full image URLs
+    const formattedPosts = posts.map(post => {
+      const obj = post.toObject();
+      if (obj.author && obj.author.companyLogo) {
+        obj.author.companyLogo = `${baseUrl}${obj.author.companyLogo}`;
+      }
+      return obj;
+    });
+    
     res.json({
-      posts,
+      posts: formattedPosts,
       pagination: {
         current: page,
         pages: Math.ceil(total / limit),

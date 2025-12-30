@@ -447,14 +447,31 @@ router.get('/user/:userId', authMiddleware, async (req, res) => {
       return p;
     });
     
+    // Build complete user object with all profile fields
+    const userObj = {
+      id: user._id,
+      username: user.username,
+      companyName: user.companyName,
+      role: user.role,
+      // Profile fields
+      profilePicture: user.profilePicture ? 
+        (user.profilePicture.startsWith('http') ? user.profilePicture : `${baseUrl}${user.profilePicture}`) : 
+        null,
+      companyLogo: user.companyLogo ? 
+        (user.companyLogo.startsWith('http') ? user.companyLogo : `${baseUrl}${user.companyLogo}`) : 
+        null,
+      coverPhoto: user.coverPhoto ? 
+        (user.coverPhoto.startsWith('http') ? user.coverPhoto : `${baseUrl}${user.coverPhoto}`) : 
+        null,
+      bio: user.bio || '',
+      companyDescription: user.companyDescription || '',
+      location: user.location || '',
+      createdAt: user.createdAt
+    };
+
     res.json({
       posts: enrichedPosts,
-      user: {
-        id: user._id,
-        username: user.username,
-        companyName: user.companyName,
-        role: user.role
-      },
+      user: userObj,
       pagination: {
         current: parseInt(page),
         pages: Math.ceil(total / limit),

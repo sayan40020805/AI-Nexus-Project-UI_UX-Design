@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { FeedContext } from '../../context/FeedContext';
 import PostCard from '../../components/PostCard/PostCard';
+import { DEFAULT_AVATAR } from '../../utils/imageUtils';
 import { usePostInteractions } from '../../hooks/usePostInteractions';
 import './Dashboard.css';
 
@@ -18,6 +19,7 @@ const CompanyDashboard = () => {
     email: '',
     description: '',
     companyLogo: '',
+    coverPhoto: '',
     website: '',
     industry: ''
   });
@@ -48,13 +50,15 @@ const CompanyDashboard = () => {
 
         if (profileResponse.ok) {
           const profileResult = await profileResponse.json();
+          const companyInfo = profileResult.company || {};
           setCompanyData({
-            companyName: profileResult.company?.companyName || user?.companyName || 'Company',
-            email: profileResult.company?.email || user?.email || '',
-            description: profileResult.company?.companyDescription || user?.companyDescription || 'Leading the future with AI innovation',
-            companyLogo: profileResult.company?.companyLogo || user?.companyLogo || '',
-            website: profileResult.company?.website || '',
-            industry: profileResult.company?.industry || ''
+            companyName: companyInfo.companyName || user?.companyName || 'Company',
+            email: companyInfo.email || user?.email || '',
+            description: companyInfo.companyDescription || user?.companyDescription || 'Leading the future with AI innovation',
+            companyLogo: companyInfo.companyLogo || user?.companyLogo || '',
+            coverPhoto: companyInfo.coverPhoto || user?.coverPhoto || '',
+            website: companyInfo.website || '',
+            industry: companyInfo.industry || ''
           });
         }
 
@@ -125,6 +129,7 @@ const CompanyDashboard = () => {
           email: user?.email || '',
           description: user?.companyDescription || 'Leading the future with AI innovation',
           companyLogo: user?.companyLogo || '',
+          coverPhoto: user?.coverPhoto || '',
           website: user?.website || '',
           industry: user?.industry || ''
         });
@@ -304,21 +309,37 @@ const CompanyDashboard = () => {
     );
   }
 
+  // Helper to get cover photo URL or default
+  const getCoverPhoto = () => {
+    if (companyData.coverPhoto) {
+      return companyData.coverPhoto.startsWith('http') ? companyData.coverPhoto : companyData.coverPhoto;
+    }
+    return 'https://cdn.pixabay.com/photo/2023/07/26/16/09/ai-generated-8151978_1280.png';
+  };
+
+  // Helper to get company logo URL or default
+  const getCompanyLogo = () => {
+    if (companyData.companyLogo) {
+      return companyData.companyLogo.startsWith('http') ? companyData.companyLogo : companyData.companyLogo;
+    }
+    return DEFAULT_AVATAR;
+  };
+
   return (
     <div className="dashboard-container">
       {/* Cover Photo and Company Profile Section */}
       <div 
         className="cover-photo" 
         style={{ 
-          backgroundImage: `url(${companyData.companyLogo ? companyData.companyLogo : 'https://cdn.pixabay.com/photo/2023/07/26/16/09/ai-generated-8151978_1280.png'})` 
+          backgroundImage: `url(${getCoverPhoto()})` 
         }}
       >
         <img 
-          src={companyData.companyLogo || '/default-avatar.svg'} 
+          src={getCompanyLogo()} 
           alt="Company Logo" 
           className="profile-pic-large" 
           onError={(e) => {
-            e.target.src = '/default-avatar.svg';
+            e.target.src = DEFAULT_AVATAR;
           }}
         />
       </div>

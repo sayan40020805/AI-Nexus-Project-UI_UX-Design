@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import PostCard from '../../components/PostCard/PostCard';
+import { getUserAvatar, getImageUrl, handleImageError, DEFAULT_AVATAR } from '../../utils/imageUtils';
 import '../../styles/ProfilePage.css';
 import { 
   User, 
@@ -148,9 +149,9 @@ const ProfilePage = () => {
     return userData.username || userData.companyName || 'User';
   };
 
-  const getUserAvatar = (userData) => {
-    if (!userData) return '/default-avatar.svg';
-    return userData.profilePicture || userData.companyLogo || '/default-avatar.svg';
+  const getUserCoverPhoto = (userData) => {
+    if (!userData) return null;
+    return userData.coverPhoto || null;
   };
 
   const getUserBio = (userData) => {
@@ -209,10 +210,19 @@ const ProfilePage = () => {
       <div className="profile-header">
         {/* Cover Photo */}
         <div className="profile-cover">
-          <div className="cover-placeholder">
-            <Camera size={24} />
-            <span>Add Cover Photo</span>
-          </div>
+          {getUserCoverPhoto(profileUser) ? (
+            <img
+              src={getImageUrl(getUserCoverPhoto(profileUser))}
+              alt={`${getUserDisplayName(profileUser)} cover photo`}
+              className="cover-image"
+              onError={(e) => handleImageError(e)}
+            />
+          ) : (
+            <div className="cover-placeholder">
+              <Camera size={24} />
+              <span>Add Cover Photo</span>
+            </div>
+          )}
         </div>
 
         {/* Profile Info */}
@@ -222,7 +232,7 @@ const ProfilePage = () => {
               <img
                 src={getUserAvatar(profileUser)}
                 alt={getUserDisplayName(profileUser)}
-                onError={(e) => { e.target.src = '/default-avatar.svg'; }}
+                onError={(e) => handleImageError(e)}
               />
               {isOwnProfile && (
                 <button className="avatar-edit-btn">

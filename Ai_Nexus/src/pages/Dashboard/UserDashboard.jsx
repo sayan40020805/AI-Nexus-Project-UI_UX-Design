@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { FeedContext } from '../../context/FeedContext';
 import PostCard from '../../components/PostCard/PostCard';
+import { getImageUrl, DEFAULT_AVATAR } from '../../utils/imageUtils';
 import { usePostInteractions } from '../../hooks/usePostInteractions';
 import './Dashboard.css';
 
@@ -15,7 +16,8 @@ const UserDashboard = () => {
     username: '',
     email: '',
     bio: '',
-    profilePicture: ''
+    profilePicture: '',
+    coverPhoto: ''
   });
 
   // Fetch user's posts and profile data
@@ -36,11 +38,13 @@ const UserDashboard = () => {
 
         if (profileResponse.ok) {
           const profileResult = await profileResponse.json();
+          const userData = profileResult.user || {};
           setProfileData({
-            username: profileResult.user?.username || user?.username || 'User',
-            email: profileResult.user?.email || user?.email || '',
-            bio: profileResult.user?.bio || 'AI enthusiast exploring the future of technology',
-            profilePicture: profileResult.user?.profilePicture || user?.profilePicture || ''
+            username: userData.username || user?.username || 'User',
+            email: userData.email || user?.email || '',
+            bio: userData.bio || 'AI enthusiast exploring the future of technology',
+            profilePicture: userData.profilePicture || user?.profilePicture || '',
+            coverPhoto: userData.coverPhoto || user?.coverPhoto || ''
           });
         }
 
@@ -58,14 +62,21 @@ const UserDashboard = () => {
           
           // Format posts for display
           const formattedPosts = userPosts.map(post => ({
-            id: post._id,
-            author: user?.username || 'User',
-            authorPic: user?.profilePicture || '/default-avatar.svg',
+            _id: post._id,
             content: post.content,
-            timestamp: new Date(post.createdAt).toLocaleDateString(),
-            image: (post.media && post.media.images && post.media.images[0]) || (Array.isArray(post.mediaList) && post.mediaList.find(m => m.type === 'image')?.url) || '',
-            likes: post.likes?.length || 0,
-            comments: post.comments?.length || 0,
+            postType: post.postType || 'normal',
+            author: {
+              _id: user._id,
+              username: userData.username || user?.username || 'User',
+              profilePicture: userData.profilePicture || user?.profilePicture || '',
+              role: user?.role || 'user'
+            },
+            media: post.media || {},
+            likes: post.likes || [],
+            comments: post.comments || [],
+            shares: post.shares || [],
+            createdAt: post.createdAt,
+            updatedAt: post.updatedAt
           }));
           
           setPosts(formattedPosts);
@@ -76,8 +87,9 @@ const UserDashboard = () => {
         setProfileData({
           username: user?.username || 'User',
           email: user?.email || '',
-          bio: 'AI enthusiast exploring the future of technology',
-          profilePicture: user?.profilePicture || ''
+          bio: user?.bio || 'AI enthusiast exploring the future of technology',
+          profilePicture: user?.profilePicture || '',
+          coverPhoto: user?.coverPhoto || ''
         });
       } finally {
         setLoading(false);
@@ -194,21 +206,36 @@ const UserDashboard = () => {
     );
   }
 
+  // Helper to get full image URL or default
+  const getCoverPhoto = () => {
+    if (profileData.coverPhoto) {
+      return profileData.coverPhoto.startsWith('http') ? profileData.coverPhoto : profileData.coverPhoto;
+    }
+    return 'https://cdn.pixabay.com/photo/2023/07/26/16/09/ai-generated-8151978_1280.png';
+  };
+
+  const getProfilePicture = () => {
+    if (profileData.profilePicture) {
+      return profileData.profilePicture.startsWith('http') ? profileData.profilePicture : profileData.profilePicture;
+    }
+    return DEFAULT_AVATAR;
+  };
+
   return (
     <div className="dashboard-container">
       {/* Cover Photo and Profile Section */}
       <div 
         className="cover-photo" 
         style={{ 
-          backgroundImage: `url(${profileData.profilePicture ? profileData.profilePicture : 'https://cdn.pixabay.com/photo/2023/07/26/16/09/ai-generated-8151978_1280.png'})` 
+          backgroundImage: `url(${getCoverPhoto()})` 
         }}
       >
         <img 
-          src={profileData.profilePicture || '/default-avatar.svg'} 
+          src={getProfilePicture()} 
           alt="Profile" 
           className="profile-pic-large" 
           onError={(e) => {
-            e.target.src = '/default-avatar.svg';
+            e.target.src = DEFAULT_AVATAR;
           }}
         />
       </div>

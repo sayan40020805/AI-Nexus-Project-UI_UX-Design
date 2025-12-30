@@ -75,6 +75,7 @@ router.get('/profile', async (req, res) => {
     const userObj = user.toObject();
     if (userObj.profilePicture) userObj.profilePicture = `${baseUrl}${userObj.profilePicture}`;
     if (userObj.companyLogo) userObj.companyLogo = `${baseUrl}${userObj.companyLogo}`;
+    if (userObj.coverPhoto) userObj.coverPhoto = `${baseUrl}${userObj.coverPhoto}`;
 
     res.json({ user: userObj });
   } catch (err) {
@@ -124,6 +125,7 @@ router.put('/profile', upload.single('profilePicture'), async (req, res) => {
 router.get('/posts', async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
     
     const posts = await Post.find({ author: req.user.id })
       .populate('author', 'username profilePicture role')
@@ -134,10 +136,14 @@ router.get('/posts', async (req, res) => {
     const total = await Post.countDocuments({ author: req.user.id });
 
     // Prefix media paths with base URL and provide mediaList
-    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
     const postsWithMedia = posts.map(p => {
       const obj = p.toObject();
       obj.mediaList = [];
+      // Format profile picture with full URL
+      if (obj.author && obj.author.profilePicture) {
+        obj.author.profilePicture = `${baseUrl}${obj.author.profilePicture}`;
+      }
+      // Format post media
       if (obj.media) {
         if (Array.isArray(obj.media.images) && obj.media.images.length) {
           obj.media.images = obj.media.images.map(img => `${baseUrl}${img}`);

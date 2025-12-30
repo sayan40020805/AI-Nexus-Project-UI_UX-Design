@@ -46,6 +46,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
+  coverPhoto: {
+    type: String,
+    default: '',
+  },
   // Company-specific fields
   companyName: {
     type: String,
